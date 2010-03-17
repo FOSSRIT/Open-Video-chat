@@ -4,6 +4,7 @@ from sugar.activity.activity import Activity, ActivityToolbox
 import gtk
 import gst
 
+from sugar.graphics.alert import NotifyAlert, Alert
 
 V_SOURCE = "v4l2src"
 #V_SOURCE = "videotestsrc"
@@ -23,7 +24,7 @@ class OpenVideoChatActivity(Activity):
 
         # INITIALIZE GUI
         ################
-        self.set_title('File Share')
+        self.set_title('OpenVideoChat')
 
         # Build Toolbars
         ################
@@ -47,8 +48,8 @@ class OpenVideoChatActivity(Activity):
         hbox.add(gtk.Label())
 
         # Connect to shared and join calls
-        #self._sh_hnd = self.connect('shared', self._shared_cb)
-        #self._jo_hnd = self.connect('joined', self._joined_cb)
+        self._sh_hnd = self.connect('shared', self._shared_cb)
+        self._jo_hnd = self.connect('joined', self._joined_cb)
 
         self.setup_gst_pipeline()
 
@@ -94,3 +95,21 @@ class OpenVideoChatActivity(Activity):
             imagesink = message.src
             imagesink.set_property("force-aspect-ratio", True)
             imagesink.set_xwindow_id(self.movie_window.window.xid)
+
+
+    def _alert(self, title, text=None, timeout=5):
+        alert = NotifyAlert(timeout=timeout)
+        alert.props.title = title
+        alert.props.msg = text
+        self.add_alert(alert)
+        alert.connect('response', self._alert_cancel_cb)
+        alert.show()
+
+    def _alert_cancel_cb(self, alert, response_id):
+        self.activity.remove_alert(alert)
+
+    def _shared_cb(self, activity):
+        self._alert("Activity Shared", "The activity has been shared")
+
+    def _joined_cb(self, activity):
+        self._alert("Activity Joined", "Someone has joined the activity")
