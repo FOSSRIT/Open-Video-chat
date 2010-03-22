@@ -7,8 +7,8 @@ import gobject
 
 from sugar.graphics.alert import NotifyAlert, Alert
 
-from Gui import Gui
-from SugarNetworkStack import SugarNetworkStack
+from gui import Gui
+from sugar_network_stack import SugarNetworkStack
 
 V_SOURCE = "v4l2src"
 #V_SOURCE = "videotestsrc"
