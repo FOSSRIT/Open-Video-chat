@@ -3,5 +3,5 @@ name = Open Video Chat
 activity_version = 1
 icon = activity-video_chat
 service_name = org.laptop.OpenVideoChat
-class = OpenVideoChat.OpenVideoChatActivity
+class = ovc.OpenVideoChatActivity
 show_launcher = 1
