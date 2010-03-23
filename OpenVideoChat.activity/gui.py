@@ -30,7 +30,9 @@ class Gui( gtk.VBox ):
 
         # Send button to complete feel of a chat program
         self.chat_entry = gtk.Entry()
+        self.chat_entry.connect("activate",self.send_chat)
         send_but = gtk.Button( _("Send") )
+        send_but.connect("clicked", self.send_chat)
 
         # Wrap button and entry in hbox so they are on the same line
         chat_entry_hbox = gtk.HBox()
@@ -44,6 +46,11 @@ class Gui( gtk.VBox ):
         # Show gui
         self.build_toolbars()
         self.show_all()
+
+    def send_chat(self, w):
+        if self.chat_entry.get_text != "":
+            self.activity.send_chat_text( self.chat_entry.get_text() )
+            self.chat_entry.set_text("")
 
     def build_toolbars(self):
         self.settings_bar = gtk.Toolbar()
