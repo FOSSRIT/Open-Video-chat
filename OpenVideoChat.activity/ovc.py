@@ -30,12 +30,6 @@ class OpenVideoChatActivity(Activity):
         ################
         self.set_title('OpenVideoChat')
 
-        # Build Toolbars
-        ################
-        self.toolbox = ActivityToolbox(self)
-        self.toolbox.show()
-        self.set_toolbox(self.toolbox)
-
         # Setup Network Stack
         #####################
         self.netstack = SugarNetworkStack(self)
@@ -44,7 +38,7 @@ class OpenVideoChatActivity(Activity):
 
         # Setup Gui
         ###########
-        self.gui = Gui()
+        self.gui = Gui(self)
         self.gui.show()
         self.set_canvas(self.gui)
 
