@@ -19,7 +19,6 @@ class TubeSpeak(ExportedGObject):
             self.tube.add_signal_receiver(self.receive_chat_text_cb,
                 'send_chat_text', IFACE, path=PATH, sender_keyword='sender')
 
-            #self.send_chat_text("TESTING A MESSAGE TO BE SENT")
 
     @signal(dbus_interface=IFACE, signature='s')
     def send_chat_text(self, text):

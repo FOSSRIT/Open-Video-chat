@@ -106,3 +106,7 @@ class OpenVideoChatActivity(Activity):
         """
         self._alert( "NETWORK TALK", src )
 
+    def send_chat_text(self, text):
+        handle = self.netstack.get_tube_handle()
+        if handle:
+            handle.send_chat_text( text )

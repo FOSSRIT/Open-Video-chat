@@ -9,6 +9,7 @@ PATH = "/org/laptop/OpenVideoChat"
 class SugarNetworkStack:
     def __init__(self, activity):
         self.__activity = activity
+        self.controlTube = None
 
     def joined_cb(self, activity):
         """
@@ -69,3 +70,7 @@ class SugarNetworkStack:
         #        # Data tube, store for later
         #        _logger.debug("New data tube added")
         #        self.unused_download_tubes.add(id)
+
+    def get_tube_handle(self):
+        if self.controlTube:
+            return self.controlTube
