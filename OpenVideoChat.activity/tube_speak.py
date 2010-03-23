@@ -18,6 +18,7 @@ class TubeSpeak(ExportedGObject):
         if self.connected:
             self.tube.add_signal_receiver(self.receive_chat_text_cb,
                 'send_chat_text', IFACE, path=PATH, sender_keyword='sender')
+            self.connected = True
 
 
     @signal(dbus_interface=IFACE, signature='s')
