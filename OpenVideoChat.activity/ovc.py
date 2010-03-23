@@ -55,6 +55,10 @@ class OpenVideoChatActivity(Activity):
         #self.start_stop( True )
 
 
+    def can_close( self ):
+        self.start_stop(False)
+        return True
+
     def setup_gst_pipeline(self):
         # Set up the gstreamer pipeline
         self.player = gst.parse_launch ( GST_PIPE )
@@ -85,7 +89,6 @@ class OpenVideoChatActivity(Activity):
         if message.structure is None:
             return
         message_name = message.structure.get_name()
-        self._alert(message_name)
         if message_name == "prepare-xwindow-id":
             # Assign the viewport
             imagesink = message.src
@@ -102,4 +105,10 @@ class OpenVideoChatActivity(Activity):
 
     def _alert_cancel_cb(self, alert, response_id):
         self.remove_alert(alert)
+
+    def net_cb(self, src, args):
+        """
+        Callback for network commands
+        """
+        self._alert( "NETWORK TALK", src )
 
