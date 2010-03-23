@@ -15,14 +15,12 @@ class SugarNetworkStack:
         """
         Called when joining an existing activity
         """
-        self.__activity._alert("Activity Joined", "Joined Activity")
         self.watch_for_tubes()
 
     def shared_cb(self, activity):
         """
         Called when setting an activity to be shared
         """
-        self.__activity._alert("Activity Shared", "The activity has been shared")
         self.watch_for_tubes()
 
         # Offer DBus Tube

@@ -104,7 +104,12 @@ class OpenVideoChatActivity(Activity):
         """
         Callback for network commands
         """
-        self._alert( "NETWORK TALK", src )
+        if src == "chat":
+            message, sender = args
+            self._alert( "Message From %s" % str(sender), message  )
+
+        elif src == "join":
+            self._alert( "Net Join from %s" % str(args) )
 
     def send_chat_text(self, text):
         handle = self.netstack.get_tube_handle()
