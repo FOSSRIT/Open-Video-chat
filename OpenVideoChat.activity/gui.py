@@ -29,7 +29,7 @@ class Gui( gtk.VBox ):
         chat_history = gtk.ScrolledWindow()
         chat_history.set_policy( gtk.POLICY_NEVER,gtk.POLICY_AUTOMATIC )
         
-        self.chat_text = gtk.TextBuffer( NONE )
+        self.chat_text = gtk.TextBuffer()
         text_view = gtk.TextView( self.chat_text )
         
         chat_history.add( text_view )
