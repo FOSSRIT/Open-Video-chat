@@ -31,6 +31,7 @@ class Gui( gtk.VBox ):
         
         self.chat_text = gtk.TextBuffer()
         text_view = gtk.TextView( self.chat_text )
+        text_view.set_editable( False )
         
         chat_history.add( text_view )
         
@@ -55,7 +56,7 @@ class Gui( gtk.VBox ):
 
     def add_chat_text( self, text ):
         
-        self.chat_text.insert( self.chat_text.get_end_iter(), text ) 
+        self.chat_text.insert( self.chat_text.get_end_iter(), "%s\n" % text ) 
         
     def send_chat(self, w):
         if self.chat_entry.get_text != "":
