@@ -34,7 +34,7 @@ class Gui( gtk.VBox ):
         self.text_view.set_editable( False )
         self.text_view.set_size_request( -1, 200 )
         
-        chat_history.add( text_view )
+        chat_history.add( self.text_view )
         
         # Send button to complete feel of a chat program
         self.chat_entry = gtk.Entry()
