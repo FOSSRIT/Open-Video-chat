@@ -108,6 +108,7 @@ class OpenVideoChatActivity(Activity):
         if src == "chat":
             message, sender = args
             self._alert( "Message From %s" % str(sender), message  )
+            self.gui.add_chat_text( message )
 
         elif src == "join":
             self._alert( "Net Join from %s" % str(args) )
