@@ -109,6 +109,7 @@ class OpenVideoChatActivity(Activity):
             message, sender = args
             buddy = self.netstack._get_buddy(sender)
             self._alert( "Message From %s" % str(buddy), message  )
+            self.gui.add_chat_text( message )
 
         elif src == "join":
             self._alert( "Net Join from %s" % str(args) )

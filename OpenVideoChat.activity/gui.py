@@ -26,8 +26,14 @@ class Gui( gtk.VBox ):
         chat_expander.add(chat_holder)
 
         # Create entry and history view for chat
-        self.chat_history = gtk.Label("Chat History Here")
-
+        chat_history = gtk.ScrolledWindow()
+        chat_history.set_policy( gtk.POLICY_NEVER,gtk.POLICY_AUTOMATIC )
+        
+        self.chat_text = gtk.TextBuffer( NONE )
+        text_view = gtk.TextView( self.chat_text )
+        
+        chat_history.add( text_view )
+        
         # Send button to complete feel of a chat program
         self.chat_entry = gtk.Entry()
         self.chat_entry.connect("activate",self.send_chat)
@@ -40,13 +46,17 @@ class Gui( gtk.VBox ):
         chat_entry_hbox.pack_end( send_but, False )
 
         # Add chat history and entry to expander
-        chat_holder.pack_start( self.chat_history )
+        chat_holder.pack_start( chat_history )
         chat_holder.pack_start( chat_entry_hbox, False )
 
         # Show gui
         self.build_toolbars()
         self.show_all()
 
+    def add_chat_text( self, text ):
+        
+        self.chat_text.insert( self.chat_text.get_end_iter(), text ) 
+        
     def send_chat(self, w):
         if self.chat_entry.get_text != "":
             self.activity.send_chat_text( self.chat_entry.get_text() )
