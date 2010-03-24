@@ -32,6 +32,7 @@ class Gui( gtk.VBox ):
         self.chat_text = gtk.TextBuffer()
         text_view = gtk.TextView( self.chat_text )
         text_view.set_editable( False )
+        text_view.set_size_request( -1, 200 )
         
         chat_history.add( text_view )
         
