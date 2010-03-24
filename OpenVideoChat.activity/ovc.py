@@ -16,7 +16,8 @@ V_SOURCE = "v4l2src"
 V_SIZE = "width=320,height=240"
 
 #GST_PIPE = "v4l2src ! autovideosink"
-GST_PIPE = V_SOURCE  + " ! videoscale ! video/x-raw-yuv," + V_SIZE + " ! ffmpegcolorspace ! ximagesink force-aspect-ratio=true name=xsink"
+#GST_PIPE = V_SOURCE  + " ! videoscale ! video/x-raw-yuv," + V_SIZE + " ! ffmpegcolorspace ! ximagesink force-aspect-ratio=true name=xsink"
+GST_PIPE = V_SOURCE  + " ! ffmpegcolorspace ! ximagesink force-aspect-ratio=true name=xsink"
 
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
@@ -106,7 +107,8 @@ class OpenVideoChatActivity(Activity):
         """
         if src == "chat":
             message, sender = args
-            self._alert( "Message From %s" % str(sender), message  )
+            buddy = self.netstack._get_buddy(sender)
+            self._alert( "Message From %s" % str(buddy), message  )
 
         elif src == "join":
             self._alert( "Net Join from %s" % str(args) )
