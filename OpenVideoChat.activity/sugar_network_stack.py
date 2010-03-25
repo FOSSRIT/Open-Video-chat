@@ -24,7 +24,7 @@ class SugarNetworkStack:
             nick = '???'
         self.__activity.net_cb('buddy_add', nick)
 
-    def rem_buddy(self, buddy)
+    def rem_buddy(self, buddy):
         """
         Passes buddy nick to ovc
         """
