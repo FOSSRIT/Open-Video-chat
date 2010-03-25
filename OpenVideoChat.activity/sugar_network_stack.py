@@ -22,7 +22,25 @@ class SugarNetworkStack:
             nick = buddy.props.nick
         else:
             nick = '???'
-        self.__activity.net_cb('buddy', nick)
+        self.__activity.net_cb('buddy_add', nick)
+
+    def rem_buddy(self, buddy)
+        """
+        Passes buddy nick to ovc
+        """
+        if buddy:
+            nick = buddy.props.nick
+        else:
+            nick = '???'
+        self.__activity.net_cb('buddy_rem', nick)
+
+    def _buddy_joined_cb(self, activity, buddy):
+        """Called when a buddy joins the shared activity."""
+        self.add_buddy( buddy )
+
+    def _buddy_left_cb(self, activity, buddy):
+        """Called when a buddy leaves the shared activity."""
+        self.rem_buddy(buddy)
 
     def joined_cb(self, activity):
         """
@@ -30,7 +48,7 @@ class SugarNetworkStack:
         """
         for buddy in self.__activity.shared_activity.get_joined_buddies():
             self.add_buddy(buddy)
-        
+
         self.watch_for_tubes()
 
     def shared_cb(self, activity):
@@ -56,6 +74,10 @@ class SugarNetworkStack:
         self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].ListTubes(
             reply_handler=self._list_tubes_reply_cb,
             error_handler=self._list_tubes_error_cb)
+
+        # Register budy join/leave
+        self.activity.__shared_activity.connect('buddy-joined', self._buddy_joined_cb)
+        self.activity.__shared_activity.connect('buddy-left', self._buddy_left_cb)
 
     def _list_tubes_reply_cb(self, tubes):
         """
