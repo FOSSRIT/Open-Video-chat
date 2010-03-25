@@ -11,10 +11,25 @@ class SugarNetworkStack:
         self.__activity = activity
         self.controlTube = None
 
+    def add_buddy(self, buddy):
+        """
+        Passes buddy nick to ovc
+        """
+        if buddy == self.presenceservice.get_instance().get_owner():
+            return
+        if buddy:
+            nick = buddy.props.nick
+        else:
+            nick = '???'
+        self.__activity.net_cb('buddy', nick)
+
     def joined_cb(self, activity):
         """
         Called when joining an existing activity
         """
+        for buddy in self.shared_activity.get_joined_buddies():
+            self.add_buddy(buddy)
+        
         self.watch_for_tubes()
 
     def shared_cb(self, activity):

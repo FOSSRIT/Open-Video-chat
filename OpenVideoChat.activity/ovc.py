@@ -31,17 +31,17 @@ class OpenVideoChatActivity(Activity):
         ################
         self.set_title('OpenVideoChat')
 
-        # Setup Network Stack
-        #####################
-        self.netstack = SugarNetworkStack(self)
-        self._sh_hnd = self.connect('shared', self.netstack.shared_cb)
-        self._jo_hnd = self.connect('joined', self.netstack.joined_cb)
-
         # Setup Gui
         ###########
         self.gui = Gui(self)
         self.gui.show()
         self.set_canvas(self.gui)
+
+        # Setup Network Stack
+        #####################
+        self.netstack = SugarNetworkStack(self)
+        self._sh_hnd = self.connect('shared', self.netstack.shared_cb)
+        self._jo_hnd = self.connect('joined', self.netstack.joined_cb)
 
         # Setup Pipeline
         #################
@@ -107,10 +107,13 @@ class OpenVideoChatActivity(Activity):
         """
         if src == "chat":
             message, sender = args
-            self.gui.add_chat_text( message )
+            self.gui.add_chat_text(message)
 
         elif src == "join":
             self._alert( "Net Join from %s" % str(args) )
+            
+        elif src == "buddy":
+			self.gui.add_chat_text(_("%s has joined chat") % args)
 
     def send_chat_text(self, text):
         handle = self.netstack.get_tube_handle()
