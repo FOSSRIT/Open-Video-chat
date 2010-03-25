@@ -76,8 +76,8 @@ class SugarNetworkStack:
             error_handler=self._list_tubes_error_cb)
 
         # Register budy join/leave
-        self.__activity.__shared_activity.connect('buddy-joined', self._buddy_joined_cb)
-        self.__activity.__shared_activity.connect('buddy-left', self._buddy_left_cb)
+        self.__activity._shared_activity.connect('buddy-joined', self._buddy_joined_cb)
+        self.__activity._shared_activity.connect('buddy-left', self._buddy_left_cb)
 
     def _list_tubes_reply_cb(self, tubes):
         """
