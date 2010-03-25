@@ -111,9 +111,12 @@ class OpenVideoChatActivity(Activity):
 
         elif src == "join":
             self._alert( "Net Join from %s" % str(args) )
-            
-        elif src == "buddy":
-			self.gui.add_chat_text(_("%s has joined chat") % args)
+
+        elif src == "buddy_add":
+            self.gui.add_chat_text(_("%s has joined the chat") % args)
+
+        elif src == "buddy_rem":
+            self.gui.add_chat_text(_("%s has left the chat") % args)
 
     def send_chat_text(self, text):
         handle = self.netstack.get_tube_handle()
