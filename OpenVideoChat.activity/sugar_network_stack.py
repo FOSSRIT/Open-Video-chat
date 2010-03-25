@@ -1,5 +1,6 @@
 import telepathy
 from sugar.presence.tubeconn import TubeConnection
+from sugar.presence import presenceservice
 from tube_speak import TubeSpeak
 
 SERVICE = "org.laptop.OpenVideoChat"
@@ -15,7 +16,7 @@ class SugarNetworkStack:
         """
         Passes buddy nick to ovc
         """
-        if buddy == self.presenceservice.get_instance().get_owner():
+        if buddy == presenceservice.get_instance().get_owner():
             return
         if buddy:
             nick = buddy.props.nick
@@ -27,7 +28,7 @@ class SugarNetworkStack:
         """
         Called when joining an existing activity
         """
-        for buddy in self.shared_activity.get_joined_buddies():
+        for buddy in self.__activity.shared_activity.get_joined_buddies():
             self.add_buddy(buddy)
         
         self.watch_for_tubes()
