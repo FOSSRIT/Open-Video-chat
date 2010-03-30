@@ -43,7 +43,7 @@ class TubeSpeak(ExportedGObject):
     def announce_join_cb(self, sender=None):
         self.cb('join', None)
 
-    def announce_ip_cb(self, ip, sender=None)
+    def announce_ip_cb(self, ip, sender=None):
         if sender != self.tube.get_unique_name():
             self.cb('ip', ip)
 
