@@ -12,7 +12,7 @@ from sugar_network_stack import SugarNetworkStack
 from sugar import profile
 
 GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! ximagesink"
-GST_OUTPIPE_BASE = "v4l2src ! theoraenc bitrate=5000 speed-level=2 ! udpsink host=%s"
+GST_OUTPIPE_BASE = "v4l2src ! theoraenc bitrate=50 speed-level=2 keyframe-force=1 ! udpsink host=%s"
 
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
