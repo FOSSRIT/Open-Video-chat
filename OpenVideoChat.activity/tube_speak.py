@@ -7,6 +7,7 @@ PATH = "/org/laptop/OpenVideoChat"
 
 # http://code.activestate.com/recipes/439094-get-the-ip-address-associated-with-a-network-inter/
 def get_ip_address(ifname):
+    import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
