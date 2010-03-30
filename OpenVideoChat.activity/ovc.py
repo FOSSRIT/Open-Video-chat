@@ -9,6 +9,7 @@ from sugar.graphics.alert import NotifyAlert, Alert
 
 from gui import Gui
 from sugar_network_stack import SugarNetworkStack
+from sugar import profile
 
 V_SOURCE = "v4l2src"
 #V_SOURCE = "videotestsrc"
@@ -120,5 +121,7 @@ class OpenVideoChatActivity(Activity):
 
     def send_chat_text(self, text):
         handle = self.netstack.get_tube_handle()
+        prof = profile.get_nick_name()
+        
         if handle:
-            handle.send_chat_text( text )
+            handle.send_chat_text( "<%s> %s" % (prof, text)

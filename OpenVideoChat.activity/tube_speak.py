@@ -1,6 +1,5 @@
 from dbus.service import method, signal
 from dbus.gobject_service import ExportedGObject
-from sugar import profile
 
 SERVICE = "org.laptop.OpenVideoChat"
 IFACE = SERVICE
@@ -32,10 +31,7 @@ class TubeSpeak(ExportedGObject):
 
     @signal(dbus_interface=IFACE, signature='s')
     def send_chat_text(self, text):
-        
-        prof = profile.get_nick_name()
-        
-        self.text = "<%s> %s" % (prof, text)
+        self.text = text
 
     def announce_join_cb(self, sender=None):
         self.cb('join', sender)
