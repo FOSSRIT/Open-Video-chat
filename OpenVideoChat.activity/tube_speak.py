@@ -1,5 +1,6 @@
 from dbus.service import method, signal
 from dbus.gobject_service import ExportedGObject
+from sugar import profile
 
 SERVICE = "org.laptop.OpenVideoChat"
 IFACE = SERVICE
@@ -40,5 +41,7 @@ class TubeSpeak(ExportedGObject):
         # Ignore our own messages
         #if sender == self.tube.get_unique_name():
         #    return
+
+        sender = profile.get_nick_name()
 
         self.cb('chat', (text, sender) )
