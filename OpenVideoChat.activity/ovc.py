@@ -11,14 +11,8 @@ from gui import Gui
 from sugar_network_stack import SugarNetworkStack
 from sugar import profile
 
-V_SOURCE = "v4l2src"
-#V_SOURCE = "videotestsrc"
-
-V_SIZE = "width=320,height=240"
-
-#GST_PIPE = "v4l2src ! autovideosink"
-#GST_PIPE = V_SOURCE  + " ! videoscale ! video/x-raw-yuv," + V_SIZE + " ! ffmpegcolorspace ! ximagesink force-aspect-ratio=true name=xsink"
-GST_PIPE = V_SOURCE  + " ! ffmpegcolorspace ! ximagesink force-aspect-ratio=true name=xsink"
+GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! ximagesink"
+GST_OUTPIPE_BASE = "v4l2src ! videorate ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! theoraenc bitrate=5000 speed-level=2 ! udpsink host=127.0.0.1 port=%s"
 
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
@@ -57,13 +51,17 @@ class OpenVideoChatActivity(Activity):
 
     def setup_gst_pipeline(self):
         # Set up the gstreamer pipeline
-        self.player = gst.parse_launch ( GST_PIPE )
+        self.player = gst.parse_launch ( GST_INPIPE )
 
         bus = self.player.get_bus()
         bus.add_signal_watch()
         bus.enable_sync_message_emission()
         bus.connect("message", self.on_message)
         bus.connect("sync-message::element", self.on_sync_message)
+
+    def setup_outgoing_pipeline(self, ip):
+        self.out = gst.parse_launch ( GST_OUTPIPE_BASE % ip )
+        self.out.set_state(gst.STATE_PLAYING)
 
 
     def start_stop(self, start=True):
@@ -112,6 +110,8 @@ class OpenVideoChatActivity(Activity):
 
         elif src == "join":
             self._alert( "Net Join from %s" % str(args) )
+            self.setup_outgoing_pipeline( args )
+
 
         elif src == "buddy_add":
             self.gui.add_chat_text(_("%s has joined the chat") % args)
