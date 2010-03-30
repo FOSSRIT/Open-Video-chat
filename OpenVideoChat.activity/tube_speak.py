@@ -32,7 +32,10 @@ class TubeSpeak(ExportedGObject):
 
     @signal(dbus_interface=IFACE, signature='s')
     def send_chat_text(self, text):
-        self.text = text
+        
+        prof = profile.get_nick_name()
+        
+        self.text = "<%s> %s" % (prof, text)
 
     def announce_join_cb(self, sender=None):
         self.cb('join', sender)
@@ -41,7 +44,5 @@ class TubeSpeak(ExportedGObject):
         # Ignore our own messages
         #if sender == self.tube.get_unique_name():
         #    return
-
-        sender = profile.get_nick_name()
 
         self.cb('chat', (text, sender) )
