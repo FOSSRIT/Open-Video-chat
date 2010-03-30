@@ -124,4 +124,4 @@ class OpenVideoChatActivity(Activity):
         prof = profile.get_nick_name()
         
         if handle:
-            handle.send_chat_text( "<%s> %s" % (prof, text)
+            handle.send_chat_text( "<%s> %s" % (prof, text) )
