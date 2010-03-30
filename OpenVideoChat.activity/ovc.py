@@ -108,9 +108,24 @@ class OpenVideoChatActivity(Activity):
             self.gui.add_chat_text(message)
 
         elif src == "join":
-            self._alert( "Net Join from %s" % str(args) )
-            self.setup_outgoing_pipeline( args )
+            handle = self.netstack.get_tube_handle()
+            if handle:
+                # http://code.activestate.com/recipes/439094-get-the-ip-address-associated-with-a-network-inter/
+                def get_ip_address(ifname):
+                    import socket
+                    import fcntl
+                    import struct
+                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    return socket.inet_ntoa(fcntl.ioctl(
+                        s.fileno(),
+                        0x8915,  # SIOCGIFADDR
+                        struct.pack('256s', ifname[:15])
+                    )[20:24])
 
+                handle.announce_ip(get_ip_address('eth0'))
+
+        elif src == "ip":
+            self.setup_outgoing_pipeline( args )
 
         elif src == "buddy_add":
             self.gui.add_chat_text(_("%s has joined the chat") % args)

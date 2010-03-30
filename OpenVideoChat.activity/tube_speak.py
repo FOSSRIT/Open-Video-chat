@@ -5,18 +5,6 @@ SERVICE = "org.laptop.OpenVideoChat"
 IFACE = SERVICE
 PATH = "/org/laptop/OpenVideoChat"
 
-# http://code.activestate.com/recipes/439094-get-the-ip-address-associated-with-a-network-inter/
-def get_ip_address(ifname):
-    import socket
-    import fcntl
-    import struct
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
-
 class TubeSpeak(ExportedGObject):
     def __init__(self, tube, cb):
         super(TubeSpeak, self).__init__(tube, PATH)
@@ -34,19 +22,30 @@ class TubeSpeak(ExportedGObject):
             self.tube.add_signal_receiver(self.announce_join_cb, 'announce_join', IFACE,
                 path=PATH, sender_keyword='sender')
 
+            self.tube.add_signal_receiver(self.announce_ip_cb, 'announce_ip', IFACE,
+                path=PATH, sender_keyword='sender')
+
             self.connected = True
-            self.announce_join(get_ip_address('eth0'))
+            self.announce_join()
 
     @signal(dbus_interface=IFACE, signature='')
-    def announce_join(self, ip):
+    def announce_join(self):
+        pass
+
+    @signal(dbus_interface=IFACE, signature='s')
+    def announce_ip(self, ip):
         self.ip = ip
 
     @signal(dbus_interface=IFACE, signature='s')
     def send_chat_text(self, text):
         self.text = text
 
-    def announce_join_cb(self, ip, sender=None):
-        self.cb('join', ip)
+    def announce_join_cb(self, sender=None):
+        self.cb('join', None)
+
+    def announce_ip_cb(self, ip, sender=None)
+        if sender != self.tube.get_unique_name():
+            self.cb('ip', ip)
 
     def receive_chat_text_cb(self, text, sender=None):
         # Ignore our own messages
