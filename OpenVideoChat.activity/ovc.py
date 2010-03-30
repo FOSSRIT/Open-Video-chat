@@ -12,7 +12,7 @@ from sugar_network_stack import SugarNetworkStack
 from sugar import profile
 
 GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! ximagesink"
-GST_OUTPIPE_BASE = "v4l2src ! videorate ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! theoraenc bitrate=5000 speed-level=2 ! udpsink host=%s"
+GST_OUTPIPE_BASE = "v4l2src ! theoraenc bitrate=5000 speed-level=2 ! udpsink host=%s"
 
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
@@ -137,6 +137,6 @@ class OpenVideoChatActivity(Activity):
     def send_chat_text(self, text):
         handle = self.netstack.get_tube_handle()
         prof = profile.get_nick_name()
-        
+
         if handle:
             handle.send_chat_text( "<%s> %s" % (prof, text) )
