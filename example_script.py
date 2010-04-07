@@ -313,8 +313,8 @@ class TfListener(object):
             source = gst.parse_bin_from_description (AUDIO_SRC, True) 
         
         elif type == farsight.MEDIA_TYPE_VIDEO:
-            if mode == "master":
-				source = gst.parse_bin_from_description ( VIDEO_SRC, True)
+            #if mode == "master":
+	    source = gst.parse_bin_from_description ( VIDEO_SRC, True)
     
         self.pipeline.add(source)        
         source.get_pad("src").link(stream.get_property("sink-pad"))        
