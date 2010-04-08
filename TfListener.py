@@ -22,23 +22,6 @@ License along with this library; if not, write to the
 Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 
-@Usage:
-Just run two clients, one with "slave" parameter and seconds with "master"
-parameter (master account initiate the call or slave accept the call).
-
-@Scenario:
-We start by connect each accounts (first the slave and then the master).
-    (see function on_status_changed_user)
-When accounts are connected, we enable CHANNEL_TYPE_STREAMED_MEDIA capabilities
-    (see function function enable_capabilities)
-on it and MASTER create a telepathy account.
-    (see function function create_telepathy_channel)
-
-When the channel CHANNEL_TYPE_STREAMED_MEDIA is created and ready
-(received by each contacts), we create an TfListener. But only the MASTER
-offer a stream on it for SLAVE. SLAVE look if some streams already exists
-on the telepathy channel and in this case, we accept the stream.
-
 TfListener is a component which encapsulate farsight management (session
 creation, stream creation, src pad adding, etc.).
 
@@ -61,21 +44,15 @@ If all works (codec negotiation and other things), we get 'src-pad-added' which
 call __on_src_pad_added.
     On signal "src-pad-added", we display stream's view
 """
-
 import pygst
 pygst.require('0.10')
-import os
+
+import sys, os
+import gobject, dbus.glib
 import tpfarsight
 import farsight, gst
 
 os.environ["GST_PLUGIN_PATH"] = "/usr/local/lib/gstreamer-0.10"
-
-#autovideosrc should choose v4l2src
-VIDEO_SRC = "autovideosrc ! videoscale ! video/x-raw-yuv,width=320,height=240  ! ffmpegcolorspace "
-VIDEO_SINK= "autovideosink"
-AUDIO_SRC = "autoaudiosrc"
-AUDIO_QUEUE_SINK= "queue ! audioconvert ! audioresample ! audioconvert ! autoaudiosink"
-
 
 ##
 ## Debugging
@@ -97,9 +74,7 @@ def debug_callback(self, *args, **kwargs):
     # Print all kwarg
     for kwarg in kwargs:
         print "\t[kwarg]%s: %s" % (kwarg, kwargs[kwarg])
-        
-
-##################################################        
+             
 class TfListener(object):
     """
     TfListener is a component which encapsulate farsight management (session
@@ -207,11 +182,12 @@ class TfListener(object):
         # creating src pipes
         type = stream.get_property ("media-type")
         if type == farsight.MEDIA_TYPE_AUDIO:
-            source = gst.parse_bin_from_description (AUDIO_SRC, True) 
+            source = gst.parse_bin_from_description (
+                            "autoaudiosrc", True) 
         
         elif type == farsight.MEDIA_TYPE_VIDEO:
-            #if mode == "master":
-            source = gst.parse_bin_from_description ( VIDEO_SRC, True)
+                source = gst.parse_bin_from_description (
+                    "v4l2src ! ffmpegcolorspace ! videoscale ! video/x-raw-yuv,width=320,height=240  ! ffmpegcolorspace", True)
     
         self.pipeline.add(source)        
         source.get_pad("src").link(stream.get_property("sink-pad"))        
@@ -228,7 +204,7 @@ class TfListener(object):
         
         type = stream.get_property ("media-type")
         if type == farsight.MEDIA_TYPE_AUDIO:
-            queue_sink = gst.parse_bin_from_description( AUDIO_QUEUE_SINK, True)
+            queue_sink = gst.parse_bin_from_description("queue ! audioconvert ! audioresample ! audioconvert ! autoaudiosink", True)
             
             audioadder = gst.element_factory_make("liveadder")
             tee = gst.element_factory_make("tee")
@@ -245,10 +221,7 @@ class TfListener(object):
         elif type == farsight.MEDIA_TYPE_VIDEO:
             queue_ff = gst.parse_bin_from_description("queue ! ffmpegcolorspace", True)
 
-            if USE_CLUTTER_TO_DISPLAY:
-                sink = cluttergst.VideoSink(video_texture)
-            else:
-                sink = gst.parse_bin_from_description( VIDEO_SINK, True)
+            sink = gst.parse_bin_from_description("videoscale ! video/x-raw-yuv,width=320,height=240 ! autovideosink", True)
             
             videofunnel = gst.element_factory_make("fsfunnel")
             tee = gst.element_factory_make("tee")

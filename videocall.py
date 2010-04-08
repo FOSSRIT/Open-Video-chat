@@ -138,7 +138,4 @@ if __name__ == '__main__':
                       
     VideoCall(master, parameters, contact)
     loop = gobject.MainLoop()
-    try:
-        loop.run()
-    except:
-        pass
+    loop.run()
