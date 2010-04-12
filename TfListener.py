@@ -54,14 +54,6 @@ import farsight, gst
 
 os.environ["GST_PLUGIN_PATH"] = "/usr/local/lib/gstreamer-0.10"
 
-##
-## Debugging
-##
-#os.environ["GST_DEBUG"] = "fsrtp*:5"
-#os.environ["GST_DEBUG"] = "1,fs*:2,rtp*:1"
-#os.environ["GST_DEBUG"] = "*PAD*:5,*bin*:5"
-
-##################################################
 def debug_callback(self, *args, **kwargs):
     """
     Debug function for unused signal    
@@ -101,16 +93,16 @@ class TfListener(object):
         
         # We create a tfChannel linked with the telepathy channel path.
         self.tf_channel = tpfarsight.Channel(
-                                     connection_busname=self.conn.service_name,
-                                     connection_path=self.conn.object_path,
-                                     channel_path=chan_object_path)
+                                connection_busname=self.conn.service_name,
+                                connection_path=self.conn.object_path,
+                                channel_path=chan_object_path)
+                                
         # Connect to several signals
         print "connecting to channel", self.tf_channel
         self.tf_channel.connect('session-created', self.__on_session_created)
         self.tf_channel.connect('stream-created', self.__on_stream_created)
-        self.tf_channel.connect('stream-get-codec-config',
-                                self.__on_stream_get_codec_config)
-
+        self.tf_channel.connect('stream-get-codec-config', self.__on_stream_get_codec_config)
+        
     def __on_session_created(self, channel, conference, participant):
         """
         On signal "session-created", we create the pipeline and add conference
@@ -139,8 +131,11 @@ class TfListener(object):
         print
         
         if media_type == farsight.MEDIA_TYPE_VIDEO:
-            codecs = [farsight.Codec(farsight.CODEC_ID_ANY, "H264",
-                                     farsight.MEDIA_TYPE_VIDEO, 0)]
+
+            codecs = [
+                farsight.Codec(farsight.CODEC_ID_ANY, "JPEG",
+                                        farsight.MEDIA_TYPE_VIDEO, 0),
+            ]
             
             if self.conn.GetProtocol() == "sip" :
                 codecs += [ farsight.Codec(farsight.CODEC_ID_DISABLE, "THEORA",
@@ -148,17 +143,6 @@ class TfListener(object):
             else:
                 codecs += [ farsight.Codec(farsight.CODEC_ID_ANY, "THEORA",
                                         farsight.MEDIA_TYPE_VIDEO, 0) ]
-            
-            codecs += [
-                farsight.Codec(farsight.CODEC_ID_ANY, "H263",
-                                        farsight.MEDIA_TYPE_VIDEO, 0),
-                farsight.Codec(farsight.CODEC_ID_ANY, "JPEG",
-                                        farsight.MEDIA_TYPE_VIDEO, 0),
-                farsight.Codec(farsight.CODEC_ID_ANY, "MPV",
-                                        farsight.MEDIA_TYPE_VIDEO, 0),
-                farsight.Codec(farsight.CODEC_ID_DISABLE, "DV",
-                                        farsight.MEDIA_TYPE_VIDEO, 0),
-            ]
 
             return codecs
         else:

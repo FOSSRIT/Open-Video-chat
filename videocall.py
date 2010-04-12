@@ -93,8 +93,8 @@ class VideoCall:
             channel = telepathy.client.channel.Channel(self.conn.service_name, object_path, self.conn.bus)
 
             # Create a tf listener
-            TfListener(self.conn, object_path)
-            print "MAKE TF LISTENER NOW"
+            tf_listener = TfListener(self.conn, object_path)
+
             if self.master:    # Request a stream
                 # Get contact handle
                 contact_handle = self.conn[CONNECTION].RequestHandles( HANDLE_TYPE_CONTACT, [self.contact] )[0]
@@ -107,7 +107,6 @@ class VideoCall:
                 if channel[CHANNEL_TYPE_STREAMED_MEDIA].ListStreams() != []:
                     # Accept the stream by adding  owner
                     channel[CHANNEL_INTERFACE_GROUP].AddMembers( [self.conn[CONNECTION].GetSelfHandle()], "")
-
 
 ##################################################
 MASTER_ACCOUNT = "ovc_master@schoolserver.rit.edu"
