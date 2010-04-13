@@ -199,11 +199,12 @@ class FsPipeline:
         convert1.set_state(gst.STATE_PLAYING)
 
     def element_added_cb(self, notifier, bin, element):
-        if element.get_factory().get_name() == "x264enc":
-            element.set_property("byte-stream", True)
-            element.set_property("bitrate", 128)
-        elif element.get_factory().get_name() == "gstrtpbin":
-            element.set_property("latency", 100)
+        if element:
+            if element.get_factory().get_name() == "x264enc":
+                element.set_property("byte-stream", True)
+                element.set_property("bitrate", 128)
+            elif element.get_factory().get_name() == "gstrtpbin":
+                element.set_property("latency", 100)
             
 
 class FsSource:
