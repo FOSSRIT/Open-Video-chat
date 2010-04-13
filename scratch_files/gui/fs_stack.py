@@ -25,10 +25,17 @@ import pygst
 pygst.require('0.10')        
 import gst
 
+import gtk
+
 import farsight
 
 import threading
 import weakref
+
+import os
+builderprefix = os.path.join(os.path.dirname(__file__),"fs2-gui-")
+
+TRANSMITTER = "rawudp"
 
 VIDEO = True
 AUDIO = True
