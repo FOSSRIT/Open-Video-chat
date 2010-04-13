@@ -4,6 +4,8 @@ import gst
 
 import farsight
 
+import weakref
+
 VIDEO = True
 AUDIO = True
 CAMERA = True

@@ -23,7 +23,6 @@
 import sys, os, pwd, os.path
 import socket
 import threading
-import weakref
 
 import signal
 
