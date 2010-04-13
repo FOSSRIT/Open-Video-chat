@@ -33,12 +33,10 @@ pygtk.require("2.0")
 import gtk, gobject, gtk.gdk
 import gobject
 
-#############IMPORTED
 import pygst
 pygst.require('0.10')
 import gst
 import farsight
-#############/IMOPRTED
 
 from fs_stack import FsPipeline, FsParticipant
 
@@ -178,37 +176,6 @@ class FsMainUI:
         dialog.destroy()
         gtk.main_quit()
         gtk.gdk.threads_leave()
-
-    def show_dtmf(self, button):
-        try:
-            self.dtmf_builder.present()
-        except AttributeError:
-            self.dtmf_builder = gtk.Builder()
-            self.dtmf_builder.add_from_file(builderprefix + "dtmf.ui")
-            self.dtmf_builder.connect_signals(self)
-            
-
-    def dtmf_start(self, button):
-        if (self.dtmf_builder.get_object("dtmf_as_event").get_active()):
-            self.dtmf_last_method = farsight.DTMF_METHOD_RTP_RFC4733
-        elif (self.dtmf_builder.get_object("dtmf_as_sound").get_active()):
-            self.dtmf_last_method = farsight.DTMF_METHOD_IN_BAND
-        else:
-            print "Invalid DTMF Method"
-            return
-        self.pipeline.audiosession.dtmf_start(button.get_label(), \
-                                              self.dtmf_last_method)
-                                              
-    def dtmf_stop(self, button):
-        try:
-            self.pipeline.audiosession.dtmf_stop(self.dtmf_last_method)
-            del self.dtmf_last_method
-        except AttributeError:
-            pass
-    def dtmf_destroy(self, button):
-        self.dtmf_builder.get_object("dtmf_window").destroy()
-        del self.dtmf_builder
-
 
 
 class FsUIStartup:

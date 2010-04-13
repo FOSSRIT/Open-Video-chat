@@ -100,9 +100,7 @@ class FsPipeline:
         elif message.type == gst.MESSAGE_WARNING:
             print message.src.get_name(), ": ", message.parse_warning()
         elif message.type == gst.MESSAGE_ELEMENT:
-            if message.structure.has_name("dtmf-event"):
-                print "dtmf-event: %d" % message.structure["number"]
-            elif message.structure.has_name("farsight-local-candidates-prepared"):
+            if message.structure.has_name("farsight-local-candidates-prepared"):
                 message.structure["stream"].uistream.local_candidates_prepared()
 
             elif message.structure.has_name("farsight-new-local-candidate"):
@@ -381,18 +379,6 @@ class FsSession:
         stream = FsStream(id, self, participant, realstream)
         self.streams.append(weakref.ref(stream, self.__stream_finalized))
         return stream
-
-    def dtmf_start(self, event, method):
-        if (event == "*"):
-            event = farsight.DTMF_EVENT_STAR
-        elif (event == "#"):
-            event = farsight.DTMF_EVENT_POUND
-        else:
-            event = int(event)
-        self.fssession.start_telephony_event(event, 2, method)
-        
-    def dtmf_stop(self, method):
-        self.fssession.stop_telephony_event(method)
 
     def codecs_changed(self):
         "Callback from FsSession"
