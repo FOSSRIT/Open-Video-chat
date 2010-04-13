@@ -27,6 +27,7 @@ import gst
 
 import farsight
 
+import threading
 import weakref
 
 VIDEO = True
