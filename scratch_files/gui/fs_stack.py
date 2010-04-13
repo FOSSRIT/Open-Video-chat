@@ -22,7 +22,7 @@
 #
 
 import pygst
-pygst.require('0.10')        
+pygst.require('0.10')
 import gst
 
 import gtk
@@ -32,7 +32,7 @@ import farsight
 import threading
 import weakref
 
-import os
+import os, sys
 builderprefix = os.path.join(os.path.dirname(__file__),"fs2-gui-")
 
 TRANSMITTER = "rawudp"
@@ -57,11 +57,11 @@ def make_video_sink(pipeline, xid, name, async=True):
     bin.add_pad(gst.GhostPad("sink", videoscale.get_pad("sink")))
     sink.set_data("xid", xid)
     return bin
-    
+
 
 class FsPipeline:
     "Object to wrap the GstPipeline"
-    
+
     def __init__(self, elementname="fsrtpconference"):
         self.pipeline = gst.Pipeline()
         notifier = farsight.ElementAddedNotifier()
@@ -132,8 +132,8 @@ class FsPipeline:
                 print message.src.get_name(), ": ", message.structure.get_name()
                 message.structure["stream"].uistream.recv_codecs_changed( \
                     message.structure["codecs"])
-                
-                
+
+
             elif message.structure.has_name("farsight-error"):
                 print "Async error ("+ str(message.structure["error-no"]) +"): " + message.structure["error-msg"] +" --- "+ message.structure["debug-msg"]
             else:
@@ -141,7 +141,7 @@ class FsPipeline:
         elif message.type != gst.MESSAGE_STATE_CHANGED \
                  and message.type != gst.MESSAGE_ASYNC_DONE:
             print message.type
-        
+
         return True
 
     def make_video_preview(self, xid, newsize_callback):
@@ -152,7 +152,7 @@ class FsPipeline:
         #Add a probe to wait for the first buffer to find the image size
         self.havesize = self.previewsink.get_pad("sink").add_buffer_probe(self.have_size,
                                                           newsize_callback)
-                                                          
+
         self.previewsink.set_state(gst.STATE_PLAYING)
         self.videosource.tee.link(self.previewsink)
         self.pipeline.set_state(gst.STATE_PLAYING)
@@ -205,7 +205,7 @@ class FsPipeline:
                 element.set_property("bitrate", 128)
             elif element.get_factory().get_name() == "gstrtpbin":
                 element.set_property("latency", 100)
-            
+
 
 class FsSource:
     "An abstract generic class for media sources"
@@ -226,8 +226,8 @@ class FsSource:
         self.tee.set_state(gst.STATE_NULL)
         self.pipeline.remove(self.source)
         self.pipeline.remove(self.tee)
-        
-        
+
+
     def make_source(self):
         "Creates and returns the source GstElement"
         raise NotImplementedError()
@@ -254,11 +254,11 @@ class FsSource:
         "Puts the source pad from the source"
         self.pipeline.remove(pad.get_data("queue"))
         self.tee.release_request_pad(pad.get_data("requestpad"))
-    
+
 
 class FsVideoSource(FsSource):
     "A Video source"
-    
+
     def get_type(self):
         return farsight.MEDIA_TYPE_VIDEO
 
@@ -289,8 +289,8 @@ class FsVideoSource(FsSource):
 
         bin.add_pad(gst.GhostPad("src", videoscale.get_pad("src")))
         return bin
-            
-      
+
+
 
 class FsAudioSource(FsSource):
     "An audio source"
@@ -310,7 +310,7 @@ class FsAudioSource(FsSource):
 
 class FsSession:
     "This is one session (audio or video depending on the source)"
-    
+
     def __init__(self, conference, source):
         self.conference = conference
         self.source = source
@@ -370,7 +370,7 @@ class FsSession:
         self.source.put_src_pad(self.sourcepad)
     def __stream_finalized(self, s):
         self.streams.remove(s)
-            
+
     def new_stream(self, id, participant):
         "Creates a new stream for a specific participant"
         transmitter_params = {}
@@ -507,12 +507,12 @@ class FsStream:
               (self.id, self.participant.id, participant.id)
         if codecs:
             participant.connect.send_codecs(participant.id, self.id, codecs,
-                                            self.participant.id)            
+                                            self.participant.id)
 
 
 class FsParticipant:
     "Wraps one FsParticipant, is one user remote contact"
-    
+
     def __init__(self, connect, id, cname, pipeline, mainui):
         self.connect = connect
         self.id = id
@@ -532,7 +532,7 @@ class FsParticipant:
             self.streams[int(farsight.MEDIA_TYPE_AUDIO)] = \
               pipeline.audiosession.new_stream(
                 int(farsight.MEDIA_TYPE_AUDIO), self)
-        
+
     def candidate(self, media, candidate):
         "Callback for the network object."
         self.streams[media].candidate(candidate)
@@ -587,7 +587,7 @@ class FsParticipant:
                 self.outcv.notifyAll()
             finally:
                 self.outcv.release()
-            
+
 
     def have_size(self, pad, buffer):
         "Callback on the first buffer to know the drawingarea size"
@@ -599,7 +599,7 @@ class FsParticipant:
         self.videosink.get_pad("sink").remove_buffer_probe(self.havesize)
         del self.havesize
         return True
-                 
+
 
 
     def link_video_sink(self, pad):
@@ -662,7 +662,7 @@ class FsParticipant:
         for mt in codecs:
             str += "<big>" +mt.value_nick.title() + "</big>:\n"
             for c in codecs[mt]:
-                str += "  <b>%s</b>: %s %s\n" % (c.id, 
+                str += "  <b>%s</b>: %s %s\n" % (c.id,
                                                  c.encoding_name,
                                                  c.clock_rate)
         self.label.set_markup(str)
