@@ -10,10 +10,15 @@ class Gui( gtk.VBox ):
 
         self.activity = activity
 
+        mov_box = gtk.HBox()
+        
         # Add movie window
         self.movie_window = gtk.DrawingArea()
-        self.pack_start( self.movie_window )
+        self.movie_window_preview = gtk.DrawingArea()
+        mov_box.pack_start( self.movie_window )
+        mov_box.pack_start( self.movie_window_preview )
 
+        self.pack_start( mov_box )
         # Add Chat section
         ##################
 

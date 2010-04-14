@@ -12,7 +12,7 @@ from sugar_network_stack import SugarNetworkStack
 from sugar import profile
 
 GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! xvimagesink force-aspect-ratio=true"
-GST_OUTPIPE_BASE = "v4l2src ! video/x-raw-yuv,width=320,height=240,franerate=15/1 ! theoraenc bitrate=50 speed-level=2 ! udpsink host=%s"
+GST_OUTPIPE_BASE = "v4l2src ! video/x-raw-yuv,width=320,height=240,franerate=15/1 ! tee name=prevsink ! theoraenc bitrate=50 speed-level=2 ! udpsink host=%s prevsink. ! xvimagesink force-aspect-ratio=true"
 
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
@@ -61,6 +61,12 @@ class OpenVideoChatActivity(Activity):
 
     def setup_outgoing_pipeline(self, ip):
         self.out = gst.parse_launch ( GST_OUTPIPE_BASE % ip )
+
+        bus = self.out.get_bus()
+        bus.add_signal_watch()
+        bus.enable_sync_message_emission()
+        bus.connect("sync-message::element", self.on_sync_prev_message)
+        
         gobject.timeout_add(2000, self.start_outgoing_pipeline)
 
     def start_outgoing_pipeline(self):
@@ -91,6 +97,15 @@ class OpenVideoChatActivity(Activity):
             # Assign the viewport
             imagesink = message.src
             imagesink.set_xwindow_id(self.gui.movie_window.window.xid)
+
+    def on_sync_prev_message(self, bus, message ):
+        if message.structure is None:
+            return
+        message_name = message.structure.get_name()
+        if message_name == "prepare-xwindow-id":
+            # Assign the viewport
+            imagesink = message.src
+            imagesink.set_xwindow_id(self.gui.movie_window_preview.window.xid)
 
 
     def _alert(self, title, text=None, timeout=5):
