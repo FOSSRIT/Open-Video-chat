@@ -11,7 +11,7 @@ from gui import Gui
 from sugar_network_stack import SugarNetworkStack
 from sugar import profile
 
-GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! ximagesink"
+GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! xvimagesink force-aspect-ratio=true"
 GST_OUTPIPE_BASE = "v4l2src ! video/x-raw-yuv,width=320,height=240,franerate=15/1 ! theoraenc bitrate=50 speed-level=2 ! udpsink host=%s"
 
 class OpenVideoChatActivity(Activity):
