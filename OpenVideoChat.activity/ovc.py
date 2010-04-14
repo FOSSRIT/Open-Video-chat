@@ -61,7 +61,11 @@ class OpenVideoChatActivity(Activity):
 
     def setup_outgoing_pipeline(self, ip):
         self.out = gst.parse_launch ( GST_OUTPIPE_BASE % ip )
+        gobject.timeout_add(2000, self.start_outgoing_pipeline)
+
+    def start_outgoing_pipeline(self):
         self.out.set_state(gst.STATE_PLAYING)
+        return False
 
 
     def start_stop(self, start=True):
