@@ -68,6 +68,7 @@ class OpenVideoChatActivity(Activity):
         bus = self.out.get_bus()
         bus.add_signal_watch()
         bus.enable_sync_message_emission()
+        bus.connect("message", self.on_message_prev)
         bus.connect("sync-message::element", self.on_sync_prev_message)
         
         gobject.timeout_add(2000, self.start_outgoing_pipeline)
@@ -92,6 +93,15 @@ class OpenVideoChatActivity(Activity):
             err, debug = message.parse_error()
             print "Error: %s" % err, debug
             self.player.set_state(gst.STATE_NULL)
+
+    def on_message_prev(self, bus, message):
+        t = message.type
+        if t == gst.MESSAGE_EOS:
+            self.out.set_state(gst.STATE_NULL)
+        elif t == gst.MESSAGE_ERROR:
+            err, debug = message.parse_error()
+            print "Error: %s" % err, debug
+            self.out.set_state(gst.STATE_NULL)
 
     def on_sync_message(self, bus, message):
         if message.structure is None:
