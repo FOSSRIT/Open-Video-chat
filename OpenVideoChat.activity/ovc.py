@@ -71,7 +71,8 @@ class OpenVideoChatActivity(Activity):
         bus.connect("message", self.on_message_prev)
         bus.connect("sync-message::element", self.on_sync_prev_message)
         
-        gobject.timeout_add(2000, self.start_outgoing_pipeline)
+        # FIXME
+        gobject.timeout_add(5000, self.start_outgoing_pipeline)
 
     def start_outgoing_pipeline(self):
         self.gui.add_chat_text( _("Starting Video Pipeline") )
