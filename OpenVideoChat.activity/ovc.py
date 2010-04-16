@@ -11,8 +11,9 @@ from gui import Gui
 from sugar_network_stack import SugarNetworkStack
 from sugar import profile
 
-GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! xvimagesink force-aspect-ratio=true"
-GST_OUTPIPE_BASE = "v4l2src ! videorate ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! tee name=t ! theoraenc bitrate=50 speed-level=2 ! udpsink host=%s t. ! queue ! ffmpegcolorspace ! xvimagesink force-aspect-ratio=true"
+# Using ximagesink due too https://fedorahosted.org/OpenVideoChat/ticket/39
+GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! ximagesink force-aspect-ratio=true"
+GST_OUTPIPE_BASE = "v4l2src ! videorate ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! tee name=t ! theoraenc bitrate=50 speed-level=2 ! udpsink host=%s t. ! queue ! ffmpegcolorspace ! ximagesink force-aspect-ratio=true"
 
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
