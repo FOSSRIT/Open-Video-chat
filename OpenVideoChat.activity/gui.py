@@ -59,9 +59,11 @@ class Gui( gtk.VBox ):
         # Show gui
         self.build_toolbars()
         self.show_all()
-
-    def add_chat_text( self, text ):
         
+    def get_history(self):
+        return self.chat_text.get_text( self.chat_text.get_start_iter(), self.chat_text.get_end_iter() )
+
+    def add_chat_text(self, text):
         self.chat_text.insert( self.chat_text.get_end_iter(), "%s\n" % text )
         self.text_view.scroll_to_iter( self.chat_text.get_end_iter(), 0.1 )
         

@@ -199,3 +199,24 @@ class OpenVideoChatActivity(Activity):
 
         if handle:
             handle.send_chat_text( "<%s> %s" % (prof, text) )
+            
+    #
+    # Save Chat Log
+    #
+    
+    def write_file(self, file_path):
+        file = open(file_path, 'w')
+        file.write( self.gui.get_history() )
+        file.close()
+        
+    #
+    # Load Chat Log
+    #
+    
+    def read_file(self, file_path):
+        file = open(file_path, 'r')
+        
+        for line in file:
+            self.gui.add_chat_text(line)
+            
+        file.close()
