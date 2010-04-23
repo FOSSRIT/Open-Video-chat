@@ -60,6 +60,9 @@ class Gui( gtk.VBox ):
         self.build_toolbars()
         self.show_all()
         
+        #scroll to bottom
+        self.text_view.scroll_to_iter( self.chat_text.get_end_iter(), 0.1 )
+        
     def get_history(self):
         return self.chat_text.get_text( self.chat_text.get_start_iter(), self.chat_text.get_end_iter() )
 
