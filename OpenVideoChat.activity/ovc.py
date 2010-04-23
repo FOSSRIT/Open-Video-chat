@@ -216,7 +216,6 @@ class OpenVideoChatActivity(Activity):
     def read_file(self, file_path):
         file = open(file_path, 'r')
         
-        for line in file:
-            self.gui.add_chat_text(line)
+        self.gui.add_chat_text(file.read())
             
         file.close()
