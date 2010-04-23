@@ -44,15 +44,15 @@ class OpenVideoChatActivity(Activity):
         gobject.idle_add( self.start_stop, True )
         #self.start_stop( True )
 
-        self.gui.add_chat_text( _("Activity Started") )
-
+        print "Activity Started"
+        
     def can_close( self ):
         self.start_stop(False)
         return True
 
     def setup_gst_pipeline(self):
         # Set up the gstreamer pipeline
-        self.gui.add_chat_text( _("Starting Listen Video Pipeline") )
+        print "Starting Listen Video Pipeline"
         self.player = gst.parse_launch ( GST_INPIPE )
 
         bus = self.player.get_bus()
@@ -62,7 +62,7 @@ class OpenVideoChatActivity(Activity):
         bus.connect("sync-message::element", self.on_sync_message)
 
     def setup_outgoing_pipeline(self, ip):
-        self.gui.add_chat_text( "Pipeline UDP to %s" % ip )
+        print "Pipeline UDP to %s" % ip 
         self.out = gst.parse_launch ( GST_OUTPIPE_BASE % ip )
 
         bus = self.out.get_bus()
@@ -75,7 +75,7 @@ class OpenVideoChatActivity(Activity):
         gobject.timeout_add(5000, self.start_outgoing_pipeline)
 
     def start_outgoing_pipeline(self):
-        self.gui.add_chat_text( _("Starting Video Pipeline") )
+        print "Starting Video Pipeline"
         self.out.set_state(gst.STATE_PLAYING)
         return False
 
