@@ -221,7 +221,7 @@ class OpenVideoChatActivity(Activity):
                     
         elif src == "ip":
             #FIXME: Store ip with user so we can make user lists to switch between later on
-            if hasattr( self, 'out' ) and self.out.get_state() == gst.STATE_PLAYING)
+            if hasattr( self, 'out' ) and self.out.get_state() == gst.STATE_PLAYING:
                 print args,"has sent its ip, ignoring as we are allready streaming"
             else:
                 self.setup_outgoing_pipeline( args )
