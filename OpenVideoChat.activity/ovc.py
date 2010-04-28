@@ -44,7 +44,12 @@ class OpenVideoChatActivity(Activity):
         Activity.__init__(self, handle)
 
         # Let sugar know we only want a 1 to 1 share (limit to 2 people)
+        # Note this is not enforced by sugar yet :(
         self.max_participants = 2
+
+        #FIXME: This is a hack to only allow our ip to be sent once.
+        #AKA disables others from double streaming
+        self.sent_ip = False
         
         gobject.threads_init()
 
@@ -173,7 +178,7 @@ class OpenVideoChatActivity(Activity):
 
         elif src == "join":
             handle = self.netstack.get_tube_handle()
-            if handle:
+            if handle and not self.sent_ip:
                 import socket
                 import fcntl
                 import struct
@@ -206,6 +211,7 @@ class OpenVideoChatActivity(Activity):
                     if interface != 'lo':
                         try:
                             ip = get_ip_address(interface)
+                            self.sent_ip = True
                             handle.announce_ip(ip)
                             break
                         except:
@@ -214,7 +220,11 @@ class OpenVideoChatActivity(Activity):
                     print "Could not find ip address"
                     
         elif src == "ip":
-            self.setup_outgoing_pipeline( args )
+            #FIXME: Store ip with user so we can make user lists to switch between later on
+            if hasattr( self, 'out' ) and self.out.get_state() == gst.STATE_PLAYING)
+                print args,"has sent its ip, ignoring as we are allready streaming"
+            else:
+                self.setup_outgoing_pipeline( args )
 
         elif src == "buddy_add":
             self.gui.add_chat_text(_("%s has joined the chat") % args)
