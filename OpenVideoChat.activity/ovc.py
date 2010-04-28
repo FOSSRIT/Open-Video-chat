@@ -42,6 +42,10 @@ GST_OUTPIPE_BASE = "v4l2src ! videorate ! video/x-raw-yuv,width=320,height=240,f
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
         Activity.__init__(self, handle)
+
+        # Let sugar know we only want a 1 to 1 share (limit to 2 people)
+        self.max_participants = 2
+        
         gobject.threads_init()
 
         # Set if they started the activity
