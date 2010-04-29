@@ -43,18 +43,24 @@ class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
         Activity.__init__(self, handle)
 
+        # gobject is used for timeing (will be removed when rtp is implemented)
+        gobject.threads_init()
+
+        # Set if they started the activity
+        self.isServer = not self._shared_activity
+
         # Let sugar know we only want a 1 to 1 share (limit to 2 people)
         # Note this is not enforced by sugar yet :(
         self.max_participants = 2
 
         #FIXME: This is a hack to only allow our ip to be sent once.
         #AKA disables others from double streaming
-        self.sent_ip = False
-        
-        gobject.threads_init()
-
-        # Set if they started the activity
-        self.isServer = not self._shared_activity
+        if self.isServer:
+            # server will send out ip twice, first when joinning empty channel
+            # second when the user joins
+            self.sent_ip = 2
+        else:
+            self.sent_ip = 1
 
         # INITIALIZE GUI
         ################
@@ -178,7 +184,7 @@ class OpenVideoChatActivity(Activity):
 
         elif src == "join":
             handle = self.netstack.get_tube_handle()
-            if handle and not self.sent_ip:
+            if handle and self.sent_ip > 0:
                 import socket
                 import fcntl
                 import struct
