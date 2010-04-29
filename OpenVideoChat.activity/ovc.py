@@ -227,12 +227,14 @@ class OpenVideoChatActivity(Activity):
                     
         elif src == "ip":
             #FIXME: Store ip with user so we can make user lists to switch between later on
-            if hasattr( self, 'out' ):
-                    s1,s2,s3 = self.out.get_state()
-                    if s2 == gst.STATE_PLAYING:
-                        print args,"has sent its ip, ignoring as we are allready streaming"
-                    else:
-                        self.setup_outgoing_pipeline( args )
+            if not hasattr( self, 'out' ):
+                    #~ s1,s2,s3 = self.out.get_state()
+                    #~ if s2 == gst.STATE_PLAYING:
+                        #~ print args,"has sent its ip, ignoring as we are allready streaming"
+                    #~ else:
+                self.setup_outgoing_pipeline( args )
+            else:
+                print args,"has sent its ip, ignoring as we are allready streaming"
 
         elif src == "buddy_add":
             self.gui.add_chat_text(_("%s has joined the chat") % args)
