@@ -104,10 +104,9 @@ class Gui( gtk.VBox ):
 
         self.settings_buttons = {}
 
-
-        self.settings_buttons['test'] = ToolButton('view-spiral')
-        self.settings_buttons['test'].set_tooltip(_("TEST FIX VIDEO"))
-        self.settings_buttons['test'].connect("clicked", self.test_redraw, None)
+        self.settings_buttons['reload_video'] = ToolButton('view-spiral')
+        self.settings_buttons['reload_video'].set_tooltip(_("Reload Screen"))
+        self.settings_buttons['reload_video'].connect("clicked", self.force_redraw, None)
         self.settings_bar.insert(self.settings_buttons['test'], -1)
 
         self.toolbox = ActivityToolbox(self.activity)
@@ -116,5 +115,10 @@ class Gui( gtk.VBox ):
         self.activity.set_toolbox(self.toolbox)
         self.toolbox.show_all()
 
-    def test_redraw(self, widget, value=None):
-        self.movie_window.queue_draw()
+    def force_redraw(self, widget, value=None):
+        # Fixme: This should not be required, this is a hack for now until
+        # a better solution that works is found
+        self.movie_window.hide()
+        self.movie_window_preview.hide()
+        self.movie_window.show()
+        self.moview_window_preview.show()
