@@ -34,6 +34,10 @@ class Gui( gtk.VBox ):
 
         self.activity = activity
 
+        # Register to be notified when visible/hidden
+        self.activity.add_events(gtk.gdk.VISIBILITY_NOTIFY_MASK)
+        self.activity.connect("visibility-notify-event", self.__visibility_notify_cb)
+
         mov_box = gtk.HBox()
         
         # Add movie window
@@ -116,5 +120,18 @@ class Gui( gtk.VBox ):
         self.activity.set_toolbox(self.toolbox)
         self.toolbox.show_all()
 
+    # Callback method for when the activity's visibility changes
+    def __visibility_notify_cb(self, window, event):
+
+        # This is hack that will force the video to be redrawn
+        if event.state == gtk.gdk.VISIBILITY_FULLY_OBSCURED:
+            self.movie_window.hide()
+            
+        elif event.state in [gtk.gdk.VISIBILITY_UNOBSCURED, gtk.gdk.VISIBILITY_PARTIAL]:
+            self.movie_window.show()
+
     def test_redraw(self, widget, value=None):
-        self.movie_window.queue_draw()
+        self.movie_window.hide()
+        self.movie_window.show()
+        
+        
