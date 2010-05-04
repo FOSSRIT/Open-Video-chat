@@ -106,8 +106,8 @@ class Gui( gtk.VBox ):
 
 
         self.settings_buttons['test'] = ToolButton('view-spiral')
-        self.settings_buttons['test'].set_tooltip(_("TEST ICON"))
-        #self.settings_buttons['test'].connect("clicked", self.view_change_cb, 'new')
+        self.settings_buttons['test'].set_tooltip(_("TEST FIX VIDEO"))
+        self.settings_buttons['test'].connect("clicked", self.test_redraw, None)
         self.settings_bar.insert(self.settings_buttons['test'], -1)
 
         self.toolbox = ActivityToolbox(self.activity)
@@ -115,3 +115,6 @@ class Gui( gtk.VBox ):
 
         self.activity.set_toolbox(self.toolbox)
         self.toolbox.show_all()
+
+    def test_redraw(self, widget, value=None):
+        self.movie_window.queue_draw()
