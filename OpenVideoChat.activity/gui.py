@@ -121,4 +121,4 @@ class Gui( gtk.VBox ):
         self.movie_window.hide()
         self.movie_window_preview.hide()
         self.movie_window.show()
-        self.moview_window_preview.show()
+        self.movie_window_preview.show()
