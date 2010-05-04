@@ -107,7 +107,7 @@ class Gui( gtk.VBox ):
         self.settings_buttons['reload_video'] = ToolButton('view-spiral')
         self.settings_buttons['reload_video'].set_tooltip(_("Reload Screen"))
         self.settings_buttons['reload_video'].connect("clicked", self.force_redraw, None)
-        self.settings_bar.insert(self.settings_buttons['test'], -1)
+        self.settings_bar.insert(self.settings_buttons['reload_video'], -1)
 
         self.toolbox = ActivityToolbox(self.activity)
         self.toolbox.add_toolbar(_("Settings"), self.settings_bar)
