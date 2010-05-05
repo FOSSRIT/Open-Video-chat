@@ -85,7 +85,7 @@ class GSTStack:
         bus.add_signal_watch()
         bus.enable_sync_message_emission()
 
-        def on_message(self, bus, message):
+        def on_message(bus, message):
             """
             This method handles errors on the video bus and then stops
             the pipeline.

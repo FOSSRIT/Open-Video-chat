@@ -86,7 +86,7 @@ class OpenVideoChatActivity(Activity):
         
     def can_close( self ):
         self.gststack.start_stop_incoming_pipeline(False)
-        self.gststack.start_stop_outcoming_pipeline(False)
+        self.gststack.start_stop_outgoing_pipeline(False)
         return True
 
     def _alert(self, title, text=None, timeout=5):
