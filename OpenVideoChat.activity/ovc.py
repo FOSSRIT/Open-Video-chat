@@ -34,10 +34,8 @@ from sugar.graphics.alert import NotifyAlert, Alert
 
 from gui import Gui
 from sugar_network_stack import SugarNetworkStack
+from gst_stack import GSTStack
 from sugar import profile
-
-GST_INPIPE = "udpsrc ! theoradec ! ffmpegcolorspace ! xvimagesink force-aspect-ratio=true"
-GST_OUTPIPE_BASE = "v4l2src ! videorate ! video/x-raw-yuv,width=320,height=240,framerate=15/1 ! tee name=t ! theoraenc bitrate=50 speed-level=2 ! udpsink host=%s t. ! queue ! ffmpegcolorspace ! ximagesink"
 
 class OpenVideoChatActivity(Activity):
     def __init__(self, handle):
@@ -80,88 +78,16 @@ class OpenVideoChatActivity(Activity):
 
         # Setup Pipeline
         #################
-        self.setup_gst_pipeline()
-        gobject.idle_add( self.start_stop, True )
-        #self.start_stop( True )
-
+        self.gststack = GSTStack( self.gui.send_video_to_screen )
+        self.build_incoming_pipeline()
+        gobject.idle_add( self.gststack.start_stop_incoming_pipeline, True )
+        
         print "Activity Started"
         
     def can_close( self ):
-        self.start_stop(False)
+        self.gststack.start_stop_incoming_pipeline(False)
+        self.gststack.start_stop_outcoming_pipeline(False)
         return True
-
-    def setup_gst_pipeline(self):
-        # Set up the gstreamer pipeline
-        print "Starting Listen Video Pipeline"
-        self.player = gst.parse_launch ( GST_INPIPE )
-
-        bus = self.player.get_bus()
-        bus.add_signal_watch()
-        bus.enable_sync_message_emission()
-        bus.connect("message", self.on_message)
-        bus.connect("sync-message::element", self.on_sync_message)
-
-    def setup_outgoing_pipeline(self, ip):
-        print "Pipeline UDP to %s" % ip 
-        self.out = gst.parse_launch ( GST_OUTPIPE_BASE % ip )
-
-        bus = self.out.get_bus()
-        bus.add_signal_watch()
-        bus.enable_sync_message_emission()
-        bus.connect("message", self.on_message_prev)
-        bus.connect("sync-message::element", self.on_sync_prev_message)
-        
-        # FIXME
-        gobject.timeout_add(5000, self.start_outgoing_pipeline)
-
-    def start_outgoing_pipeline(self):
-        print "Starting Video Pipeline"
-        self.out.set_state(gst.STATE_PLAYING)
-        return False
-
-
-    def start_stop(self, start=True):
-        if start:
-            self.player.set_state(gst.STATE_PLAYING)
-        else:
-            self.player.set_state(gst.STATE_NULL)
-
-    def on_message(self, bus, message):
-        t = message.type
-        if t == gst.MESSAGE_EOS:
-            self.player.set_state(gst.STATE_NULL)
-        elif t == gst.MESSAGE_ERROR:
-            err, debug = message.parse_error()
-            print "Error: %s" % err, debug
-            self.player.set_state(gst.STATE_NULL)
-
-    def on_message_prev(self, bus, message):
-        t = message.type
-        if t == gst.MESSAGE_EOS:
-            self.out.set_state(gst.STATE_NULL)
-        elif t == gst.MESSAGE_ERROR:
-            err, debug = message.parse_error()
-            print "Error: %s" % err, debug
-            self.out.set_state(gst.STATE_NULL)
-
-    def on_sync_message(self, bus, message):
-        if message.structure is None:
-            return
-        message_name = message.structure.get_name()
-        if message_name == "prepare-xwindow-id":
-            # Assign the viewport
-            imagesink = message.src
-            imagesink.set_xwindow_id(self.gui.movie_window.window.xid)
-
-    def on_sync_prev_message(self, bus, message ):
-        if message.structure is None:
-            return
-        message_name = message.structure.get_name()
-        if message_name == "prepare-xwindow-id":
-            # Assign the viewport
-            imagesink = message.src
-            imagesink.set_xwindow_id(self.gui.movie_window_preview.window.xid)
-
 
     def _alert(self, title, text=None, timeout=5):
         alert = NotifyAlert(timeout=timeout)
@@ -232,7 +158,12 @@ class OpenVideoChatActivity(Activity):
                     #~ if s2 == gst.STATE_PLAYING:
                         #~ print args,"has sent its ip, ignoring as we are allready streaming"
                     #~ else:
-                self.setup_outgoing_pipeline( args )
+
+                self.gststack.build_outgoing_pipeline( args )
+
+                # FIXME
+                gobject.timeout_add(5000, self.gststack.start_stop_outgoing_pipeline)
+                
             else:
                 print args,"has sent its ip, ignoring as we are allready streaming"
 

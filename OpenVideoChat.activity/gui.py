@@ -122,3 +122,10 @@ class Gui( gtk.VBox ):
         self.movie_window_preview.hide()
         self.movie_window.show()
         self.movie_window_preview.show()
+
+    def send_video_to_screen(self, source, screen):
+        if screen == 'MAIN':
+            source.set_xwindow_id(self.movie_window.window.xid)
+        elif screen == 'PREVIEW':
+            source.set_xwindow_id(self.movie_window_preview.window.xid)
+        
