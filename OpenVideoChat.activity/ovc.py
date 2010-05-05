@@ -79,7 +79,7 @@ class OpenVideoChatActivity(Activity):
         # Setup Pipeline
         #################
         self.gststack = GSTStack( self.gui.send_video_to_screen )
-        self.build_incoming_pipeline()
+        self.gststack.build_incoming_pipeline()
         gobject.idle_add( self.gststack.start_stop_incoming_pipeline, True )
         
         print "Activity Started"

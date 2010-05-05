@@ -37,7 +37,7 @@ class GSTStack:
         
 
     def build_outgoing_pipeline(self, ip):
-         if self._out_pipeline != None:
+        if self._out_pipeline != None:
             print "WARNING: incoming pipline exists"
             return
 
@@ -98,16 +98,16 @@ class GSTStack:
                 print "Error: %s" % err, debug
                 self._in_pipeline.set_state(gst.STATE_NULL)
 
-            def on_sync_message(bus, message):
-                if message.structure is None:
-                    return
+        def on_sync_message(bus, message):
+            if message.structure is None:
+                return
 
-                if message.structure.get_name() == "prepare-xwindow-id":
-                    # Assign the viewport
-                    self.link_funciton(message.src, 'MAIN')
+            if message.structure.get_name() == "prepare-xwindow-id":
+                # Assign the viewport
+                self.link_funciton(message.src, 'MAIN')
         
         bus.connect("message", on_message)
-        bus.connect("sync-message::element", self.on_sync_message)
+        bus.connect("sync-message::element", on_sync_message)
 
     def start_stop_outgoing_pipeline(self, start=True):
         if self._out_pipeline != None:
