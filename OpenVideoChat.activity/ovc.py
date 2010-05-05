@@ -85,6 +85,7 @@ class OpenVideoChatActivity(Activity):
         print "Activity Started"
         
     def can_close( self ):
+        print "Closing, stopping pipelines"
         self.gststack.start_stop_incoming_pipeline(False)
         self.gststack.start_stop_outgoing_pipeline(False)
         return True

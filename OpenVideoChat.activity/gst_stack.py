@@ -42,9 +42,9 @@ class GSTStack:
             return
 
         print "Starting outgoing pipeline UDP to %s" % ip 
-        self.out = gst.parse_launch ( GST_OUTPIPE_BASE % ip )
+        self._out_pipeline = gst.parse_launch ( GST_OUTPIPE_BASE % ip )
 
-        bus = self.out.get_bus()
+        bus = self._out_pipeline.get_bus()
         bus.add_signal_watch()
         bus.enable_sync_message_emission()
 
