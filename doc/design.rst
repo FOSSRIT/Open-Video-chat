@@ -10,18 +10,20 @@ Program Flow
 ============
 The main class is OpenVideoChatActivity.  This extends the sugar activity and acts as the main canvas for the gui.  It loads up the gui file which builds the menus and displays. It also builds a network stack instance and connects the sugar's shared and join calls to the network.
 
-This network stack will set up a tube for the system to communicate which uses tube speak as its dbus protocol.
+This network stack is used for the text chat as well as passing ip addresses to the ohter machine. It uses the tube speak class to act as its dbus protocol.
+
+When a user joins the activity, they announce themselves over the network connection. Then the other computer responds to the announce with their ip address.  Once the joining system gets the other's ip, it sends its ip back and starts to stream its video using udp to the other machine.
 
 
 Class Breakdown
 ===============
 ovc.py
 ------
-Main Program.  This class  connects the gui to the network.
+Main Program.  This class  connects the gui, gstreamer, and the network.
 
 gui.py
 ------
-This class handles the graphical user interface.  It builds the menus and toolbars on the screen.
+This class handles the graphical user interface.  It builds the menus, toolbars, and the main display.
 
 network_stack.py
 ----------------
@@ -35,3 +37,6 @@ tube_speak.py
 -------------
 standard Dbus ExportedGObject 	
 
+gst_stack.py
+------------
+This is the gstreamer stack.  This file builds the gstreamer pipeline that will be used by the activity.
