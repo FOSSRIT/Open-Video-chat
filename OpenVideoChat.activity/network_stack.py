@@ -13,7 +13,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with OpenVideoChat.  If not, see <http://www.gnu.org/licenses/>.
 """
-:mod: `OpenVideoChat/OpenVideoChat.activity/network_stack` -- Open Video Chat Network Stack (Non-Sugar)
+:mod: `OpenVideoChat/OpenVideoChat.activity/network_stack` --
+        Open Video Chat Network Stack (Non-Sugar)
 =======================================================================
 
 .. moduleauthor:: Justin Lewis <jlew.blackout@gmail.com>

@@ -13,7 +13,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with OpenVideoChat.  If not, see <http://www.gnu.org/licenses/>.
 """
-:mod: `OpenVideoChat/OpenVideoChat.activity/tube_speak` -- Open Video Chat TubeSpeak
+:mod: `OpenVideoChat/OpenVideoChat.activity/tube_speak` --
+        Open Video Chat TubeSpeak
 =======================================================================
 
 .. moduleauthor:: Justin Lewis <jlew.blackout@gmail.com>
@@ -22,14 +23,16 @@
 .. moduleauthro:: Remy DeCausemaker <remyd@civx.us>
 """
 
-from dbus.service import method, signal
+from dbus.service import signal
 from dbus.gobject_service import ExportedGObject
 
 SERVICE = "org.laptop.OpenVideoChat"
 IFACE = SERVICE
 PATH = "/org/laptop/OpenVideoChat"
 
+
 class TubeSpeak(ExportedGObject):
+
     def __init__(self, tube, cb):
         super(TubeSpeak, self).__init__(tube, PATH)
 
@@ -43,11 +46,12 @@ class TubeSpeak(ExportedGObject):
             self.tube.add_signal_receiver(self.receive_chat_text_cb,
                 'send_chat_text', IFACE, path=PATH, sender_keyword='sender')
 
-            self.tube.add_signal_receiver(self.announce_join_cb, 'announce_join', IFACE,
+            self.tube.add_signal_receiver(self.announce_join_cb,
+                                            'announce_join', IFACE,
                 path=PATH, sender_keyword='sender')
 
-            self.tube.add_signal_receiver(self.announce_ip_cb, 'announce_ip', IFACE,
-                path=PATH, sender_keyword='sender')
+            self.tube.add_signal_receiver(self.announce_ip_cb, 'announce_ip',
+                                    IFACE, path=PATH, sender_keyword='sender')
 
             self.connected = True
             self.announce_join()
@@ -76,4 +80,4 @@ class TubeSpeak(ExportedGObject):
         #if sender == self.tube.get_unique_name():
         #    return
 
-        self.cb('chat', (text, sender) )
+        self.cb('chat', (text, sender))

@@ -13,7 +13,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with OpenVideoChat.  If not, see <http://www.gnu.org/licenses/>.
 """
-:mod: `OpenVideoChat/OpenVideoChat.activity/sugar_network_stack` -- Open Video Chat Sugar Networking Stack
+:mod: `OpenVideoChat/OpenVideoChat.activity/sugar_network_stack` --
+       Open Video Chat Sugar Networking Stack
 =======================================================================
 
 .. moduleauthor:: Justin Lewis <jlew.blackout@gmail.com>
@@ -30,7 +31,9 @@ SERVICE = "org.laptop.OpenVideoChat"
 IFACE = SERVICE
 PATH = "/org/laptop/OpenVideoChat"
 
+
 class SugarNetworkStack:
+
     def __init__(self, activity):
         self.__activity = activity
         self.controlTube = None
@@ -59,7 +62,7 @@ class SugarNetworkStack:
 
     def _buddy_joined_cb(self, activity, buddy):
         """Called when a buddy joins the shared activity."""
-        self.add_buddy( buddy )
+        self.add_buddy(buddy)
 
     def _buddy_left_cb(self, activity, buddy):
         """Called when a buddy leaves the shared activity."""
@@ -81,7 +84,8 @@ class SugarNetworkStack:
         self.watch_for_tubes()
 
         # Offer DBus Tube
-        self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].OfferDBusTube( SERVICE, {})
+        self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].OfferDBusTube(
+                                                        SERVICE, {})
 
     def watch_for_tubes(self):
         """
@@ -91,16 +95,18 @@ class SugarNetworkStack:
         self.conn = self.__activity._shared_activity.telepathy_conn
         self.tubes_chan = self.__activity._shared_activity.telepathy_tubes_chan
 
-        self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].connect_to_signal('NewTube',
-            self._new_tube_cb)
+        self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].connect_to_signal(
+                                            'NewTube', self._new_tube_cb)
 
         self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].ListTubes(
             reply_handler=self._list_tubes_reply_cb,
             error_handler=self._list_tubes_error_cb)
 
         # Register budy join/leave
-        self.__activity._shared_activity.connect('buddy-joined', self._buddy_joined_cb)
-        self.__activity._shared_activity.connect('buddy-left', self._buddy_left_cb)
+        self.__activity._shared_activity.connect('buddy-joined',
+                                                self._buddy_joined_cb)
+        self.__activity._shared_activity.connect('buddy-left',
+                                                self._buddy_left_cb)
 
     def _list_tubes_reply_cb(self, tubes):
         """
@@ -116,7 +122,8 @@ class SugarNetworkStack:
 
         if (type == telepathy.TUBE_TYPE_DBUS and service == SERVICE):
             if state == telepathy.TUBE_STATE_LOCAL_PENDING:
-                self.tubes_chan[telepathy.CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
+                self.tubes_chan[
+                    telepathy.CHANNEL_TYPE_TUBES].AcceptDBusTube(id)
 
             # Create Tube Connection
             tube_conn = TubeConnection(self.conn,
@@ -125,7 +132,8 @@ class SugarNetworkStack:
 
             self.controlTube = TubeSpeak(tube_conn, self.__activity.net_cb)
 
-        #elif (type == telepathy.TUBE_TYPE_STREAM and service == DIST_STREAM_SERVICE):
+        #elif (type == telepathy.TUBE_TYPE_STREAM and
+        #service == DIST_STREAM_SERVICE):
         #        # Data tube, store for later
         #        _logger.debug("New data tube added")
         #        self.unused_download_tubes.add(id)
