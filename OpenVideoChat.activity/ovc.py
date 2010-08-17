@@ -25,19 +25,18 @@
 
 from gettext import gettext as _
 
-from sugar.activity.activity import Activity, ActivityToolbox
-import gtk
-import gst
+from sugar.activity.activity import Activity
 import gobject
 
-from sugar.graphics.alert import NotifyAlert, Alert
-
+from sugar.graphics.alert import NotifyAlert
 from gui import Gui
 from sugar_network_stack import SugarNetworkStack
 from gst_stack import GSTStack
 from sugar import profile
 
+
 class OpenVideoChatActivity(Activity):
+
     def __init__(self, handle):
         Activity.__init__(self, handle)
 
@@ -78,13 +77,13 @@ class OpenVideoChatActivity(Activity):
 
         # Setup Pipeline
         #################
-        self.gststack = GSTStack( self.gui.send_video_to_screen )
+        self.gststack = GSTStack(self.gui.send_video_to_screen)
         self.gststack.build_incoming_pipeline()
-        gobject.idle_add( self.gststack.start_stop_incoming_pipeline, True )
-        
+        gobject.idle_add(self.gststack.start_stop_incoming_pipeline, True)
+
         print "Activity Started"
-        
-    def can_close( self ):
+
+    def can_close(self):
         print "Closing, stopping pipelines"
         self.gststack.start_stop_incoming_pipeline(False)
         self.gststack.start_stop_outgoing_pipeline(False)
@@ -107,7 +106,7 @@ class OpenVideoChatActivity(Activity):
         """
         if src == "chat":
             message, sender = args
-            self.gui.add_chat_text( message )
+            self.gui.add_chat_text(message)
 
         elif src == "join":
             handle = self.netstack.get_tube_handle()
@@ -116,16 +115,19 @@ class OpenVideoChatActivity(Activity):
                 import fcntl
                 import struct
                 import array
-                # http://code.activestate.com/recipes/439094-get-the-ip-address-associated-with-a-network-inter/
+                # http://code.activestate.com/recipes/439094-get-the-ip-address
+                # -associated-with-a-network-inter/
+
                 def get_ip_address(ifname):
                     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                     return socket.inet_ntoa(fcntl.ioctl(
-                        s.fileno(),
-                        0x8915,  # SIOCGIFADDR
-                        struct.pack('256s', ifname[:15])
-                    )[20:24])
+                            s.fileno(),
+                            0x8915,  # SIOCGIFADDR
+                            struct.pack('256s', ifname[:15]))[20:24])
 
-                #http://code.activestate.com/recipes/439093-get-names-of-all-up-network-interfaces-linux-only/
+                # http://code.activestate.com/recipes/439093-get-names-of-all-
+                # up-network-interfaces-linux-only/
+
                 def all_interfaces():
                     max_possible = 128  # arbitrary. raise if needed.
                     bytes = max_possible * 32
@@ -134,10 +136,10 @@ class OpenVideoChatActivity(Activity):
                     outbytes = struct.unpack('iL', fcntl.ioctl(
                         s.fileno(),
                         0x8912,  # SIOCGIFCONF
-                        struct.pack('iL', bytes, names.buffer_info()[0])
-                    ))[0]
+                        struct.pack('iL', bytes, names.buffer_info()[0])))[0]
                     namestr = names.tostring()
-                    return [namestr[i:i+32].split('\0', 1)[0] for i in range(0, outbytes, 32)]
+                    return [namestr[i:i + 32].split('\0', 1)[0] for i in range
+                                                    (0, outbytes, 32)]
 
 
                 for interface in all_interfaces():
@@ -151,22 +153,28 @@ class OpenVideoChatActivity(Activity):
                             print "Interface %s did not give ip" % interface
                 else:
                     print "Could not find ip address"
-                    
+
         elif src == "ip":
-            #FIXME: Store ip with user so we can make user lists to switch between later on
-            if not hasattr( self, 'out' ):
+
+            # fixme: Store ip with user so we can make user lists to switch
+            # between later on
+
+            if not hasattr(self, 'out'):
                     #~ s1,s2,s3 = self.out.get_state()
                     #~ if s2 == gst.STATE_PLAYING:
-                        #~ print args,"has sent its ip, ignoring as we are allready streaming"
+                    #~ print args,"has sent its ip, ignoring as we are already
+                    #              streaming"
                     #~ else:
 
-                self.gststack.build_outgoing_pipeline( args )
+                self.gststack.build_outgoing_pipeline(args)
 
                 # FIXME
-                gobject.timeout_add(5000, self.gststack.start_stop_outgoing_pipeline)
-                
+                gobject.timeout_add(5000, self.gststack.
+                                    start_stop_outgoing_pipeline)
+
             else:
-                print args,"has sent its ip, ignoring as we are allready streaming"
+                print args, "has sent its ip, ignoring as we are already \
+                            streaming"
 
         elif src == "buddy_add":
             self.gui.add_chat_text(_("%s has joined the chat") % args)
@@ -179,24 +187,24 @@ class OpenVideoChatActivity(Activity):
         prof = profile.get_nick_name()
 
         if handle:
-            handle.send_chat_text( "<%s> %s" % (prof, text) )
-            
+            handle.send_chat_text("<%s> %s" % (prof, text))
+
     #
     # Save Chat Log
     #
-    
+
     def write_file(self, file_path):
         file = open(file_path, 'w')
-        file.write( self.gui.get_history() )
+        file.write(self.gui.get_history())
         file.close()
-        
+
     #
     # Load Chat Log
     #
-    
+
     def read_file(self, file_path):
         file = open(file_path, 'r')
-        
+
         self.gui.add_chat_text(file.read())
-            
+
         file.close()
