@@ -38,7 +38,7 @@ class GSTStack:
 
     def build_outgoing_pipeline(self, ip):
         if self._out_pipeline != None:
-            print "WARNING: incoming pipline exists"
+            print "WARNING: outgoing pipline exists"
             return
 
         print "Building outgoing pipeline UDP to %s" % ip

@@ -104,10 +104,13 @@ class OpenVideoChatActivity(Activity):
         """
         Callback for network commands
         """
+
+        # new chat message
         if src == "chat":
             message, sender = args
             self.gui.add_chat_text(message)
 
+        # join request
         elif src == "join":
             handle = self.netstack.get_tube_handle()
             if handle and self.sent_ip > 0:
@@ -181,6 +184,10 @@ class OpenVideoChatActivity(Activity):
 
         elif src == "buddy_rem":
             self.gui.add_chat_text(_("%s has left the chat") % args)
+
+    #
+    # Send new chat message
+    #
 
     def send_chat_text(self, text):
         handle = self.netstack.get_tube_handle()
