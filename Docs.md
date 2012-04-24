@@ -1,10 +1,8 @@
-THE DOCS
-========
 This document serves as an outline of the code running OVC. We'll make
 note of the methods and areas that may need improvement.
 
 ovc.py
-------
+======
 The main program behind Open Video Chat.
 
 ### \_\_init__
@@ -37,7 +35,7 @@ The main program behind Open Video Chat.
     Store or read the chat history
 
 gui.py
-------
+======
 Controls the OLPC gui.
 
 ### \_\_init__
