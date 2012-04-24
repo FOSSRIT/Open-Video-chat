@@ -58,3 +58,29 @@ Controls the OLPC gui.
 
 ### send_video_to_screen
     Sends the video streams to the correct view.
+
+gst_ stack.py
+============
+Gstreamer bindings
+
+This [manual](http://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&ved=0CDEQFjAB&url=http%3A%2F%2Fgstreamer.freedesktop.org%2Fdata%2Fdoc%2Fgstreamer%2Fhead%2Fmanual%2Fmanual.pdf&ei=QwmXT63yNpGJ0QHJgfG3Dg&usg=AFQjCNEvyaAmY6UX5IHR9XyHr9fdhPjAAQ)
+is particularly helpful for understanding Gstreamer. Chapter 3 explains pipelines.
+
+### \_\_init__
+    Initialization
+
+### build_outgoing_pipeline
+    Creates a udpsink pipeline streaming video.
+
+    v4l2src -> videorate -> (CAPS) -> tee -> theoraenc -> udpsink
+    -> queue -> ffmpegcolorspace -> ximagesink
+
+    Higher reliability may be gained by using tcp or rtp sink instead.
+
+### build_incoming_pipeline
+    Creates a udpsrc pipeline to receive streaming video.
+
+    udpsrc -> theoradec -> ffmpegcolorspace -> xvimagesink
+
+    Higher reliability may be gained by using tcp or rtp src instead.
+
