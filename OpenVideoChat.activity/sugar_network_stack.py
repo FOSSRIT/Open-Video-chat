@@ -52,7 +52,7 @@ class SugarNetworkStack:
 
     def rem_buddy(self, buddy):
         """
-        Passes buddy nick to ovc
+        Remove buddy nick
         """
         if buddy:
             nick = buddy.props.nick
