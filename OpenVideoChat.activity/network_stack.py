@@ -20,5 +20,95 @@
 .. moduleauthor:: Justin Lewis <jlew.blackout@gmail.com>
 .. moduleauthor:: Taylor Rose <tjr1351@rit.edu>
 .. moduleauthor:: Fran Rogers <fran@dumetella.net>
-.. moduleauthro:: Remy DeCausemaker <remyd@civx.us>
+.. moduleauthor:: Remy DeCausemaker <remyd@civx.us>
+.. moduleauthor:: Casey DeLorme <cxd4280@rit.edu>
 """
+
+
+# External Imports
+import logging
+from telepathy.client import Connection
+from telepathy.client import Channel
+from telepathy.interfaces import CHANNEL_INTERFACE
+from telepathy.interfaces import CHANNEL_TYPE_TEXT
+from telepathy.constants import CHANNEL_TEXT_MESSAGE_TYPE_NORMAL
+
+
+# Define Logger for Logging & DEBUG level for Development
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
+class NetworkStack(object):
+
+    def __init__(self):
+        # Establish Default Properties
+        self.chan = None
+        self.owner = None
+        self.shared_activity = None
+        self.username = None
+        self.receive_message_callback = None
+
+    def setup(self, activity, get_buddy):
+        # Grab Shared Activity Reference
+        self.shared_activity = activity.shared_activity
+
+        # Add get_buddy reference
+        self.get_buddy = get_buddy
+
+        # Grab Username & Apply Owner
+        self.owner = activity.owner
+        if self.owner.nick:
+            self.username = self.owner.nick
+
+    def close(self):
+        # Delete Telepathy Connection Reference
+        self.chan = None
+        # try:
+        #     if self.chan is not None:
+        #         self.chan[CHANNEL_INTERFACE].Close()
+        # except Exception:
+        #     logger.debug("Unable to close channel")
+        # finally:
+
+    def connect(self, receive_message_callback):
+        logger.debug("Creating Connection")
+
+        # Assign Callback for Receiving Messages
+        self.receive_message_callback = receive_message_callback
+
+        # Acquire Channel and Connection
+        self.chan = self.shared_activity.telepathy_text_chan
+
+        # Assign Callbacks
+        self.chan[CHANNEL_INTERFACE].connect_to_signal(
+                'Closed',
+                self.close)
+        self.chan[CHANNEL_TYPE_TEXT].connect_to_signal(
+                'Received',
+                self.receive_message)
+
+    def send_message(self, message):
+        if self.chan is not None:
+            self.chan[CHANNEL_TYPE_TEXT].Send(
+                    CHANNEL_TEXT_MESSAGE_TYPE_NORMAL,
+                    message)
+
+    def receive_message(self, identity, timestamp, sender, type_, flags, message):
+        # Exclude any auxiliary messages
+        if type_ != 0:
+            return
+
+        # Get buddy from main
+        buddy = self.get_buddy(sender)
+        if type(buddy) is dict:
+            nick = buddy['nick']
+        else:
+            nick = buddy.props.nick
+
+        # Send Message if callback is set & buddy is not self
+        if self.receive_message_callback is not None and buddy != self.owner:
+            self.receive_message_callback(nick, message)
+
+        # Empty from pending messages
+        self.chan[CHANNEL_TYPE_TEXT].AcknowledgePendingMessages([identity])

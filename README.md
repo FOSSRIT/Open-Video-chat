@@ -18,11 +18,11 @@ Current Features
  * 20 FPS video
  * preview window
  * text chat
+ * RTP protocol implementation - Done :)
 
 Desired Features
 ----------------
 
- * RTP protocol implementation
  * faster frame rate (30+ FPS)
  * audio
  * higher resolution video

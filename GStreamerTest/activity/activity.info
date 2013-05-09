@@ -1,0 +1,7 @@
+[Activity]
+name = GSTreamerTest
+activity_version = 1
+bundle_id = org.sugarlabs.GStreamerTest
+exec = sugar-activity activity.TestWindow
+icon = activity-icon
+license = GPLv2+

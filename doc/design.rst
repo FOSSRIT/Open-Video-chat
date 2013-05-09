@@ -8,18 +8,22 @@ Open Video Chat is a video communication program being developed in the Center f
 
 Program Flow
 ============
-The main class is OpenVideoChatActivity.  This extends the sugar activity and acts as the main canvas for the gui.  It loads up the gui file which builds the menus and displays. It also builds a network stack instance and connects the sugar's shared and join calls to the network.
+The main class, ovc, sets up the components of OpenVideoChat: the GUI, the Network Stack, and GStreamer.
 
-This network stack is used for the text chat as well as passing ip addresses to the ohter machine. It uses the tube speak class to act as its dbus protocol.
+The GUI builds the menus and displays using GTK3.
 
-When a user joins the activity, they announce themselves over the network connection. Then the other computer responds to the announce with their ip address.  Once the joining system gets the other's ip, it sends its ip back and starts to stream its video using udp to the other machine.
+This network stack is used for the chat service overall.
+
+GStreamer operations are broken in to multiple bins for organization. Outbound video is taken, tee'd so the local user can see their own video preview, and the other end is sent over the network. The inbound part simply takes the video and displays it.
+
+When the system starts up, it starts a listener for anyone joining the shared activity (over telepathy and the accounts system). When the activity is marked as shared, sugar creates what is essentially a "joined listener" to start communication.
 
 
 Class Breakdown
 ===============
 ovc.py
 ------
-Main Program.  This class  connects the gui, gstreamer, and the network.
+Main Program.  This class connects the gui, gstreamer, and the network.
 
 gui.py
 ------
@@ -27,16 +31,16 @@ This class handles the graphical user interface.  It builds the menus, toolbars,
 
 network_stack.py
 ----------------
-Empty at this time. Will be used to generalize the Sugar network stack.
-
-sugar_network_stack.py
-----------------------
-Controls the Dbus tubes.  Requests all tubes and filters out ones that are not used by this program.
-
-tube_speak.py
--------------
-standard Dbus ExportedGObject 	
+Handles networking, using Telepathy. Presence is used more as an accounts system, rather than relying on Presence and tubes separately.
 
 gst_stack.py
 ------------
-This is the gstreamer stack.  This file builds the gstreamer pipeline that will be used by the activity.
+This is the GStreamer stack.  This file builds the gstreamer pipeline that will be used by the activity.
+
+gst_bins.py
+-----------
+Handles the grouping of GStreamer elements.
+
+test_ovc.py
+-----------
+A simple testing script for OVC.
