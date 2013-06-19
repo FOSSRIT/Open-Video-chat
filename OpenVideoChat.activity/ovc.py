@@ -126,10 +126,10 @@ class OpenVideoChatActivity(Activity):
             alert.props.title = title
             alert.props.msg = text
             self.add_alert(alert)
-            alert.connect('response', self.alert_cancel_cb)
+            alert.connect('response', self.cancel_alert)
             alert.show()
 
-    def alert_cancel_cb(self, alert, response_id):
+    def cancel_alert(self, alert, response_id):
         self.remove_alert(alert)
 
 
