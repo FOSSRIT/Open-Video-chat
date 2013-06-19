@@ -1,8 +1,8 @@
 [Activity]
 name = Open Video Chat
-activity_version = 1
+activity_version = 2
+host_version = 1
+bundle_id = org.laptop.OpenVideoChat
+license = GPL+
 icon = activity-video_chat
-service_name = org.laptop.OpenVideoChat
 exec = sugar-activity ovc.OpenVideoChatActivity
-
-show_launcher = 1
