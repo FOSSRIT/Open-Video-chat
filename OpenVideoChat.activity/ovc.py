@@ -58,9 +58,11 @@ class OpenVideoChatActivity(Activity):
         logger.debug("Preparing GUI")
         self.set_canvas(Gui(self))
 
+        """ Setup GSTStack """
+        logger.debug("Setting up GSTStack")
+        self.gststack = GSTStack()
+        self.get_canvas().set_gstreamer_stack(self.gststack);
 
-        # gobject is used for timeing (will be removed when rtp is implemented)
-        gobject.threads_init()
 
         # Set if they started the activity
         self.isServer = not self._shared_activity
@@ -84,18 +86,14 @@ class OpenVideoChatActivity(Activity):
         self._sh_hnd = self.connect('shared', self.netstack.shared_cb)
         self._jo_hnd = self.connect('joined', self.netstack.joined_cb)
 
-        # Setup Pipeline
-        #################
-        self.gststack = GSTStack(self.get_canvas().send_video_to_screen)
-        self.gststack.build_incoming_pipeline()
-        gobject.idle_add(self.gststack.start_stop_incoming_pipeline, True)
 
-        print "Activity Started"
-
+    # Automate Tear-Down of OVC Components
     def can_close(self):
-        print "Closing, stopping pipelines"
-        self.gststack.start_stop_incoming_pipeline(False)
-        self.gststack.start_stop_outgoing_pipeline(False)
+        logger.debug("Shutting down Network and GST")
+
+
+        # self.gststack.start_stop_incoming_pipeline(False)
+        # self.gststack.start_stop_outgoing_pipeline(False)
         return True
 
     def _alert(self, title, text=None, timeout=5):
