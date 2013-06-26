@@ -5,4 +5,4 @@ host_version = 1
 bundle_id = org.laptop.OpenVideoChat
 license = GPL+
 icon = activity-video_chat
-exec = sugar-activity ovc.OpenVideoChatActivity
+exec = sugar-activity sugar_ovc.OpenVideoChatActivity
