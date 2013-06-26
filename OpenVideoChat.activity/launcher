@@ -1,0 +1,5 @@
+#!/usr/bin/python2.7
+# Open Video Chat Launcher script
+
+from ovc import OpenVideoChat
+OpenVideoChat()
