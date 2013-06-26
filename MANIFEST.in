@@ -1,0 +1,10 @@
+MANIFEST.in
+OpenVideoChat.activity/activity/activity-video_chat.svg
+OpenVideoChat.activity/gst_bins.py
+OpenVideoChat.activity/gst_stack.py
+OpenVideoChat.activity/gui.py
+OpenVideoChat.activity/launcher
+OpenVideoChat.activity/network_stack.py
+OpenVideoChat.activity/ovc.py
+OpenVideoChat.activity/toolbar.py
+README.md
