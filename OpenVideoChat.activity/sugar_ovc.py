@@ -36,6 +36,7 @@ from sugar3.graphics.alert import NotifyAlert
 #Local Imports
 from gui import Gui
 from gst_stack import GSTStack
+from sugar_toolbar import Toolbar
 from network_stack import NetworkStack
 
 
@@ -56,16 +57,21 @@ class OpenVideoChatActivity(Activity):
         # Self-Enforced max_participants
         self.max_participants = SUGAR_MAX_PARTICIPANTS
 
-        # Prepare Storage Components
+        # Define Empty Properties
         self.network_stack = None
         self.gstreamer_stack = None
 
         # Set Owner
         self.owner = presenceservice.get_instance().get_owner()
 
-        # Setup GUI
+
+        """ Setup GUI """
+
         logger.debug("Preparing GUI")
+        self.set_title(_("OpenVideoChat"))
         self.set_canvas(Gui(self))
+        self.set_toolbar_box(Toolbar())
+        # activity.set_toolbar_box(self.build_toolbar(activity))
 
         # Setup GStreamer Stack
         logger.debug("Setting up GSTStack")
