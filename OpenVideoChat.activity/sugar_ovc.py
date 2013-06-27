@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with OpenVideoChat.  If not, see <http://www.gnu.org/licenses/>.
 """
-:mod: `OpenVideoChat/OpenVideoChat.activity/sugar_ovc` -- Open Video Chat
+:mod: `OpenVideoChat.activity/sugar_ovc` -- Open Video Chat
 =======================================================================
 
 .. moduleauthor:: Justin Lewis <jlew.blackout@gmail.com>
