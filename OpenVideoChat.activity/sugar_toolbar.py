@@ -25,8 +25,8 @@ from gi.repository import Gtk
 
 
 # Define Logger for Logging & DEBUG level for Development
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class Toolbar():
