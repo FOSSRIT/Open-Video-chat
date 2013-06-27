@@ -23,6 +23,8 @@
 # External Imports
 import logging
 from gi.repository import Gtk
+from gi.repository import Gdk
+from gettext import gettext as _
 
 
 # Define Logger for Logging & DEBUG level for Development
@@ -32,16 +34,16 @@ logger = logging.getLogger(__name__)
 
 # Constants
 ICONS = {
-    'play': 'media-playback-start-insensitive.svg',
-    'stop': 'media-playback-stop-insensitive.svg',
-    'unmute': 'speaker-100.svg',
-    'mute': 'speaker-000.svg'
+    'play': 'icons/media-playback-start-insensitive.svg',
+    'stop': 'icons/media-playback-stop-insensitive.svg',
+    'unmute': 'icons/speaker-100.svg',
+    'mute': 'icons/speaker-000.svg'
 }
 
 
 class Toolbar(Gtk.Expander):
     def __init__(self):
-        Gtk.Toolbar.__init__(self, expanded=True)
+        Gtk.Toolbar.__init__(self, expanded=True, label=_('Toolbar'))
         logger.debug("Preparing Toolbar")
 
         # Define Buttons
