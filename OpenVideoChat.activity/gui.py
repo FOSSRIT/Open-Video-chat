@@ -140,4 +140,3 @@ class Gui(Gtk.Grid):
     #         self.network_stack.send_message(message)
     #         self.chat_entry.set_text("")
     #         self.chat_entry.grab_focus()
-
