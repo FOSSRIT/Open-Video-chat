@@ -52,3 +52,53 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+### Linux Cross Platform Instructions
+
+#### Execution
+
+The application can be launched from command line via the launcher script:
+
+    chmod +x launcher
+    ./launcher
+
+Alternatively you can run the launcher through python:
+
+    python launcher
+
+
+#### Installation
+
+Simply download the repository files or unpackage the distributable copy to a folder of your choosing.
+
+An example of proper setup (requires privileged access):
+
+    sudo mv OpenVideoChat.activity /usr/local/ovc
+    sudo ln -s /usr/local/ovc/launcher /usr/bin/ovc-launcher
+
+Then you can access OpenVideoChat from anywhere while in command line via `ovc-launcher`.
+
+#### Adding it to Gnome3
+
+To add OpenVideoChat to the Gnome3 graphical environment, you will want to create an `ovc.desktop` file with contents similar to:
+
+    [Desktop Entry]
+    Name=Open Video Chat
+    Comment=FOSS Video Communication Tool
+    TryExec=ovc-launcher
+    Exec=ovc-launcher
+    Icon=/usr/local/ovc/activity/activity-video_chat.svg
+    Type=Application
+    Categories=GNOME;GTK;AudioVideo;Video;
+
+Place this file in `/usr/share/applications/` and it will now be accessible from Gnome3 either searching its name or its icon.
+
+
+##### _Local Installation_
+
+_You will not be able to install a symlink to command line without privielges._
+
+However you can still execute it, and add an `ovc.desktop` file to `~/.local/share/applications/` to make it accessible to only your user.  The path for `TryExec` and `Exec` will need to be changed according to its locally installed location since you have no short-hand command.
+
+
+- [Gnome3 Reference](https://developer.gnome.org/integration-guide/stable/desktop-files.html.en)
