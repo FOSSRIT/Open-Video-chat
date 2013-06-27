@@ -26,11 +26,6 @@ from gi.repository import Gdk
 from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ShareButton
 
-# from sugar3.graphics.toolbutton import ToolButton
-# from sugar3.graphics.toolbarbox import ToolbarBox
-# from sugar3.activity.widgets import ActivityButton
-# from sugar3.graphics.toolbarbox import ToolbarButton
-
 
 # Define Logger for Logging & DEBUG level for Development
 logging.basicConfig(level=logging.DEBUG)
@@ -83,32 +78,18 @@ class Toolbar(Gtk.Toolbar):
 
     def build_toolbar(self):
 
-        # Create Toolbar
-        # logger.debug("Building Toolbar")
-        # toolbar = Gtk.Toolbar()
-
-        # Add Buttons to Toolbar
-        # logger.debug("Adding Buttons")
-        # toolbar.insert(self.toggles['outgoing-video'], 0)
-        # toolbar.insert(self.toggles['outgoing-audio'], 1)
-        # toolbar.insert(self.toggles['incoming-video'], 2)
-        # toolbar.insert(self.toggles['incoming-audio'], 3)
-        # logger.debug("Buttons Added")
-
-        # Activity Specific Buttons
+        # Add Buttons to Self
+        logger.debug("Building Toolbar")
+        self.insert(ActivityButton(self.activity), -1)
+        self.insert(self.toggles['outgoing-video'], 0)
+        self.insert(self.toggles['outgoing-audio'], 1)
+        self.insert(self.toggles['incoming-video'], 2)
+        self.insert(self.toggles['incoming-audio'], 3)
+        self.insert(Gtk.SeparatorToolItem(draw=False, expand=True), -1)
+        # separator.set_expand(True)# No clue how this works
         self.insert(ShareButton(self.activity), -1)
         self.insert(StopButton(self.activity), -1)
-
-        # Return Toolbar
-        # logger.debug("Built Toolbar")
-        # return toolbar
-
-    # def build_toolbar(self, activity):
-    #     # Prepare Primary Toolbar Container
-    #     toolbar_box = ToolbarBox();
-
-    #     # Create activity button
-    #     toolbar_box.toolbar.insert(ActivityButton(activity), -1)
+        logger.debug("Built Toolbar")
 
     #     # Video Toggle
     #     video_toggle_button = ToolButton()
@@ -134,21 +115,3 @@ class Toolbar(Gtk.Toolbar):
     #     reload_video.connect("clicked", self.force_redraw)
     #     toolbar_box.toolbar.insert(reload_video, -1)
 
-    #     # Push stop button to far right
-    #     separator = Gtk.SeparatorToolItem()
-    #     separator.props.draw = False
-    #     separator.set_expand(True)
-    #     toolbar_box.toolbar.insert(separator, -1)
-
-    #     # Create Share Button
-    #     toolbar_box.toolbar.insert(ShareButton(activity), -1)
-
-    #     # Create stop button
-    #     toolbar_box.toolbar.insert(StopButton(activity), -1)
-
-    #     # Add reference to toolbar items
-    #     self.toolbar = toolbar_box.toolbar
-
-    #     # Display all components & Return
-    #     toolbar_box.show_all()
-    #     return toolbar_box
