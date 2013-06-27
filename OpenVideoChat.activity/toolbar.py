@@ -43,7 +43,7 @@ ICONS = {
 
 class Toolbar(Gtk.Expander):
     def __init__(self):
-        Gtk.Toolbar.__init__(self, expanded=True, label=_('Toolbar'))
+        Gtk.Expander.__init__(self, expanded=True, label=_('Toolbar'))
         logger.debug("Preparing Toolbar")
 
         # Define Buttons
@@ -72,17 +72,17 @@ class Toolbar(Gtk.Expander):
 
     def build_toolbar(self):
 
-        # Log Status
-        logger.debug("Building Toolbar")
-
         # Create Toolbar
+        logger.debug("Building Toolbar")
         toolbar = Gtk.Toolbar()
 
         # Add Buttons to Toolbar
+        logger.debug("Adding Buttons")
         toolbar.insert(self.toggles['outgoing-video'], 0)
         toolbar.insert(self.toggles['outgoing-audio'], 1)
         toolbar.insert(self.toggles['incoming-video'], 2)
         toolbar.insert(self.toggles['incoming-audio'], 3)
+        logger.debug("Buttons Added")
 
         # Override Background Color
         toolbar.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .8))
