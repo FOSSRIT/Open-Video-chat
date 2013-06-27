@@ -24,6 +24,7 @@
 import logging
 from gi.repository import Gtk
 
+
 #Local Imports
 from gui import Gui
 
@@ -51,13 +52,14 @@ class OpenVideoChatActivity(Gtk.Window):
         self.connect("delete-event", Gtk.main_quit)
         self.connect('check-resize', self.on_resize)
 
-        # Attach GUI
+        """ Setup GUI """
+        logger.debug("Preparing GUI")
         self.add(Gui())
+        # self.get_child().attach()
+        logger.debug("Finished Preparing GUI")
 
-        # Display
+        # Display & Begin Main Loop
         self.show()
-
-        # Begin Main Loop
         Gtk.main()
 
     def on_resize(self, trigger):
