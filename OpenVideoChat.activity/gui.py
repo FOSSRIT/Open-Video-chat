@@ -55,7 +55,7 @@ class Gui(Gtk.Grid):
     def build_video(self):
         logger.debug("Building Video")
 
-        # Create [GtkDrawingArea](https://developer.gnome.org/gtk3/3.0/GtkDrawingArea.html) & [Modify Background](https://developer.gnome.org/gtk3/3.0/gtk-question-index.html)
+        # Create Video Component
         self.video = video = Gtk.DrawingArea(vexpand=True, hexpand=True)
         video.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .9))
         video.show()
