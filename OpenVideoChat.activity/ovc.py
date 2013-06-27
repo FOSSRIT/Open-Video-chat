@@ -33,14 +33,33 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
+# Constants
+DEFAULT_WINDOW_SIZE = {
+    'width': 800,
+    'height': 600
+}
+
+
 class OpenVideoChatActivity(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Open Video Chat")
+
+        # Assume a default size of 800x600
+        self.set_default_size(DEFAULT_WINDOW_SIZE['width'], DEFAULT_WINDOW_SIZE['height'])
+
+        # Connect Window Event Signals
         self.connect("delete-event", Gtk.main_quit)
+        self.connect('check-resize', self.on_resize)
 
         # Attach GUI
+        self.add(Gui())
 
-        #
+        # Display
+        self.show()
 
         # Begin Main Loop
         Gtk.main()
+
+    def on_resize(self, trigger):
+        # On resize adjust displayed components (may not be needed)
+        return False
