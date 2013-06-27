@@ -1,4 +1,3 @@
-MANIFEST.in
 OpenVideoChat.activity/activity/activity-video_chat.svg
 OpenVideoChat.activity/gst_bins.py
 OpenVideoChat.activity/gst_stack.py
