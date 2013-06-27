@@ -33,3 +33,53 @@ class Toolbar():
     def __init__(self):
         # Do Something
         return True
+
+    # def build_toolbar(self, activity):
+    #     # Prepare Primary Toolbar Container
+    #     toolbar_box = ToolbarBox();
+
+    #     # Create activity button
+    #     toolbar_box.toolbar.insert(ActivityButton(activity), -1)
+
+    #     # Video Toggle
+    #     video_toggle_button = ToolButton()
+    #     video_toggle_button.connect("clicked", self.toggle_video)
+    #     toolbar_box.toolbar.insert(video_toggle_button, 1)
+    #     self.toggle_video(video_toggle_button)
+
+    #     # Audio Toggle
+    #     audio_toggle_button = ToolButton()
+    #     audio_toggle_button.connect("clicked", self.toggle_audio)
+    #     toolbar_box.toolbar.insert(audio_toggle_button, 2)
+    #     self.toggle_audio(audio_toggle_button)
+
+    #     # Toggle Preview Display Button
+    #     preview_toggle_button = ToolButton()
+    #     preview_toggle_button.connect("clicked", self.toolbar_toggle_preview_visibility)
+    #     toolbar_box.toolbar.insert(preview_toggle_button, 3)
+    #     self.toolbar_toggle_preview_visibility(preview_toggle_button)
+
+    #     # Forced Refresh
+    #     reload_video = ToolButton("view-refresh")
+    #     reload_video.set_tooltip_text(_("Reload Video"))
+    #     reload_video.connect("clicked", self.force_redraw)
+    #     toolbar_box.toolbar.insert(reload_video, -1)
+
+    #     # Push stop button to far right
+    #     separator = Gtk.SeparatorToolItem()
+    #     separator.props.draw = False
+    #     separator.set_expand(True)
+    #     toolbar_box.toolbar.insert(separator, -1)
+
+    #     # Create Share Button
+    #     toolbar_box.toolbar.insert(ShareButton(activity), -1)
+
+    #     # Create stop button
+    #     toolbar_box.toolbar.insert(StopButton(activity), -1)
+
+    #     # Add reference to toolbar items
+    #     self.toolbar = toolbar_box.toolbar
+
+    #     # Display all components & Return
+    #     toolbar_box.show_all()
+    #     return toolbar_box
