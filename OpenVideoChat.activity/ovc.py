@@ -43,7 +43,7 @@ DEFAULT_WINDOW_SIZE = {
 
 
 # OpenVideoChat Cross Platform extends [GtkWindow](https://developer.gnome.org/gtk3/3.0/GtkWindow.html)
-class OpenVideoChatActivity(Gtk.Window):
+class OpenVideoChat(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Open Video Chat")
 
