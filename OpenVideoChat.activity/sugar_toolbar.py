@@ -54,7 +54,7 @@ class Toolbar(Gtk.Toolbar):
         self.activity = activity
 
         # Set Background
-        self.toolbarbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .8))
+        self.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .8))
 
         # Define Buttons
         self.build_buttons()
