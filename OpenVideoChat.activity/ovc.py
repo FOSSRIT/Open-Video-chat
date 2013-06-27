@@ -27,6 +27,7 @@ from gi.repository import Gtk
 
 #Local Imports
 from gui import Gui
+from toolbar import Toolbar
 
 
 # Define Logger for Logging & DEBUG level for Development
@@ -41,6 +42,7 @@ DEFAULT_WINDOW_SIZE = {
 }
 
 
+# OpenVideoChat Cross Platform extends [GtkWindow](https://developer.gnome.org/gtk3/3.0/GtkWindow.html)
 class OpenVideoChatActivity(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Open Video Chat")
@@ -54,8 +56,10 @@ class OpenVideoChatActivity(Gtk.Window):
 
         """ Setup GUI """
         logger.debug("Preparing GUI")
+        # Gui extends [GtkGrid](https://developer.gnome.org/gtk3/3.0/GtkGrid.html)
         self.add(Gui())
-        # self.get_child().attach()
+        # Toolbar extends [GtkExpander](https://developer.gnome.org/gtk3/3.0/GtkExpander.html)
+        self.get_child().attach(Toolbar(), 0, 0, 1, 1)
         logger.debug("Finished Preparing GUI")
 
         # Display & Begin Main Loop
