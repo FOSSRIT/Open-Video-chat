@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1440"
+   height="900"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="Wire Frames.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3784"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3786" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#000000"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.2020815"
+     inkscape:cx="479.44988"
+     inkscape:cy="543.46617"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1436"
+     inkscape:window-height="856"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-152.36218)">
+    <rect
+       style="fill:#cccccc;fill-opacity:0.80000001;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3006"
+       width="1035.7142"
+       height="728.57141"
+       x="161.42857"
+       y="219.50504" />
+    <rect
+       y="253.07918"
+       x="162.29532"
+       height="68.018425"
+       width="1034.4226"
+       id="rect3778"
+       style="fill:#191919;fill-opacity:0.80000001;stroke:#000000;stroke-width:0.79712105000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <rect
+       style="fill:#191919;fill-opacity:0.89803922;stroke:#000000;stroke-width:1.00105738999999994;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3780"
+       width="1034.4226"
+       height="466.10373"
+       x="162.29532"
+       y="322.17935" />
+    <rect
+       y="805.72021"
+       x="162.29532"
+       height="121.07974"
+       width="1034.4226"
+       id="rect3782"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.95703745;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <rect
+       y="-947.57648"
+       x="162.29532"
+       height="20.790609"
+       width="970.16565"
+       id="rect3790"
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:1.13111544;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       transform="scale(1,-1)"
+       rx="4"
+       ry="4" />
+    <rect
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:1.12138844;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3792"
+       width="64.088226"
+       height="20.43457"
+       x="1132.6296"
+       y="927.14191"
+       rx="4"
+       ry="4" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="1148.645"
+       y="942.21497"
+       id="text3794"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3796"
+         x="1148.645"
+         y="942.21497"
+         style="font-size:12px">Send</tspan></text>
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0.13777777999999999;stroke-miterlimit:4;stroke-dasharray:none;opacity:0.96551724000000005;fill-opacity:1"
+       d="m 168.40251,795.49046 13.71792,0 -6.85896,5.6367 z"
+       id="path3798"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="1180.8885"
+       y="231.06755"
+       id="text3800"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3802"
+         x="1180.8885"
+         y="231.06755"
+         style="font-size:14px;font-weight:bold;-inkscape-font-specification:Sans Bold">x</tspan></text>
+    <rect
+       style="opacity:0.96551723;fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:1.079;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3828"
+       width="24.207895"
+       height="17.722677"
+       x="1172.7415"
+       y="219.54539" />
+    <rect
+       transform="scale(1,-1)"
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:1.03252697;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3818"
+       width="1034.3053"
+       height="16.25"
+       x="162.29532"
+       y="-805.57648" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="187.84776"
+       y="801.76312"
+       id="text3804"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3806"
+         x="187.84776"
+         y="801.76312"
+         style="font-size:12px">Chat (Gtk.Expander)</tspan></text>
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       id="path3808"
+       d="m 168.40251,241.49046 13.71792,0 -6.85896,5.6367 z"
+       style="opacity:0.96551723;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.13777777;stroke-dasharray:none" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text3810"
+       y="247.76312"
+       x="187.84776"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"><tspan
+         style="font-size:12px"
+         y="247.76312"
+         x="187.84776"
+         id="tspan3812"
+         sodipodi:role="line">Toolbar (Gtk.Expander)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="623.74634"
+       y="237.06755"
+       id="text3814"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3816"
+         x="623.74634"
+         y="237.06755"
+         style="font-size:16px;font-weight:bold;-inkscape-font-specification:Sans Bold">Open Video Chat (Gtk.Window, Title)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="169.74625"
+       y="825.01697"
+       id="text3820"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3822"
+         x="169.74625"
+         y="825.01697"
+         style="font-size:14px">Chat History (Gtk.TextBuffer inside Gtk.TextView inside Gtk.ScrolledWindow)</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3824"
+       y="941.01697"
+       x="169.74625"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"><tspan
+         style="font-size:14px"
+         y="941.01697"
+         x="169.74625"
+         id="tspan3826"
+         sodipodi:role="line">Chat Message Entry (Gtk.Entry)</tspan></text>
+  </g>
+</svg>
