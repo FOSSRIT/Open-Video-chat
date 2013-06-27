@@ -39,6 +39,7 @@ MAX_CHAT_MESSAGE_SIZE = 200
 
 class Gui(Gtk.Grid):
     def __init__(self):
+        Gtk.Grid.__init__(self, hexpand=True, vexpand=True)
 
         # Add Video
         logger.debug("Adding Video")
