@@ -40,19 +40,20 @@ MAX_CHAT_MESSAGE_SIZE = 200
 class Gui(Gtk.Grid):
     def __init__(self):
         Gtk.Grid.__init__(self, hexpand=True, vexpand=True)
+        logger.debug("Preparing GUI")
 
         # Add Video
-        logger.debug("Adding Video")
         self.attach(self.build_video(), 0, 1, 1, 1)
 
         # Add Chat
-        logger.debug("Adding Chat")
         self.attach(self.build_chat(), 0, 2, 1, 1)
 
         # Display Grid
         self.show()
+        logger.debug("GUI Prepared")
 
     def build_video(self):
+        logger.debug("Building Video")
 
         # Create [GtkDrawingArea](https://developer.gnome.org/gtk3/3.0/GtkDrawingArea.html) & [Modify Background](https://developer.gnome.org/gtk3/3.0/gtk-question-index.html)
         self.video = video = Gtk.DrawingArea(vexpand=True, hexpand=True)
@@ -60,9 +61,11 @@ class Gui(Gtk.Grid):
         video.show()
 
         # Return Video Component
+        logger.debug("Built Video")
         return video
 
     def build_chat(self):
+        logger.debug("Building Chat")
 
         # Create Chat Components
         self.chat_text_buffer = chat_text_buffer = Gtk.TextBuffer()
@@ -73,12 +76,14 @@ class Gui(Gtk.Grid):
         chat_entry.connect("activate", self.send_message)
         chat_send_message_button = Gtk.Button(_("Send"))
         chat_send_message_button.connect("clicked", self.send_message)
+        logger.debug("Built Chat Buffer, History, and Input")
 
         # Create Grid and Append Chat Components
         chat_grid = Gtk.Grid()
         chat_grid.attach(chat_scrollable_history, 0, 0, 2, 1)
         chat_grid.attach(chat_entry, 0, 1, 1, 1)
         chat_grid.attach(chat_send_message_button, 1, 1, 1, 1)
+        logger.debug("Built Chat Grid")
 
         # Add User List (Multi-User Feature - Not yet ready for implementation)
         # self.chat_grid.attach(self.build_user_list(), 2, 0, 1, 1)
@@ -87,11 +92,14 @@ class Gui(Gtk.Grid):
         chat_expander = Gtk.Expander(expanded=True, label=_("Chat"))
         chat_expander.add(chat_grid)
         chat_expander.show_all()
+        logger.debug("Built Chat Expander")
 
         # Return Attachable Component
+        logger.debug("Built Chat")
         return chat_expander
 
     def build_user_list(self):
+        # logger.debug("Building User List")
         # # Create User List Components
         # self.user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
         # self.user_list_search_button = Gtk.Button(_("Search"))
@@ -103,6 +111,7 @@ class Gui(Gtk.Grid):
         # self.user_list_expander = Gtk.Expander(label=_("Users"))
         # self.user_list_expander.add(self.user_list_grid)
         # self.user_list_expander.show_all()
+        # logger.debug("Built User List")
         return False
 
     def send_message(self, sender):

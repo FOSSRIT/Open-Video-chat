@@ -42,10 +42,10 @@ DEFAULT_WINDOW_SIZE = {
 }
 
 
-# OpenVideoChat Cross Platform extends [GtkWindow](https://developer.gnome.org/gtk3/3.0/GtkWindow.html)
 class OpenVideoChat(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Open Video Chat")
+        logger.debug("Preparing Open Video Chat")
 
         # Assume a default size of 800x600
         self.set_default_size(DEFAULT_WINDOW_SIZE['width'], DEFAULT_WINDOW_SIZE['height'])
@@ -55,15 +55,15 @@ class OpenVideoChat(Gtk.Window):
         self.connect('check-resize', self.on_resize)
 
         """ Setup GUI """
-        logger.debug("Preparing GUI")
-        # Gui extends [GtkGrid](https://developer.gnome.org/gtk3/3.0/GtkGrid.html)
         self.add(Gui())
-        # Toolbar extends [GtkExpander](https://developer.gnome.org/gtk3/3.0/GtkExpander.html)
         self.get_child().attach(Toolbar(), 0, 0, 1, 1)
-        logger.debug("Finished Preparing GUI")
-
-        # Display & Begin Main Loop
         self.show()
+
+        """ Setup Network Stack """
+        """ Setup GStreamer Stack """
+
+        # Proceed with Application Loop
+        logger.debug("Open Video Chat Prepared")
         Gtk.main()
 
     def on_resize(self, trigger):

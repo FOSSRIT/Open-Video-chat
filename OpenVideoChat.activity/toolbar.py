@@ -42,31 +42,36 @@ ICONS = {
 class Toolbar(Gtk.Expander):
     def __init__(self):
         Gtk.Toolbar.__init__(self, expanded=True)
+        logger.debug("Preparing Toolbar")
 
         # Define Buttons
-        logger.debug("Defining Toolbar Buttons")
         self.build_buttons()
 
         # Build Menu
-        logger.debug("Building Toolbar")
         self.add(self.build_toolbar())
 
         # Display
         self.show_all()
+        logger.debug("Toolbar Prepared")
 
     def build_buttons(self):
 
         # Create Toggles
+        logger.debug("Defining Toolbar Buttons")
         self.toggles = {
             'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
             'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['mute'])),
             'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
             'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['mute']))
         }
+        logger.debug("Defined Toolbar Buttons")
 
         # Define Signal Events
 
     def build_toolbar(self):
+
+        # Log Status
+        logger.debug("Building Toolbar")
 
         # Create Toolbar
         toolbar = Gtk.Toolbar()
@@ -81,4 +86,5 @@ class Toolbar(Gtk.Expander):
         toolbar.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .8))
 
         # Return Toolbar
+        logger.debug("Built Toolbar")
         return toolbar
