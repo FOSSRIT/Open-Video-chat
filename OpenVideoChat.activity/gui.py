@@ -26,6 +26,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gettext import gettext as _
 
+
 # Define Logger for Logging & DEBUG level for Development
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -38,26 +39,12 @@ ICONS = {
     'unmute': 'speaker-100.svg',
     'mute': 'speaker-000.svg'
 }
-DEFAULT_WINDOW_SIZE = {
-    'width': 800,
-    'height': 600
-}
 MIN_CHAT_HEIGHT = 160
 MAX_CHAT_MESSAGE_SIZE = 200
 
 
-class Gui(Gtk.Window):
+class Gui(Gtk.Grid):
     def __init__(self):
-        Gtk.Window.__init__(self, title="Open Video Chat")
-        self.connect("delete-event", Gtk.main_quit)
-
-        # Assume a default size of 800x600
-        self.set_default_size(DEFAULT_WINDOW_SIZE['width'], DEFAULT_WINDOW_SIZE['height'])
-
-        # Create a Grid Layout & Add to Window
-        self.layout = Gtk.Grid()
-        self.add(self.layout)
-        self.layout.show()
 
         # Add Toolbar
         self.build_toolbar()
@@ -68,10 +55,7 @@ class Gui(Gtk.Window):
         # Add Chat
         self.build_chat()
 
-        # Add Resize Event
-        self.connect('check-resize', self.on_resize)
-
-        # Display Contents & Execute Main Loop
+        # Display Grid
         self.show()
 
     def build_toolbar(self):
@@ -97,7 +81,7 @@ class Gui(Gtk.Window):
         self.toolbar_expander = Gtk.Expander(expanded=True)
         self.toolbar.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .9))
         self.toolbar_expander.add(self.toolbar)
-        self.layout.attach(self.toolbar_expander, 0, 0, 1, 1)
+        self.attach(self.toolbar_expander, 0, 0, 1, 1)
         self.toolbar_expander.show_all()
 
     def build_video(self):
@@ -105,7 +89,7 @@ class Gui(Gtk.Window):
         # Create a Gtk Drawing Area & Append to grid then display
         self.video = Gtk.DrawingArea(vexpand=True, hexpand=True)
         self.video.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .8))
-        self.layout.attach(self.video, 0, 1, 1, 1)
+        self.attach(self.video, 0, 1, 1, 1)
         self.video.show()
 
     def build_chat(self):
@@ -142,15 +126,8 @@ class Gui(Gtk.Window):
         # Create Expander & Add Grid to Expander and Expander to Layout Grid
         self.chat_expander = Gtk.Expander(expanded=True, label=_("Chat"))
         self.chat_expander.add(self.chat_grid)
-        self.layout.attach(self.chat_expander, 0, 2, 1, 1)
+        self.attach(self.chat_expander, 0, 2, 1, 1)
         self.chat_expander.show_all()
 
     def send_message(self, sender):
-        return False
-
-
-
-    # May remove this if I can figure out a smarter implementation
-    def on_resize(self, trigger):
-        # On resize adjust video components etc
         return False
