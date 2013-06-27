@@ -53,6 +53,9 @@ class Toolbar(Gtk.Toolbar):
         # Reference to Activity
         self.activity = activity
 
+        # Set Background
+        self.toolbarbox.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .8))
+
         # Define Buttons
         self.build_buttons()
 
@@ -90,9 +93,6 @@ class Toolbar(Gtk.Toolbar):
         # toolbar.insert(self.toggles['incoming-video'], 2)
         # toolbar.insert(self.toggles['incoming-audio'], 3)
         # logger.debug("Buttons Added")
-
-        # Override Background Color
-        # toolbar.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .8))
 
         # Activity Specific Buttons
         self.insert(ShareButton(self.activity), -1)
