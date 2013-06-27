@@ -26,8 +26,6 @@
 
 #External Imports
 import logging
-from gi.repository import Gdk
-Gdk.threads_init()
 from gettext import gettext as _
 from sugar3.presence import presenceservice
 from sugar3.activity.activity import Activity
