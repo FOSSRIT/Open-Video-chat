@@ -22,6 +22,7 @@
 # External Imports
 import logging
 from gi.repository import Gtk
+from gi.repository import Gdk
 from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ShareButton
 
