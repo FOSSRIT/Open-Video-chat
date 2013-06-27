@@ -26,28 +26,14 @@
 
 
 # External Imports
-import logging
-import datetime
 from gi.repository import Gtk
-from gi.repository import Gdk
 from gettext import gettext as _
-from sugar3.activity.widgets import StopButton
-from sugar3.activity.widgets import ShareButton
-from sugar3.graphics.toolbutton import ToolButton
-from sugar3.graphics.toolbarbox import ToolbarBox
-from sugar3.activity.widgets import ActivityButton
-from sugar3.graphics.toolbarbox import ToolbarButton
 
 
 # Constants
 MAX_MESSAGE_SIZE = 200
 MIN_CHAT_HEIGHT = 180
 DEFAULT_PREVIEW_SIZE = 0.25
-
-
-# Define Logger for Logging & DEBUG level for Development
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class Gui(Gtk.Grid):
@@ -61,14 +47,9 @@ class Gui(Gtk.Grid):
         # Display GUI
         self.show()
 
-        # Status Message
-        logger.debug("Finished Preparing GUI")
-
     """ Resource Methods """
 
     def set_network_stack(self, network_stack):
-        logger.debug("Network Stack has been supplied.")
-
         # Apply Network Stack for Local Use
         self.network_stack = network_stack
         self.buddy_handler = None
@@ -83,8 +64,6 @@ class Gui(Gtk.Grid):
             self.buddy_handler = network_stack.shared_activity.connect("buddy-joined", self.buddy_joined)
 
     def set_gstreamer_stack(self, gstreamer_stack):
-        logger.debug("GST Stack has been supplied.")
-
         # Set local GST Access
         self.gstreamer_stack = gstreamer_stack
 
@@ -173,31 +152,12 @@ class Gui(Gtk.Grid):
         else:
             self.movie_window_preview.show()
 
-    def toggle_incoming_visibility(self):
-        logger.debug("Temporarily Stairs")
-        # if self.movie_window_incoming.get_visible():
-        #     self.movie_window_incoming.hide()
-        # else:
-        #     self.movie_window_incoming.show()
-        #     self.movie_window_preview.hide()
-        #     self.movie_window_preview.show()
-
     """ Video Methods """
 
     def render_preview(self, sender):
         self.gstreamer_stack.build_working_preview(self.movie_window_preview.get_window().get_xid())
         # self.movie_window_preview.get_allocation().width,
         # self.movie_window_preview.get_allocation().height
-
-    def render_incoming(self, sender):
-        logger.debug("Temporarily Stairs")
-        # self.gstreamer_stack.set_incoming_window(self.movie_window_incoming.get_window().get_xid())
-
-    def set_incoming_size(self):
-        logger.debug("Temporarily Stairs")
-        # self.movie_window_incoming.set_size_request(
-        #         self.movie_window_incoming.get_parent().get_parent().get_allocation().width,
-        #         self.movie_window_incoming.get_parent().get_parent().get_allocation().height)
 
     def toggle_preview_size(self):
         if self.movie_window_preview.get_size_request()[0] == -1:
