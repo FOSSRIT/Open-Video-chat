@@ -66,7 +66,7 @@ class OpenVideoChatActivity(Activity):
 
         """ Setup GUI """
         self.set_canvas(Gui())
-        self.attach(Toolbar(activity), 0, 0, 1, 1)
+        self.get_canvas().attach(Toolbar(activity), 0, 0, 1, 1)
         self.show()
 
     #     logger.debug("Preparing GUI")
