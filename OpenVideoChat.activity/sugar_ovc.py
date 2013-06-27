@@ -64,79 +64,80 @@ class OpenVideoChatActivity(Activity):
         # Set Owner
         self.owner = presenceservice.get_instance().get_owner()
 
-
         """ Setup GUI """
+        self.add(Gui())
+        # self.get_child().attach(Toolbar(), 0, 0, 1, 1)
+        self.set_toolbox(Toolbar())
+        self.show()
 
-        logger.debug("Preparing GUI")
-        self.set_title(_("OpenVideoChat"))
-        self.set_canvas(Gui(self))
-        self.set_toolbar_box(Toolbar())
-        # activity.set_toolbar_box(self.build_toolbar(activity))
+    #     """ Setup GUI """
 
-        # Setup GStreamer Stack
-        logger.debug("Setting up GSTStack")
-        self.gststack = GSTStack()
-        self.get_canvas().set_gstreamer_stack(self.gststack);
+    #     logger.debug("Preparing GUI")
+    #     self.set_title(_("OpenVideoChat"))
+    #     self.set_canvas(Gui(self))
+    #     self.set_toolbar_box(Toolbar())
+    #     # activity.set_toolbar_box(self.build_toolbar(activity))
 
-        # Setup Network Stack
-        logger.debug("Connect Event to Setup Network Stack on Demand")
-        self.establish_activity_sharing(handle)
+    #     # Setup GStreamer Stack
+    #     logger.debug("Setting up GSTStack")
+    #     self.gststack = GSTStack()
+    #     self.get_canvas().set_gstreamer_stack(self.gststack);
 
+    #     # Setup Network Stack
+    #     logger.debug("Connect Event to Setup Network Stack on Demand")
+    #     self.establish_activity_sharing(handle)
 
-    """ Networking & Network Stack Setup """
+    # """ Networking & Network Stack Setup """
 
-    def establish_activity_sharing(self, handle=None):
-        if self.shared_activity:
-            self.sharing_handler = self.connect("joined", self.share_activity_internals)
-        elif handle.uri:# XMPP Logic
-            logger.debug("XMPP Connection Requested")
-        else:
-            self.sharing_handler = self.connect("shared", self.share_activity_internals)
+    # def establish_activity_sharing(self, handle=None):
+    #     if self.shared_activity:
+    #         self.sharing_handler = self.connect("joined", self.share_activity_internals)
+    #     elif handle.uri:# XMPP Logic
+    #         logger.debug("XMPP Connection Requested")
+    #     else:
+    #         self.sharing_handler = self.connect("shared", self.share_activity_internals)
 
-    def share_activity_internals(self, sender):
-        # Create Network Stack
-        sender.network_stack = NetworkStack()
+    # def share_activity_internals(self, sender):
+    #     # Create Network Stack
+    #     sender.network_stack = NetworkStack()
 
-        # Disconnect Sharing Handler
-        sender.disconnect(sender.sharing_handler)
+    #     # Disconnect Sharing Handler
+    #     sender.disconnect(sender.sharing_handler)
 
-        # Setup Network Components
-        sender.network_stack.setup(sender, sender.get_buddy)
+    #     # Setup Network Components
+    #     sender.network_stack.setup(sender, sender.get_buddy)
 
-        # Supply Network Stack to GUI
-        sender.get_canvas().set_network_stack(sender.network_stack)
+    #     # Supply Network Stack to GUI
+    #     sender.get_canvas().set_network_stack(sender.network_stack)
 
-    def get_buddy(self, handle):
-        pservice = presenceservice.get_instance()
-        tp_name, tp_path = pservice.get_preferred_connection()
-        return pservice.get_buddy_by_telepathy_handle(tp_name, tp_path, handle)
+    # def get_buddy(self, handle):
+    #     pservice = presenceservice.get_instance()
+    #     tp_name, tp_path = pservice.get_preferred_connection()
+    #     return pservice.get_buddy_by_telepathy_handle(tp_name, tp_path, handle)
 
+    # """ Tear-Down Handling """
 
-    """ Tear-Down Handling """
+    # def can_close(self):
+    #     logger.debug("Shutting down Network and GST")
+    #     if self.network_stack is not None:
+    #         self.network_stack.close()
+    #     # self.gststack.start_stop_incoming_pipeline(False)
+    #     # self.gststack.start_stop_outgoing_pipeline(False)
+    #     return True
 
-    def can_close(self):
-        logger.debug("Shutting down Network and GST")
-        if self.network_stack is not None:
-            self.network_stack.close()
-        # self.gststack.start_stop_incoming_pipeline(False)
-        # self.gststack.start_stop_outgoing_pipeline(False)
-        return True
+    # """ Automated Alert Handling """
 
+    # def alert(self, title, text=None, timeout=5):
+    #     if text != None:
+    #         alert = NotifyAlert(timeout=timeout)
+    #         alert.props.title = title
+    #         alert.props.msg = text
+    #         self.add_alert(alert)
+    #         alert.connect('response', self.cancel_alert)
+    #         alert.show()
 
-    """ Automated Alert Handling """
-
-    def alert(self, title, text=None, timeout=5):
-        if text != None:
-            alert = NotifyAlert(timeout=timeout)
-            alert.props.title = title
-            alert.props.msg = text
-            self.add_alert(alert)
-            alert.connect('response', self.cancel_alert)
-            alert.show()
-
-    def cancel_alert(self, alert, response_id):
-        self.remove_alert(alert)
-
+    # def cancel_alert(self, alert, response_id):
+    #     self.remove_alert(alert)
 
     """ Journal Save and Restore """
 
