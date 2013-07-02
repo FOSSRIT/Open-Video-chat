@@ -86,11 +86,11 @@ class Toolbar(Gtk.Toolbar):
         # Add Buttons to Self
         logger.debug("Building Toolbar")
         self.insert(ActivityButton(self.activity), -1)
-        self.insert(self.toggles['outgoing-video'], 0)
-        self.insert(self.toggles['outgoing-audio'], 1)
-        self.insert(self.toggles['incoming-video'], 2)
-        self.insert(self.toggles['incoming-audio'], 3)
-        self.insert(Gtk.SeparatorToolItem(draw=False, expand=True), -1)
+        self.insert(self.toggles['outgoing-video'], 1)
+        self.insert(self.toggles['outgoing-audio'], 2)
+        self.insert(self.toggles['incoming-video'], 3)
+        self.insert(self.toggles['incoming-audio'], 4)
+        self.insert(Gtk.SeparatorToolItem(draw=False, hexpand=True), -1)
         # separator.set_expand(True)# No clue how this works
         self.insert(ShareButton(self.activity), -1)
         self.insert(StopButton(self.activity), -1)
