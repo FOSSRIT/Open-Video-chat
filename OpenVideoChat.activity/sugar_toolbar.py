@@ -83,17 +83,24 @@ class Toolbar(Gtk.Toolbar):
 
     def build_toolbar(self):
 
+        # Apparently set_expand is not the same as expand=True in properties
+        # So we need to prepare this to space out the middle
+        spacer = Gtk.SeparatorToolItem(draw=False)
+        spacer.set_expand(True)
+
         # Add Buttons to Self
         logger.debug("Building Toolbar")
-        self.insert(ActivityButton(self.activity), -1)
-        self.insert(self.toggles['outgoing-video'], 1)
-        self.insert(self.toggles['outgoing-audio'], 2)
-        self.insert(self.toggles['incoming-video'], 3)
-        self.insert(self.toggles['incoming-audio'], 4)
-        self.insert(Gtk.SeparatorToolItem(draw=False, hexpand=True), -1)
-        # separator.set_expand(True)# No clue how this works
-        self.insert(ShareButton(self.activity), -1)
-        self.insert(StopButton(self.activity), -1)
+        self.insert(Gtk.SeparatorToolItem(draw=False), 0)
+        self.insert(ActivityButton(self.activity), 1)
+        self.insert(self.toggles['outgoing-video'], 2)
+        self.insert(self.toggles['outgoing-audio'], 3)
+        self.insert(Gtk.SeparatorToolItem(draw=True), 4)
+        self.insert(self.toggles['incoming-video'], 5)
+        self.insert(self.toggles['incoming-audio'], 6)
+        self.insert(spacer, 7)
+        self.insert(ShareButton(self.activity), 8)
+        self.insert(StopButton(self.activity), 9)
+        self.insert(Gtk.SeparatorToolItem(draw=False), 10)
         logger.debug("Built Toolbar")
 
     #     # Video Toggle
