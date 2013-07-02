@@ -78,10 +78,12 @@ class Toolbar(Gtk.Expander):
 
         # Add Buttons to Toolbar
         logger.debug("Adding Buttons")
-        toolbar.insert(self.toggles['outgoing-video'], 0)
-        toolbar.insert(self.toggles['outgoing-audio'], 1)
-        toolbar.insert(self.toggles['incoming-video'], 2)
-        toolbar.insert(self.toggles['incoming-audio'], 3)
+        toolbar.insert(Gtk.SeparatorToolItem(draw=False), 0)
+        toolbar.insert(self.toggles['outgoing-video'], 1)
+        toolbar.insert(self.toggles['outgoing-audio'], 2)
+        toolbar.insert(Gtk.SeparatorToolItem(draw=False), 3)
+        toolbar.insert(self.toggles['incoming-video'], 4)
+        toolbar.insert(self.toggles['incoming-audio'], 5)
         logger.debug("Buttons Added")
 
         # Override Background Color
