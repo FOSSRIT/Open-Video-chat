@@ -65,8 +65,9 @@ class OpenVideoChatActivity(Activity):
         self.owner = presenceservice.get_instance().get_owner()
 
         """ Setup GUI """
+        self.set_toolbar_box(Toolbar(self))
         self.set_canvas(Gui())
-        self.get_canvas().attach(Toolbar(self), 0, 0, 1, 1)
+        # self.get_canvas().attach(Toolbar(self), 0, 0, 1, 1)
         self.show()
 
     #     logger.debug("Preparing GUI")
