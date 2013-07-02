@@ -13,11 +13,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with OpenVideoChat.  If not, see <http://www.gnu.org/licenses/>.
 """
-:mod: `OpenVideoChat.activity/dialog` -- Open Video Chat
+:mod: `OpenVideoChat.activity/dialog` -- Open Video Chat Gui
 =======================================================================
 
 .. moduleauthor:: Casey DeLorme <cxd4280@rit.edu>
 """
+
 
 # Imports
 from gi.repository import Gtk
@@ -45,9 +46,6 @@ class Dialog(Gtk.EventBox):
     def __init__(self, **kwargs):
         Gtk.EventBox.__init__(self, **kwargs)
 
-        # Set Max Size?
-        # self.set_size_request(-1, 50)
-
         # Background Color
         self.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.1, .1, .1, .75))
 
@@ -69,12 +67,8 @@ class Dialog(Gtk.EventBox):
         self.apply_message(None, None)
 
         # Add Buttons
-        self.buttons[Gtk.ResponseType.OK] = Gtk.Button(label=_("Ok"))
-        self.buttons[Gtk.ResponseType.OK].connect('clicked', self.button_clicked, Gtk.ResponseType.OK)
-        self.buttons[Gtk.ResponseType.CANCEL] = Gtk.Button(label=_("Cancel"))
-        self.buttons[Gtk.ResponseType.CANCEL].connect('clicked', self.button_clicked, Gtk.ResponseType.CANCEL)
-        self.layout.attach(self.buttons[Gtk.ResponseType.OK], 1, 0, 1, 1)
-        self.layout.attach(self.buttons[Gtk.ResponseType.CANCEL], 1, 1, 1, 1)
+        self.add_button(Gtk.ResponseType.OK, "Ok")
+        self.add_button(Gtk.ResponseType.CANCEL, "Cancel")
 
         # Change UI on update
         self.connect('notify::title', self.apply_title)
@@ -82,6 +76,13 @@ class Dialog(Gtk.EventBox):
 
         # Render
         self.show_all()
+
+    def add_button(self, signal, text):
+        button = Gtk.Button(label=_(text), hexpand=False, vexpand=False)
+        button.set_size_request(50, 30)
+        button.connect('clicked', self.button_clicked, signal)
+        self.buttons[signal] = button
+        self.layout.attach(self.buttons[signal], len(self.buttons), 0, 1, 2)
 
     def apply_title(self, sender, data):
         self.title_label.set_markup('<b>' + (self.title or '') + '</b>')
