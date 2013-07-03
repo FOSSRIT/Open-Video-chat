@@ -62,7 +62,7 @@ class Toolbar(Gtk.Expander):
         logger.debug("Defining Toolbar Buttons")
         self.toggles = {
             'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['play'])),
-            'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['mute'])),
+            'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['unmute'])),
             'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
             'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['mute']))
         }
@@ -81,7 +81,7 @@ class Toolbar(Gtk.Expander):
         toolbar.insert(Gtk.SeparatorToolItem(draw=False), 0)
         toolbar.insert(self.toggles['outgoing-video'], 1)
         toolbar.insert(self.toggles['outgoing-audio'], 2)
-        toolbar.insert(Gtk.SeparatorToolItem(draw=False), 3)
+        toolbar.insert(Gtk.SeparatorToolItem(draw=True), 3)
         toolbar.insert(self.toggles['incoming-video'], 4)
         toolbar.insert(self.toggles['incoming-audio'], 5)
         logger.debug("Buttons Added")
