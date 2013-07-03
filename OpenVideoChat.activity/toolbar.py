@@ -36,8 +36,8 @@ logger = logging.getLogger(__name__)
 ICONS = {
     'play': 'icons/ovc-start-tiny.svg',
     'stop': 'icons/ovc-stop-tiny.svg',
-    'unmute': 'icons/speaker-100.svg',
-    'mute': 'icons/speaker-000.svg'
+    'unmute': 'icons/ovc-unmute-tiny.svg',
+    'mute': 'icons/ovc-mute-tiny.svg'
 }
 
 
