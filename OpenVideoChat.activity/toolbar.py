@@ -34,8 +34,8 @@ logger = logging.getLogger(__name__)
 
 # Constants
 ICONS = {
-    'play': 'icons/media-playback-start-insensitive.svg',
-    'stop': 'icons/media-playback-stop-insensitive.svg',
+    'play': 'icons/ovc-start.svg',
+    'stop': 'icons/ovc-start-tiny.svg',
     'unmute': 'icons/speaker-100.svg',
     'mute': 'icons/speaker-000.svg'
 }
@@ -61,7 +61,7 @@ class Toolbar(Gtk.Expander):
         # Create Toggles
         logger.debug("Defining Toolbar Buttons")
         self.toggles = {
-            'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
+            'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['play'])),
             'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['mute'])),
             'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
             'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['mute']))
