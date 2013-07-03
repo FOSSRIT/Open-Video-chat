@@ -34,8 +34,8 @@ logger = logging.getLogger(__name__)
 
 # Constants
 ICONS = {
-    'play': 'icons/ovc-start.svg',
-    'stop': 'icons/ovc-start-tiny.svg',
+    'play': 'icons/ovc-start-tiny.svg',
+    'stop': 'icons/ovc-stop-tiny.svg',
     'unmute': 'icons/speaker-100.svg',
     'mute': 'icons/speaker-000.svg'
 }
