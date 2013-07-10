@@ -16,6 +16,11 @@
 :mod: `OpenVideoChat.activity/gui` -- Open Video Chat
 =======================================================================
 
+.. moduleauthor:: Justin Lewis <jlew.blackout@gmail.com>
+.. moduleauthor:: Taylor Rose <tjr1351@rit.edu>
+.. moduleauthor:: Fran Rogers <fran@dumetella.net>
+.. moduleauthro:: Remy DeCausemaker <remyd@civx.us>
+.. moduleauthor:: Caleb Coffie <CalebCoffie@gmail.com>
 .. moduleauthor:: Casey DeLorme <cxd4280@rit.edu>
 """
 
