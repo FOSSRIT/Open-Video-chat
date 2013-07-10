@@ -4,358 +4,234 @@
 
 UI Design and objects are undergoing changes, check the date of this document against the file git log for reference.
 
+---
+
+## File Summary
+
+- launcher
+- setup.py
+- ovc.py
+- sugar_ovc.py
+- toolbar.py
+- sugar_toolbar.py
+- dialog.py
+- gui.py
+- network_stack.py
+- gst_stack.py
+- gst_bins.py
+
+Theree are also small & large icons, created for cross-platform consistency.
+
+
+## What each file does
+
+The launcher is for cross-platform execution, and the setup.py is for sugar.
+
+A top-level setup.py will be modified to install the cross-platform implementation.
+
+There are two ovc and toolbar files to handle sugar dependencies.  Ideally we wish to keep sugar abstracted from the gui, network stack, and gstreamer stack.
+
+At the moment both the network stack and gst files are incomplete and non-functional.
+
+The toolbars both use the new icons for cross-platform consistency.
+
+
+## A Note on Cross Platform
+
+If patches are made to the code in the future, please keep the sugar specific components inside the sugar prefixed files in order to retain layered abstraction.
 
 ---
 
-### ovc.py
 
-Primary Executable; contains the class referenced by activity.info for execution.
+### Verbose File Descriptions
 
 
-#### `establish_activity_sharing`
+#### ovc.py
 
-Handles setup for sharing and joining conditionally according to whether the activity has been shared or joined.
+**Imports:**
 
+-
 
-#### `share_activity_internals`
+**Depends On:**
 
-Creates the network stack and establishes connection between components.
+-
 
+**Classes>Methods:**
 
-#### `get_buddy`
+-
 
-Use Sugar components from the activity and Telepathy components from the Network Stack to derive a buddy name.
+This file is the core of the system and acts as a medium between the components.
 
+**References:**
 
-#### `can_close`
+- []()
 
-Handles deconstruction of objects in-use (if needed).
 
-_Will be used to notify other users of disconnection._
+#### sugar_ovc.py
 
+**Imports:**
 
-#### `alert`
+-
 
-Display alert message.
+**Depends On:**
 
-_This may not be needed, so some tests should be performed._
+-
 
+**Classes>Methods:**
 
-#### `cancel_alert`
+-
 
-Close the displayed alert
+This file is the core for sugar and acts as a medium between the components, and the abstraction for sugar specific requirements.
 
+**References:**
 
-#### `write_file`
+- []()
 
-Save chat log to journal entry for restoring session.
 
-_Needs additional testing._
+#### toolbar.py
 
+**Imports:**
 
-#### `read_file`
+-
 
-Restore previous session chat log.
+**Depends On:**
 
+-
 
----
+**Classes>Methods:**
 
-### gui.py
+-
 
-UI extending Sugar Activity and using Gtk3.
+This is the cross-platform toolbar without sugar specific components.
 
-Ideally if we can separate the Network Stack and GStreamer Stack from Sugar dependencies, we can make them portable, pushing the only need for changes off to the gui.
+It uses the small icon sizes by default.
 
-Still requires some serious cleanup to reduce length and verbosity where able.
+**References:**
 
+- []()
 
-#### `set_network_stack`
 
-Connect network_stack for handling.
+#### sugar_toolbar.py
 
+**Imports:**
 
-#### `set_gstreamer_stack`
+-
 
-Connect gst_stack for handling.
+**Depends On:**
 
+-
 
-#### `build_video`
+**Classes>Methods:**
 
-Prepare video GUI components and container.
+-
 
+This toolbar uses the sugar components for activity icon and closing.
 
-#### `build_chat`
+It uses the large icons by default.
 
-Prepare chat GUI components and container.
+**References:**
 
+- []()
 
-#### `build_toolbar`
 
-Build Sugar Toolbar buttons and tie toggles to methods.
+#### gui.py
 
+**Imports:**
 
-#### `toggle_video`
+-
 
-Toggle Incoming Video.
+**Depends On:**
 
+-
 
-#### `toggle_audio`
+**Classes>Methods:**
 
-Toggle Audio (incoming/outgoing?)
+-
 
+This is a multi-platform compatible GUI that has no sugar dependencies and can therefore exist on sugar and on other platforms.
 
-#### `toolbar_toggle_preview_visibility`
+It uses Gtk3.
 
-Toggle button display and label text, connects to toggle_preview_visibility method.
+**References:**
 
+- [Gtk3 Docs](https://developer.gnome.org/gtk3/3.0/)
+- [Gtk3 Python Tutorial](http://python-gtk-3-tutorial.readthedocs.org/en/latest/)
+- [GObject Docs](https://developer.gnome.org/gobject/stable/)
+- [GLib Docs](https://developer.gnome.org/glib/stable/)
 
-#### `enable_net_options`
 
-Enable Network processes and related toggles.
+#### network_stack.py
 
-Called when connected.
 
+**Imports:**
 
-#### `disable_net_options`
+-
 
-Disable Network processes and related toggles.
+**Depends On:**
 
-Called if connection lost?
+-
 
+**Classes>Methods:**
 
-#### `enable_gst_options`
+-
 
-Enable GStreamer components.
+Network Stack, details incomplete.
 
+**References:**
 
-#### `disable_gst_options`
+- [Telepathy Docs](http://telepathy.freedesktop.org/doc/book/index.html)
+- [Telepathy DBus](http://telepathy.freedesktop.org/doc/book/sect.basics.dbus.html)
+- [Gajim Jabber Client](http://gajim.org/)
 
-Disable GStreamer components.
 
+#### gst_stack.py
 
-#### `toggle_preview_visibility`
+**Imports:**
 
-Toggle video preview, notifies GStreamer Stack to stop using webcam and notifies any connected users to cease listening for theirs.
+-
 
+**Depends On:**
 
-#### `toggle_incoming_visibility`
+-
 
-Turn off incoming video.
+**Classes>Methods:**
 
-Should notify connected user over network stack to cease their output.
+-
 
+GStreamer Stack, details incomplete.
 
-#### `render_preview`
+**References:**
 
-Tie GtkDrawingArea Gdk window id to GStreamer Stack output.
+- [GStreamer Official Docs](http://gstreamer.freedesktop.org/documentation/)
+- [GStreamer Docs](https://developer.gnome.org/platform-overview/stable/gstreamer)
 
 
-#### `render_incoming`
+#### gst_bins.py
 
-Tie GtkDrawingArea Gdk window id to GStreamer Stack output.
 
+**Imports:**
 
-#### `set_preview_size`
+-
 
-Sets the preview GtkDrawingArea size according dynamically.
+**Depends On:**
 
+-
 
-#### `set_incoming_size`
+**Classes>Methods:**
 
-Set incoming video GtkDrawingArea size dynamically.
+-
 
+This file manages bins used to exert simplified control and separate GStreamer components.
 
-#### `toggle_preview_size`
+Keeping components separated can increase bandwidth consumption but reduces CPU requirements for parsing streams.  This may prove to be a requirement for low-powered machines, like the XO laptops.
 
-Adjust dynamic preview sizes.
 
 
-#### `resized`
 
-Handle resize event (does not apply to Sugar and can probably be removed).
 
 
-#### `get_history`
 
-Retreives chat log from stored history in journal session, if able.
 
-
-#### `chat_write_line`
-
-Writes a custom message to chat history (such as system messages).
-
-
-#### `receive_message`
-
-Handles message received over chat dialog.
-
-
-#### `send_message`
-
-Sends message over network.
-
-
-#### `buddy_joined`
-
-Posts buddy-joined message.
-
-
-#### `buddy_left`
-
-Posts buddy-left message.
-
-_Sugar does not appear to be working._
-
-
-#### `connect_incoming_movie`
-
-_Currently not in use._
-
-
-#### `disconnect_incoming_movie`
-
-_Currently not in use._
-
-
-#### `force_redraw`
-
-Method tied to component used to resolve formerly logged video frame locking problem.
-
-
----
-
-### gst_stack.py
-
-GStreamer Stack, handles video (and soon audio) protocols and streaming.
-
-Currently working on 1.0 and 0.10 cross-compatible code.
-
-
-#### `build_working_preview`
-
-_Temporary method to test preview video._
-
-
-#### `on_message`
-
-Global on_message handler tied to `build_working_preview`.
-
-
-#### `draw_preview`
-
-Temporary method to tie video output to a supplied window id.
-
-
-#### `set_incoming_window`
-
-**Documentation Incomplete**
-
-
-#### `toggle_video_state`
-
-**Documentation Incomplete**
-
-
-#### `toggle_audio_state`
-
-**Documentation Incomplete**
-
-
-#### `build_preview`
-
-**Documentation Incomplete**
-
-
-#### `build_preview` > `on_message`
-
-**Documentation Incomplete**
-
-
-#### `build_preview` >  `on_sync_message`
-
-**Documentation Incomplete**
-
-
-#### `build_outgoing_pipeline`
-
-**Documentation Incomplete**
-
-
-#### `build_incoming_pipeline`
-
-**Documentation Incomplete**
-
-
-#### `build_incoming_pipeline` > `on_message`
-
-**Documentation Incomplete**
-
-
-#### `build_incoming_pipeline` > `on_sync_message`
-
-**Documentation Incomplete**
-
-
-#### `start_stop_outgoing_pipeline`
-
-**Documentation Incomplete**
-
-
-#### `start_stop_incoming_pipeline`
-
-**Documentation Incomplete**
-
-
----
-
-### gst_bins.py
-
-Simple Bin Class Storage used to managed entire constructed streams and grouped by type.
-
-- Incoming Video
-- Incoming Audio
-- Outgoing Video
-- Outgoing Audio
-
-Implementation is still incomplete and experimental.
-
-
----
-
-### network_stack.py
-
-Handles network activity.
-
-Attempts have been made to extrapolate Sugar dependencies from the code, resulting in a smaller and lighter weight stack.
-
-
-#### `setup`
-
-Setup network stack and connect to activity without directly referencing or depending on Sugar design.
-
-
-#### `close`
-
-Close the Telepathy channels.
-
-_Should first send a message to connected users regarding disconnection for graceful shutdown._
-
-
-#### `connect`
-
-Establishes Telepathy Channel for communication.
-
-
-#### `send_message`
-
-Send chat message over Telepathy Channel.
-
-
-#### `receive_message`
-
-Handle received messages over channel.
-
-_Possibility of using parsed string command format would turn this into a much more complex utility method._
 
 
 ---
@@ -379,7 +255,8 @@ Manual installation command:
 **Note: The sugar setup.py build & dist_xo processes use the git file history when copying the files, and will throw an error if you delete a file without notifying git.  It may also skip files in the directory that have not been added to the git repository.**
 
 
-#### Latest Reference Materials
+
+#### Generic / All Purpose References
 
 The following list of links are reference materials and reading related to the code.
 
@@ -388,23 +265,30 @@ Most of the code was written using these links and other Sugar activities as ref
 Keep in mind that due to Introspection libraries many of the docs these days are for C specifically, and some degree of a learning curve is involved with identifying the API according to your language of choice (in our case python).
 
 
-- [Gtk3 Docs](https://developer.gnome.org/gtk3/3.0/)
-- [Gtk3 Python Tutorial](http://python-gtk-3-tutorial.readthedocs.org/en/latest/)
 - [bpython (terminal introspection autocompletion)](http://bpython-interpreter.org/)
-
-- [Telepathy Docs](http://telepathy.freedesktop.org/doc/book/index.html)
-- [Telepathy DBus](http://telepathy.freedesktop.org/doc/book/sect.basics.dbus.html)
-
-- [GStreamer Official Docs](http://gstreamer.freedesktop.org/documentation/)
-- [GStreamer Docs](https://developer.gnome.org/platform-overview/stable/gstreamer)
-
-- [GObject Docs](https://developer.gnome.org/gobject/stable/)
-- [GLib Docs](https://developer.gnome.org/glib/stable/)
-
+- [Developer Blog](http://cxd4280.wordpress.com)
 - [distutils](http://docs.python.org/2/library/distutils.html)
 - [Distributable](http://guide.python-distribute.org/)
 - [C setuputils](http://robotics.usc.edu/~ampereir/wordpress/?p=202)
 - [Setup Script](http://docs.python.org/2/distutils/setupscript.html#installing-scripts)
 - [One Click Distributable](http://stackoverflow.com/questions/5359581/want-to-use-distutils-to-install-my-python-app-with-a-one-click-launcher-file)
 
-- [Developer Blog](http://cxd4280.wordpress.com)
+
+
+
+
+
+
+---
+
+**Incomplete Misplaced:**
+
+    # Gui extends [GtkGrid](https://developer.gnome.org/gtk3/3.0/GtkGrid.html)
+    # Toolbar extends [GtkExpander](https://developer.gnome.org/gtk3/3.0/GtkExpander.html)
+    # OpenVideoChat Cross Platform extends [GtkWindow](https://developer.gnome.org/gtk3/3.0/GtkWindow.html)
+    # Create [GtkDrawingArea](https://developer.gnome.org/gtk3/3.0/GtkDrawingArea.html) & [Modify Background](https://developer.gnome.org/gtk3/3.0/gtk-question-index.html)
+
+- [Tutorial](http://python-gtk-3-tutorial.readthedocs.org/en/latest/objects.html)
+- [GtkGrid](https://developer.gnome.org/gtk3/3.4/GtkGrid.html)
+- [Sugar Alerts](http://wiki.sugarlabs.org/go/Development_Team/Almanac/sugar.graphics.alert)
+- [Outdated Source](https://github.com/PabloCastellano/telepathy-python)
