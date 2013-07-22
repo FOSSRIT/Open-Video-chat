@@ -61,7 +61,7 @@ class OpenVideoChatActivity(Activity):
         self.network_stack = None
         self.gstreamer_stack = None
 
-        # Set Owner
+        # Acquire Owner
         self.owner = presenceservice.get_instance().get_owner()
 
         """ Setup GUI """
@@ -69,16 +69,11 @@ class OpenVideoChatActivity(Activity):
         self.get_canvas().attach(Toolbar(self), 0, 0, 1, 1)
         self.show()
 
-    #     logger.debug("Preparing GUI")
-    #     self.set_title(_("OpenVideoChat"))
-    #     self.set_canvas(Gui(self))
-    #     self.set_toolbar_box(Toolbar())
-    #     # activity.set_toolbar_box(self.build_toolbar(activity))
+        """ Setup Network Stack """
 
-    #     # Setup GStreamer Stack
-    #     logger.debug("Setting up GSTStack")
-    #     self.gststack = GSTStack()
-    #     self.get_canvas().set_gstreamer_stack(self.gststack);
+        # logger.debug("Setting up GSTStack")
+        self.gststack = GSTStack()
+        self.get_canvas().set_gstreamer_stack(self.gststack);
 
     #     # Setup Network Stack
     #     logger.debug("Connect Event to Setup Network Stack on Demand")
