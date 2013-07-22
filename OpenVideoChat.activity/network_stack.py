@@ -69,8 +69,10 @@ class NetworkStack(object):
 
     def setup_chat_channel(self):
 
+        # Setup an account manager
         account_manager = Tp.AccountManager.dup()
 
+        # Prepare to create channel
         handler = Tp.SimpleHandler.new_with_am(
             account_manager,
             False,# Bypass Approval
@@ -81,14 +83,21 @@ class NetworkStack(object):
             None# Custom Data supplied to callback
         )
 
+        # Define Channel
         handler.add_handler_filter({
             Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
             Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
             Tp.PROP_CHANNEL_REQUESTED: False,
         })
 
+        # Register Channel
+        handler.register()
+
     def channel_setup_callback(self):
         print "Handle Setup"
+
+    def get_users_list(self):
+        print "Getting users..."
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
