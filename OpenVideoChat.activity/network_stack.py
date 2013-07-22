@@ -35,16 +35,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-# Constants
-OVC_DBUS_CHANNEL = "org.laptop.OpenVideoChat"
-
-
 class NetworkStack(object):
 
     def __init__(self, owner=None, get_buddy=None):
         logger.debug("Preparing Network Stack...")
 
-        # Channels fr chat, stream, and commands
+        # Channels for chat, stream, and commands
         self.chat_channel = None
         self.stream_channel = None
         self.command_channel = None
@@ -61,13 +57,51 @@ class NetworkStack(object):
 
         # Assign buddy callback if exists (???)
 
-        # Run some kind of additional setup processing
-        self.setup_chat_channel()
+        # Grab Account Details
+        if not self.prepare_account():
+            logger.debug("Failed to initialize the network stack")
 
         # Completed
         logger.debug("Network Stack Initialized")
 
+    def prepare_account(self):
+        logger.debug("Preparing account asynchronously...")
+
+        # Grab the account manager
+        self.account_manager = Tp.AccountManager.dup()
+
+        # Don't do anything else if the account manager is non-existent
+        if self.account_manager is None:
+            return False
+
+        # Wait for the account to be ready to ensure the channel
+        self.account_manager.prepare_async(None, setup_channels, None)
+
+    def setup_channels(self, account_manager, status, data):
+
+        # Remove Async Listener from account_manager
+        self.account_manager.prepare_finish(status)
+
+        # Run through channel setup procedures
+        setup_chat_channel()
+        setup_command_channel()
+        setup_stream_channel()
+
     def setup_chat_channel(self):
+        logger.debug("Setting up chat channel...")
+
+        # account = account_manager.ensure_account("%s%s" %
+        #     (TelepathyGLib.ACCOUNT_OBJECT_PATH_BASE, account_id))
+        # request_dict = create_request_dict(action, contact_id)
+        # request = TelepathyGLib.AccountChannelRequest.new(account, request_dict, 0)
+        # # FIXME: for some reason TelepathyGLib.USER_ACTION_TIME_CURRENT_TIME is
+        # # not defined (bgo #639206)
+        # request.ensure_channel_async("", None, ensure_channel_cb, None)
+
+        logger.debug("Chat channel ensured")
+
+    def channel_setup_callback(self):
+        print "Handle Setup"
 
         # Setup an account manager
         account_manager = Tp.AccountManager.dup()
@@ -77,7 +111,7 @@ class NetworkStack(object):
             account_manager,
             False,                        # Bypass Approval
             False,                        # Implement Requests
-            OVC_DBUS_CHANNEL + '.chat',   # Name of service
+            username + '.chat',   # Name of service
             False,                        # Unique Name
             self.channel_setup_callback,  # Callback
             None                          # Custom Data supplied to callback
@@ -92,9 +126,6 @@ class NetworkStack(object):
 
         # Register Channel
         handler.register()
-
-    def channel_setup_callback(self):
-        print "Handle Setup"
 
     def get_users_list(self):
         print "Getting users..."
