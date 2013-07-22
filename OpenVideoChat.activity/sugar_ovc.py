@@ -53,6 +53,7 @@ class OpenVideoChatActivity(Activity):
 
     def __init__(self, handle):
         Activity.__init__(self, handle)
+        logger.debug("Preparing Open Video Chat...")
 
         # Self-Enforced max_participants
         self.max_participants = SUGAR_MAX_PARTICIPANTS
@@ -71,7 +72,9 @@ class OpenVideoChatActivity(Activity):
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
+        # self.network_stack = NetworkStack(self.owner, self.get_buddy)
 
+        logger.debug("Open Video Chat Prepared")
 
         # logger.debug("Connect Event to Setup Network Stack on Demand")
         # self.establish_activity_sharing(handle)
@@ -79,6 +82,11 @@ class OpenVideoChatActivity(Activity):
         # self.gststack = GSTStack()
         # self.get_canvas().set_gstreamer_stack(self.gststack);
 
+    # This method is to obfuscate sugar from the network stack
+    # def get_buddy(self, handle):
+    #     pservice = presenceservice.get_instance()
+    #     tp_name, tp_path = pservice.get_preferred_connection()
+    #     return pservice.get_buddy_by_telepathy_handle(tp_name, tp_path, handle)
 
 
     # """ Networking & Network Stack Setup """
@@ -103,11 +111,6 @@ class OpenVideoChatActivity(Activity):
 
     #     # Supply Network Stack to GUI
     #     sender.get_canvas().set_network_stack(sender.network_stack)
-
-    # def get_buddy(self, handle):
-    #     pservice = presenceservice.get_instance()
-    #     tp_name, tp_path = pservice.get_preferred_connection()
-    #     return pservice.get_buddy_by_telepathy_handle(tp_name, tp_path, handle)
 
     # """ Tear-Down Handling """
 
