@@ -82,10 +82,13 @@ class NetworkStack(object):
         # Remove Async Listener from account_manager
         self.account_manager.prepare_finish(status)
 
+        # Grab the first available account (assumptions are bad! **FIXME**)
+        self.account = self.account_manager.get_valid_accounts()[0]
+
         # Run through channel setup procedures
-        setup_chat_channel()
-        setup_command_channel()
-        setup_stream_channel()
+        self.setup_chat_channel()
+        self.setup_command_channel()
+        self.setup_stream_channel()
 
     def setup_chat_channel(self):
         logger.debug("Setting up chat channel...")
