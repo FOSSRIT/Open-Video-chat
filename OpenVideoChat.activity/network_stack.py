@@ -37,7 +37,7 @@ logger.setLevel(logging.DEBUG)
 
 class NetworkStack(object):
 
-    def __init__(self):
+    def __init__(self, owner=None, get_buddy=None):
         logger.debug("Preparing Network Stack...")
 
         # Channels fr chat, stream, and commands
@@ -51,10 +51,29 @@ class NetworkStack(object):
         self.username = None
         self.receive_message_callback = None
 
+        """ Sugar Specific Handling """
+
+        # Assign owner if exists (???)
+
+        # Assign buddy callback if exists (???)
+
+        # Run some kind of additional setup processing
+        self.setup_chat_channel()
+
         # Completed
         logger.debug("Network Stack Initialized")
 
+    def setup_chat_channel(self):
 
+        dbus = Tp.DBusDaemon.dup()
+
+        handler = Tp.SimpleHandler.new(dbus, False, False, 'ChatChannel', False, self.channel_setup_callback, None)
+
+        handler.add_handler_filter({
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
+            Tp.PROP_CHANNEL_REQUESTED: False,
+        })
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
