@@ -127,6 +127,12 @@ class NetworkStack(object):
         # Register Channel
         handler.register()
 
+    def setup_command_channel(self):
+        logger.debug("Setting up command channel...")
+
+    def setup_stream_channel(self):
+        logger.debug("Setting up stream channel...")
+
     def get_users_list(self):
         print "Getting users..."
 
