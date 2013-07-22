@@ -46,7 +46,7 @@ DEFAULT_WINDOW_SIZE = {
 class OpenVideoChat(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Open Video Chat")
-        logger.debug("Preparing Open Video Chat")
+        logger.debug("Preparing Open Video Chat...")
 
         # Assume a default size of 800x600
         self.set_default_size(DEFAULT_WINDOW_SIZE['width'], DEFAULT_WINDOW_SIZE['height'])
