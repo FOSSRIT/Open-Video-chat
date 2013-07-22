@@ -45,7 +45,7 @@ ICONS = {
 class Toolbar(Gtk.Toolbar):
     def __init__(self, activity):
         Gtk.Toolbar.__init__(self)
-        logger.debug("Preparing Toolbar")
+        logger.debug("Preparing Toolbar...")
 
         # Reference to Activity
         self.activity = activity
@@ -66,7 +66,7 @@ class Toolbar(Gtk.Toolbar):
     def build_buttons(self):
 
         # Create Toggles
-        logger.debug("Defining Toolbar Buttons")
+        logger.debug("Defining Toolbar Buttons...")
         self.toggles = {
             'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
             'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['mute'])),
@@ -85,7 +85,7 @@ class Toolbar(Gtk.Toolbar):
         spacer.set_expand(True)
 
         # Add Buttons to Self
-        logger.debug("Building Toolbar")
+        logger.debug("Building Toolbar...")
         self.insert(Gtk.SeparatorToolItem(draw=False), 0)
         self.insert(ActivityButton(self.activity), 1)
         self.insert(self.toggles['outgoing-video'], 2)
