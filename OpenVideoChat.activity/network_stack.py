@@ -75,12 +75,12 @@ class NetworkStack(object):
         # Prepare to create channel
         handler = Tp.SimpleHandler.new_with_am(
             account_manager,
-            False,# Bypass Approval
-            False,# Implement Requests
-            OVC_DBUS_CHANNEL + '.chat',# Name of service
-            False,# Unique Name
-            self.channel_setup_callback,# Callback
-            None# Custom Data supplied to callback
+            False,                        # Bypass Approval
+            False,                        # Implement Requests
+            OVC_DBUS_CHANNEL + '.chat',   # Name of service
+            False,                        # Unique Name
+            self.channel_setup_callback,  # Callback
+            None                          # Custom Data supplied to callback
         )
 
         # Define Channel
