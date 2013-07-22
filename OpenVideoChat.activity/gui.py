@@ -45,7 +45,7 @@ MAX_CHAT_MESSAGE_SIZE = 200
 class Gui(Gtk.Grid):
     def __init__(self):
         Gtk.Grid.__init__(self, hexpand=True, vexpand=True)
-        logger.debug("Preparing GUI")
+        logger.debug("Preparing GUI...")
 
         # Add Video
         self.attach(self.build_video(), 0, 1, 1, 1)
@@ -58,7 +58,7 @@ class Gui(Gtk.Grid):
         logger.debug("GUI Prepared")
 
     def build_video(self):
-        logger.debug("Building Video")
+        logger.debug("Building Video...")
 
         # Create Video Component
         self.video = video = Gtk.DrawingArea(vexpand=True, hexpand=True)
@@ -70,7 +70,7 @@ class Gui(Gtk.Grid):
         return video
 
     def build_chat(self):
-        logger.debug("Building Chat")
+        logger.debug("Building Chat...")
 
         # Create Chat Components
         self.chat_text_buffer = chat_text_buffer = Gtk.TextBuffer()
