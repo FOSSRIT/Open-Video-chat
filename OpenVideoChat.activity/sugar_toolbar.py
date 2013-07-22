@@ -27,10 +27,6 @@ from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ShareButton
 from sugar3.activity.widgets import ActivityButton
 
-# from sugar3.graphics.toolbutton import ToolButton
-# from sugar3.graphics.toolbarbox import ToolbarBox
-# from sugar3.graphics.toolbarbox import ToolbarButton
-
 
 # Define Logger for Logging & DEBUG level for Development
 logging.basicConfig(level=logging.DEBUG)
