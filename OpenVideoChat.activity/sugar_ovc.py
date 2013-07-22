@@ -70,14 +70,16 @@ class OpenVideoChatActivity(Activity):
         self.show()
 
         """ Setup Network Stack """
+        self.network_stack = NetworkStack()
 
-        # logger.debug("Setting up GSTStack")
-        self.gststack = GSTStack()
-        self.get_canvas().set_gstreamer_stack(self.gststack);
 
-    #     # Setup Network Stack
-    #     logger.debug("Connect Event to Setup Network Stack on Demand")
-    #     self.establish_activity_sharing(handle)
+        # logger.debug("Connect Event to Setup Network Stack on Demand")
+        # self.establish_activity_sharing(handle)
+
+        # self.gststack = GSTStack()
+        # self.get_canvas().set_gstreamer_stack(self.gststack);
+
+
 
     # """ Networking & Network Stack Setup """
 
