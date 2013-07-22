@@ -28,6 +28,7 @@ from gi.repository import Gtk
 #Local Imports
 from gui import Gui
 from toolbar import Toolbar
+from network_stack import NetworkStack
 
 
 # Define Logger for Logging & DEBUG level for Development
@@ -60,6 +61,8 @@ class OpenVideoChat(Gtk.Window):
         self.show()
 
         """ Setup Network Stack """
+        self.network_stack = NetworkStack()
+
         """ Setup GStreamer Stack """
 
         # Proceed with Application Loop
