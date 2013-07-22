@@ -27,11 +27,7 @@
 
 # External Imports
 import logging
-from telepathy.client import Connection
-from telepathy.client import Channel
-from telepathy.interfaces import CHANNEL_INTERFACE
-from telepathy.interfaces import CHANNEL_TYPE_TEXT
-from telepathy.constants import CHANNEL_TEXT_MESSAGE_TYPE_NORMAL
+from gi.repository import TelepathyGLib as Tp
 
 
 # Define Logger for Logging & DEBUG level for Development
@@ -42,12 +38,22 @@ logger.setLevel(logging.DEBUG)
 class NetworkStack(object):
 
     def __init__(self):
-        # Establish Default Properties
-        self.chan = None
+        logger.debug("Preparing Network Stack...")
+
+        # Channels fr chat, stream, and commands
+        self.chat_channel = None
+        self.stream_channel = None
+        self.command_channel = None
+
+        # Other data (??? Do we still need it all)
         self.owner = None
         self.shared_activity = None
         self.username = None
         self.receive_message_callback = None
+
+        # Completed
+        logger.debug("Network Stack Initialized")
+
 
     def setup(self, activity, get_buddy):
         # Grab Shared Activity Reference
