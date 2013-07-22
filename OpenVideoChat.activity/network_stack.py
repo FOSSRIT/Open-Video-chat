@@ -35,6 +35,10 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
+# Constants
+OVC_DBUS_CHANNEL = "org.laptop.OpenVideoChat"
+
+
 class NetworkStack(object):
 
     def __init__(self, owner=None, get_buddy=None):
@@ -65,15 +69,26 @@ class NetworkStack(object):
 
     def setup_chat_channel(self):
 
-        dbus = Tp.DBusDaemon.dup()
+        account_manager = Tp.AccountManager.dup()
 
-        handler = Tp.SimpleHandler.new(dbus, False, False, 'ChatChannel', False, self.channel_setup_callback, None)
+        handler = Tp.SimpleHandler.new_with_am(
+            account_manager,
+            False,# Bypass Approval
+            False,# Implement Requests
+            OVC_DBUS_CHANNEL + '.chat',# Name of service
+            False,# Unique Name
+            self.channel_setup_callback,# Callback
+            None# Custom Data supplied to callback
+        )
 
         handler.add_handler_filter({
             Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
             Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
             Tp.PROP_CHANNEL_REQUESTED: False,
         })
+
+    def channel_setup_callback(self):
+        print "Handle Setup"
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
