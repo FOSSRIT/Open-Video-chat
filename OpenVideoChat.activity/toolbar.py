@@ -44,7 +44,7 @@ ICONS = {
 class Toolbar(Gtk.Expander):
     def __init__(self):
         Gtk.Expander.__init__(self, expanded=True, label=_('Toolbar'))
-        logger.debug("Preparing Toolbar")
+        logger.debug("Preparing Toolbar...")
 
         # Define Buttons
         self.build_buttons()
@@ -59,7 +59,7 @@ class Toolbar(Gtk.Expander):
     def build_buttons(self):
 
         # Create Toggles
-        logger.debug("Defining Toolbar Buttons")
+        logger.debug("Defining Toolbar Buttons...")
         self.toggles = {
             'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['play'])),
             'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['unmute'])),
@@ -73,11 +73,11 @@ class Toolbar(Gtk.Expander):
     def build_toolbar(self):
 
         # Create Toolbar
-        logger.debug("Building Toolbar")
+        logger.debug("Building Toolbar...")
         toolbar = Gtk.Toolbar()
 
         # Add Buttons to Toolbar
-        logger.debug("Adding Buttons")
+        logger.debug("Adding Buttons...")
         toolbar.insert(Gtk.SeparatorToolItem(draw=False), 0)
         toolbar.insert(self.toggles['outgoing-video'], 1)
         toolbar.insert(self.toggles['outgoing-audio'], 2)
