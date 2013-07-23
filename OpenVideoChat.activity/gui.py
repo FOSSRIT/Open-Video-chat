@@ -90,8 +90,8 @@ class Gui(Gtk.Grid):
         chat_grid.attach(chat_send_message_button, 1, 1, 1, 1)
         logger.debug("Built Chat Grid")
 
-        # Add User List (Multi-User Feature - Not yet ready for implementation)
-        # self.chat_grid.attach(self.build_user_list(), 2, 0, 1, 1)
+        # Add Users List
+        self.chat_grid.attach(self.build_user_list(), 2, 0, 1, 1)
 
         # Create Expander, Add Grid & Display
         chat_expander = Gtk.Expander(expanded=True, label=_("Chat"))
@@ -104,19 +104,19 @@ class Gui(Gtk.Grid):
         return chat_expander
 
     def build_user_list(self):
-        # logger.debug("Building User List")
-        # # Create User List Components
-        # self.user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
-        # self.user_list_search_button = Gtk.Button(_("Search"))
-        # # self.user_list_search_entry.connect("clicked", undefined_user_search_function)
-        # self.user_list_grid = Gtk.Grid()
-        # # self.user_list_grid.attach(self.user_list, 0, 0, 2, 1)
-        # self.user_list_grid.attach(self.user_list_search_entry, 0, 1, 1, 1)
-        # self.user_list_grid.attach(self.user_list_search_button, 1, 1, 1, 1)
-        # self.user_list_expander = Gtk.Expander(label=_("Users"))
-        # self.user_list_expander.add(self.user_list_grid)
-        # self.user_list_expander.show_all()
-        # logger.debug("Built User List")
+        logger.debug("Building User List")
+        # Create User List Components
+        self.user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
+        self.user_list_search_button = Gtk.Button(_("Search"))
+        # self.user_list_search_entry.connect("clicked", undefined_user_search_function)
+        self.user_list_grid = Gtk.Grid()
+        # self.user_list_grid.attach(self.user_list, 0, 0, 2, 1)
+        self.user_list_grid.attach(self.user_list_search_entry, 0, 1, 1, 1)
+        self.user_list_grid.attach(self.user_list_search_button, 1, 1, 1, 1)
+        self.user_list_expander = Gtk.Expander(label=_("Users"))
+        self.user_list_expander.add(self.user_list_grid)
+        self.user_list_expander.show_all()
+        logger.debug("Built User List")
         return False
 
     def send_message(self, sender):
