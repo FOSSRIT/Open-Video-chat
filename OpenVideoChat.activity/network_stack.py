@@ -181,7 +181,8 @@ class NetworkStack(object):
         logger.debug("Getting user list...")
 
         # Take the users list and send them one-by-one to the GUI?
-        logger.debug(pprint(users_list))
+        # logger.debug(pprint(users_list))
+        logger.debug(users_list)
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
