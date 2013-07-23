@@ -112,26 +112,26 @@ class Gui(Gtk.Grid):
         user_list_search_button.connect("clicked", self.search_for_user)
 
         # Create Buffer for user storage
-        user_list_store = Gtk.ListStore()
+        self.user_list_store = Gtk.ListStore()
 
         # Create User List (Tree View)
         user_list_tree_view = Gtk.TreeView()
 
         # Define Storage Container & Attach Components
         user_list_grid = Gtk.Grid()
-        self.user_list_grid.attach(self.user_list_tree_view, 0, 0, 2, 1)
-        self.user_list_grid.attach(self.user_list_search_entry, 0, 1, 1, 1)
-        self.user_list_grid.attach(self.user_list_search_button, 1, 1, 1, 1)
+        user_list_grid.attach(user_list_tree_view, 0, 0, 2, 1)
+        user_list_grid.attach(user_list_search_entry, 0, 1, 1, 1)
+        user_list_grid.attach(user_list_search_button, 1, 1, 1, 1)
 
         # Create an expander to show the users on-demand & display all components
-        self.user_list_expander = Gtk.Expander(label=_("Users"))
-        self.user_list_expander.add(self.user_list_grid)
-        self.user_list_expander.show_all()
+        user_list_expander = Gtk.Expander(label=_("Users"))
+        user_list_expander.add(user_list_grid)
+        user_list_expander.show_all()
 
         logger.debug("Built User List")
 
         # Return the top-level container
-        return self.user_list_expander
+        return user_list_expander
 
     def search_for_user(self, sender):
         logger.debug("Searching for user...")
