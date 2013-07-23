@@ -82,6 +82,7 @@ class NetworkStack(object):
 
         # Grab the first available account
         valid_accounts = self.account_manager.get_valid_accounts()
+        logger.debug(valid_accounts)
         if len(valid_accounts) > 0:
             self.account = valid_accounts[0]
             # **FIXME** assumptions are bad, allow the user to select from their accounts
