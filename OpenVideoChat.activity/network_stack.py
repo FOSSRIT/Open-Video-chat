@@ -78,17 +78,21 @@ class NetworkStack(object):
         self.account_manager.prepare_async(None, setup_channels, None)
 
     def setup_channels(self, account_manager, status, data):
+        logger.debug("Setting up channels...")
 
         # Remove Async Listener from account_manager
         self.account_manager.prepare_finish(status)
 
-        # Grab the first available account (assumptions are bad! **FIXME**)
+        # Grab the first available account (**FIXME** assumptions are bad!)
         self.account = self.account_manager.get_valid_accounts()[0]
 
+        print self.account
+        print dir(self.account)
+
         # Run through channel setup procedures
-        self.setup_chat_channel()
-        self.setup_command_channel()
-        self.setup_stream_channel()
+        # self.setup_chat_channel()
+        # self.setup_command_channel()
+        # self.setup_stream_channel()
 
     def setup_chat_channel(self):
         logger.debug("Setting up chat channel...")
@@ -104,7 +108,7 @@ class NetworkStack(object):
         logger.debug("Chat channel ensured")
 
     def channel_setup_callback(self):
-        print "Handle Setup"
+        logger.debug("Handle channel setup callback...")
 
         # Setup an account manager
         account_manager = Tp.AccountManager.dup()
@@ -137,7 +141,7 @@ class NetworkStack(object):
         logger.debug("Setting up stream channel...")
 
     def get_users_list(self):
-        print "Getting users..."
+        logger.debug("Getting user list...")
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
