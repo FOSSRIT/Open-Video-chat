@@ -45,12 +45,6 @@ class NetworkStack(object):
         self.stream_channel = None
         self.command_channel = None
 
-        # Other data (??? Do we still need it all)
-        self.owner = None
-        self.shared_activity = None
-        self.username = None
-        self.receive_message_callback = None
-
         """ Sugar Specific Handling """
 
         # Assign owner if exists (???)
@@ -74,6 +68,9 @@ class NetworkStack(object):
         if self.account_manager is None:
             return False
 
+        # Grab the factory & tell it to get us a list of users
+
+
         # Wait for the account to be ready to ensure the channel
         self.account_manager.prepare_async(None, self.setup_channels, None)
 
@@ -91,8 +88,11 @@ class NetworkStack(object):
             logger.debug("Failed to acquire account...")
             return False
 
+        # Populate Users List
+        self.populate_users_list(users_list)
+
         # Run through channel setup procedures
-        self.setup_chat_channel()
+        # self.setup_chat_channel()
         # self.setup_command_channel()
         # self.setup_stream_channel()
 
@@ -102,8 +102,8 @@ class NetworkStack(object):
         # Describe the channel type (text)
         channel_description = {
             Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
-            Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()    # Target ID for initializer
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT)   # What it is tied to (A Contact)
+            # Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()  # Who to open the channel with
         }
 
         # **FIXME** Still investigating how to name the channel
@@ -131,32 +131,33 @@ class NetworkStack(object):
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
 
-    def channel_setup_callback(self):
-        logger.debug("Handle channel setup callback...")
 
-        # Setup an account manager
-        account_manager = Tp.AccountManager.dup()
+    # def channel_setup_callback(self):
+    #     logger.debug("Handle channel setup callback...")
 
-        # Prepare to create channel
-        handler = Tp.SimpleHandler.new_with_am(
-            account_manager,
-            False,                        # Bypass Approval
-            False,                        # Implement Requests
-            username + '.chat',   # Name of service
-            False,                        # Unique Name
-            self.channel_setup_callback,  # Callback
-            None                          # Custom Data supplied to callback
-        )
+    #     # Setup an account manager
+    #     account_manager = Tp.AccountManager.dup()
 
-        # Define Channel
-        handler.add_handler_filter({
-            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
-            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
-            Tp.PROP_CHANNEL_REQUESTED: False,
-        })
+    #     # Prepare to create channel
+    #     handler = Tp.SimpleHandler.new_with_am(
+    #         account_manager,
+    #         False,                        # Bypass Approval
+    #         False,                        # Implement Requests
+    #         username + '.chat',   # Name of service
+    #         False,                        # Unique Name
+    #         self.channel_setup_callback,  # Callback
+    #         None                          # Custom Data supplied to callback
+    #     )
 
-        # Register Channel
-        handler.register()
+    #     # Define Channel
+    #     handler.add_handler_filter({
+    #         Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
+    #         Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
+    #         Tp.PROP_CHANNEL_REQUESTED: False,
+    #     })
+
+    #     # Register Channel
+    #     handler.register()
 
     def setup_command_channel(self):
         logger.debug("Setting up command channel...")
@@ -164,8 +165,11 @@ class NetworkStack(object):
     def setup_stream_channel(self):
         logger.debug("Setting up stream channel...")
 
-    def get_users_list(self):
+    def populate_users_list(self, users_list):
         logger.debug("Getting user list...")
+
+        # Take the users list and send them one-by-one to the GUI?
+
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
