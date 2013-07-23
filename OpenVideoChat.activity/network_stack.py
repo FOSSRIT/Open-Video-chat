@@ -101,13 +101,19 @@ class NetworkStack(object):
 
         # Describe the channel type (text)
         channel_description = {
-            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
-            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
-            Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()    # Target ID for initializer
         }
 
+        # **FIXME** Still investigating how to name the channel
+
         # Request the channel
-        request = Tp.AccountChannelRequest.new(self.account, channel_description, 0)
+        request = Tp.AccountChannelRequest.new(
+            self.account,                              # Account
+            channel_description,                       # Dict of channel properties
+            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
+        )
 
         # Run this asynchronously
         request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
@@ -115,10 +121,15 @@ class NetworkStack(object):
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat Channel Setup Completed")
 
-        # Still more to do, but this means the request succeeded?
+        # Grab the channel while removing the asynchronous listener
+        (self.chat_channel, context) = request.create_and_handle_channel_finish(result)
 
-        # Remove asynchronous listener
-        request.ensure_channel_finish(status)
+        # If the chat channel was made connect message received handler
+        if self.chat_channel:
+            self.chat_channel.connect('message-received', self.chat_message_received)
+
+    def chat_message_received(self, channel, message):
+        logger.debug("Processing received message...")
 
     def channel_setup_callback(self):
         logger.debug("Handle channel setup callback...")
