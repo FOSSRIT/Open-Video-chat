@@ -29,8 +29,6 @@
 import logging
 from gi.repository import TelepathyGLib as Tp
 
-# Temporary debugging aid
-import pprint
 
 # Define Logger for Logging & DEBUG level for Development
 logger = logging.getLogger(__name__)
