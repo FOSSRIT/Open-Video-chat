@@ -78,7 +78,7 @@ class NetworkStack(object):
         self.account_manager.prepare_async(None, self.setup_channels, None)
 
     def setup_channels(self, account_manager, status, data):
-        logger.debug("Setting up channels...")
+        logger.debug("Setting up asynchronous stack components...")
 
         # Remove Async Listener from account_manager
         self.account_manager.prepare_finish(status)
