@@ -52,8 +52,7 @@ class NetworkStack(object):
         # Assign buddy callback if exists (???)
 
         # Grab Account Details
-        if not self.prepare_account():
-            logger.debug("Failed to initialize the network stack")
+        self.prepare_account()
 
         # Completed
         logger.debug("Network Stack Initialized")
@@ -64,10 +63,6 @@ class NetworkStack(object):
         # Grab the account manager
         self.account_manager = Tp.AccountManager.dup()
 
-        # Don't do anything else if the account manager is non-existent
-        # if self.account_manager is None:
-            # return False
-
         # Grab the factory & tell it to get us a list of users
         factory = self.account_manager.get_factory()
         # factory.add_account_features([Tp.Account.get_feature_quark_connection()])
@@ -75,9 +70,9 @@ class NetworkStack(object):
         # factory.add_contact_features([Tp.ContactFeature.CONTACT_GROUPS])
 
         # Wait for the account to be ready to ensure the channel
-        self.account_manager.prepare_async(None, self.setup_channels, None)
+        self.account_manager.prepare_async(None, self.setup_stack_components, None)
 
-    def setup_channels(self, account_manager, status, data):
+    def setup_stack_components(self, account_manager, status, data):
         logger.debug("Setting up asynchronous stack components...")
 
         # Remove Async Listener from account_manager
