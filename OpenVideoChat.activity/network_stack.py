@@ -122,7 +122,7 @@ class NetworkStack(object):
         logger.debug("Chat Channel Setup Completed")
 
         # Grab the channel while removing the asynchronous listener
-        (self.chat_channel, context) = request.create_and_handle_channel_finish(result)
+        (self.chat_channel, context) = request.create_and_handle_channel_finish(status)
 
         # If the chat channel was made connect message received handler
         if self.chat_channel:
