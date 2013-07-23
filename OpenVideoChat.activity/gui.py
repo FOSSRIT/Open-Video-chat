@@ -109,7 +109,7 @@ class Gui(Gtk.Grid):
         # Build Search Components
         user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
         user_list_search_button = Gtk.Button(_("Search"))
-        user_list_search_entry.connect("clicked", self.search_for_user)
+        user_list_search_button.connect("clicked", self.search_for_user)
 
         # Create Buffer for user storage
         user_list_store = Gtk.ListStore()
