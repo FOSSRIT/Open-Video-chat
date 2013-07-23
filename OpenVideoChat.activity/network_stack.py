@@ -110,7 +110,7 @@ class NetworkStack(object):
         request = Tp.AccountChannelRequest.new(self.account, channel_description, 0)
 
         # Run this asynchronously
-        request.ensure_channel_async(None, None, self.chat_channel_setup_callback, None)
+        request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
 
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat Channel Setup Completed")
