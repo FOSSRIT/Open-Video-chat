@@ -63,9 +63,9 @@ class NetworkStack(object):
         # Grab the account manager
         self.account_manager = Tp.AccountManager.dup()
 
-        # Grab the factory & tell it to get us a list of users
+        # Grab the factory & tell it to get us a list of users by setting appropriate quarks
         factory = self.account_manager.get_factory()
-        # factory.add_account_features([Tp.Account.get_feature_quark_connection()])
+        factory.add_account_features([Tp.Account.get_feature_quark_connection()])
         factory.add_connection_features([Tp.Connection.get_feature_quark_contact_list()])
         factory.add_contact_features([Tp.ContactFeature.CONTACT_GROUPS])
 
