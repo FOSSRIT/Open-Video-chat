@@ -29,6 +29,8 @@
 import logging
 from gi.repository import TelepathyGLib as Tp
 
+# Temporary debugging aid
+import pprint
 
 # Define Logger for Logging & DEBUG level for Development
 logger = logging.getLogger(__name__)
@@ -98,8 +100,6 @@ class NetworkStack(object):
         # Dup the users & populate our users list for selecting a contact
         if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
             self.populate_users_list(connection.dup_contact_list())
-        else:
-            logger.debug("Failed to load contacts")
 
         """ Sugar handling for if connection established through sugar sharing process """
 
@@ -181,7 +181,7 @@ class NetworkStack(object):
         logger.debug("Getting user list...")
 
         # Take the users list and send them one-by-one to the GUI?
-
+        pprint(user_list)
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
