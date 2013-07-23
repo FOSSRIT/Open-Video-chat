@@ -69,7 +69,10 @@ class NetworkStack(object):
             return False
 
         # Grab the factory & tell it to get us a list of users
-
+        factory = self.account_manager.get_factory()
+        # factory.add_account_features([Tp.Account.get_feature_quark_connection()])
+        factory.add_connection_features([Tp.Connection.get_feature_quark_contact_list()])
+        # factory.add_contact_features([Tp.ContactFeature.CONTACT_GROUPS])
 
         # Wait for the account to be ready to ensure the channel
         self.account_manager.prepare_async(None, self.setup_channels, None)
@@ -80,16 +83,28 @@ class NetworkStack(object):
         # Remove Async Listener from account_manager
         self.account_manager.prepare_finish(status)
 
-        # Grab the first available account (**FIXME** assumptions are bad!)
-        self.account = self.account_manager.get_valid_accounts()[0]
+        # Grab the first available account
+        valid_accounts = self.account_manager.get_valid_accounts()
+        if len(valid_accounts) > 0:
+            self.account = valid_accounts[0]
+            # **FIXME** assumptions are bad, allow the user to select from their accounts
+            # if len(valid_accounts) > 1:
+                # Display Gtk3 dialog selection or something?
 
-        # If no account exists (eg. None), print error and end setup (**FIXME** cleaner error handling is desirable)
+        # If no account exists (eg. None), print error and end setup
         if not self.account:
             logger.debug("Failed to acquire account...")
+            # **FIXME** if no valid accounts need to open account management window
             return False
 
-        # Populate Users List
-        self.populate_users_list(users_list)
+        # Get connection
+        connection = self.account.get_connection()
+
+        # Dup the users & populate our users list for selecting a contact
+        if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS::
+            self.populate_users_list(connection.dup_contact_list())
+
+        """ Sugar handling for if connection established through sugar sharing process """
 
         # Run through channel setup procedures
         # self.setup_chat_channel()
