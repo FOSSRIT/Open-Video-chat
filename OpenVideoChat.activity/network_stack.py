@@ -112,13 +112,18 @@ class NetworkStack(object):
         # Run this asynchronously
         request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
 
-    def chat_channel_setup_callback(request, status, data):
+    # def chat_channel_setup_callback(request, status, data):
+    def chat_channel_setup_callback(arg1, arg2, arg3, arg4):
         logger.debug("Chat Channel Setup Completed")
 
+        print arg1
+        print arg2
+        print arg3
+        print arg4
         # Still more to do, but this means the request succeeded?
 
         # Remove asynchronous listener
-        request.ensure_channel_finish(status)
+        # request.ensure_channel_finish(status)
 
     def channel_setup_callback(self):
         logger.debug("Handle channel setup callback...")
