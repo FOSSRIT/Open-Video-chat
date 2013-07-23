@@ -75,7 +75,7 @@ class NetworkStack(object):
             return False
 
         # Wait for the account to be ready to ensure the channel
-        self.account_manager.prepare_async(None, setup_channels, None)
+        self.account_manager.prepare_async(None, self.setup_channels, None)
 
     def setup_channels(self, account_manager, status, data):
         logger.debug("Setting up channels...")
