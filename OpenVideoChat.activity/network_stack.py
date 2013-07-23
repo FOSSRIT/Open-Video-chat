@@ -86,26 +86,39 @@ class NetworkStack(object):
         # Grab the first available account (**FIXME** assumptions are bad!)
         self.account = self.account_manager.get_valid_accounts()[0]
 
-        print self.account.get_nickname()
-        print self.account.get_normalized_name()
+        # If no account exists (eg. None), print error and end setup (**FIXME** cleaner error handling is desirable)
+        if not self.account:
+            logger.debug("Failed to acquire account...")
+            return False
 
         # Run through channel setup procedures
-        # self.setup_chat_channel()
+        self.setup_chat_channel()
         # self.setup_command_channel()
         # self.setup_stream_channel()
 
     def setup_chat_channel(self):
         logger.debug("Setting up chat channel...")
 
-        # account = account_manager.ensure_account("%s%s" %
-        #     (TelepathyGLib.ACCOUNT_OBJECT_PATH_BASE, account_id))
-        # request_dict = create_request_dict(action, contact_id)
-        # request = TelepathyGLib.AccountChannelRequest.new(account, request_dict, 0)
-        # # FIXME: for some reason TelepathyGLib.USER_ACTION_TIME_CURRENT_TIME is
-        # # not defined (bgo #639206)
-        # request.ensure_channel_async("", None, ensure_channel_cb, None)
+        # Describe the channel type (text)
+        channel_description = {
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
+            Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()
+        }
 
-        logger.debug("Chat channel ensured")
+        # Request the channel
+        request = Tp.AccountChannelRequest.new(self.account, channel_description, 0)
+
+        # Run this asynchronously
+        request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
+
+    def chat_channel_setup_callback(request, status, data):
+        logger.debug("Chat Channel Setup Completed")
+
+        # Still more to do, but this means the request succeeded?
+
+        # Remove asynchronous listener
+        request.ensure_channel_finish(status)
 
     def channel_setup_callback(self):
         logger.debug("Handle channel setup callback...")
