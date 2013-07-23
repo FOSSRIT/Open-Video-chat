@@ -86,8 +86,8 @@ class NetworkStack(object):
         # Grab the first available account (**FIXME** assumptions are bad!)
         self.account = self.account_manager.get_valid_accounts()[0]
 
-        print self.account
-        print dir(self.account)
+        print self.account.get_nickname()
+        print self.account.get_normalized_name()
 
         # Run through channel setup procedures
         # self.setup_chat_channel()
