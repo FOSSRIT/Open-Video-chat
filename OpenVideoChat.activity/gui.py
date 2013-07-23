@@ -91,7 +91,7 @@ class Gui(Gtk.Grid):
         logger.debug("Built Chat Grid")
 
         # Add Users List
-        self.chat_grid.attach(self.build_user_list(), 2, 0, 1, 1)
+        chat_grid.attach(self.build_user_list(), 2, 0, 1, 1)
 
         # Create Expander, Add Grid & Display
         chat_expander = Gtk.Expander(expanded=True, label=_("Chat"))
