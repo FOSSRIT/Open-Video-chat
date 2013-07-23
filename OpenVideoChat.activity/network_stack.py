@@ -67,7 +67,7 @@ class NetworkStack(object):
         factory = self.account_manager.get_factory()
         # factory.add_account_features([Tp.Account.get_feature_quark_connection()])
         factory.add_connection_features([Tp.Connection.get_feature_quark_contact_list()])
-        # factory.add_contact_features([Tp.ContactFeature.CONTACT_GROUPS])
+        factory.add_contact_features([Tp.ContactFeature.CONTACT_GROUPS])
 
         # Wait for the account to be ready to ensure the channel
         self.account_manager.prepare_async(None, self.setup_stack_components, None)
