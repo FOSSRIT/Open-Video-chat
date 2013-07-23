@@ -101,7 +101,7 @@ class NetworkStack(object):
         connection = self.account.get_connection()
 
         # Dup the users & populate our users list for selecting a contact
-        if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS::
+        if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
             self.populate_users_list(connection.dup_contact_list())
 
         """ Sugar handling for if connection established through sugar sharing process """
