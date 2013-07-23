@@ -64,6 +64,8 @@ class NetworkStack(object):
         # Grab the account manager
         self.account_manager = Tp.AccountManager.dup()
 
+        print "Account Manager: " + str(self.account_manager)
+
         # Don't do anything else if the account manager is non-existent
         if self.account_manager is None:
             return False
