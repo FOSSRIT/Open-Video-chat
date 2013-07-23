@@ -117,7 +117,7 @@ class Gui(Gtk.Grid):
         self.user_list_expander.add(self.user_list_grid)
         self.user_list_expander.show_all()
         logger.debug("Built User List")
-        return False
+        return self.user_list_expander
 
     def send_message(self, sender):
         # Send a message over the tubes
