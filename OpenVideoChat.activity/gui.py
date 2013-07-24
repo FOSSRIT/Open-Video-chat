@@ -147,7 +147,7 @@ class Gui(Gtk.Grid):
 
     def add_a_contact(self, contact):
         # Simply add a user (logs would fill fast if I added one here)
-        self.user_list_store.append(contact.get_alias(), contact)
+        self.user_list_store.append([contact.get_alias(), contact])
 
     """ Chat Methods """
 
