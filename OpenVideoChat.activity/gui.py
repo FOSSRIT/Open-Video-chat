@@ -132,6 +132,9 @@ class Gui(Gtk.Grid):
         user_list_scrolled_window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         user_list_scrolled_window.add(user_list_tree_view)
 
+        # Add a click handler to the tree view for user selection
+        user_list_tree_view.connect('row-activated', self.select_user)
+
         # Build Search Entry
         user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
         user_list_search_entry.set_tooltip_text(_("Search for contacts..."))
@@ -154,15 +157,24 @@ class Gui(Gtk.Grid):
         # Return the top-level container
         return user_list_expander
 
-    def send_message(self, sender):
-        # Send a message over the tubes
-        return False
+    """ Network & User Methods """
 
     def add_a_contact(self, contact):
         # Simply add a user (logs would fill fast if I added one here)
         self.user_list_store.append([contact.get_alias(), contact])
 
+    def user_selected(self, tree_view, arg2):
+        logger.debug("Identifying selected user to initiate communication...")
+
+        # Let's test some info
+        logger.debug(tree_view)
+        logger.debug(arg2)
+
     """ Chat Methods """
+
+    def send_message(self, sender):
+        # Send a message over the tubes
+        return False
 
     # def get_history(self):
     #     return self.chat_text.get_text(
