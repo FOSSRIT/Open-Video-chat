@@ -44,7 +44,7 @@ MAX_CHAT_MESSAGE_SIZE = 200
 
 class Gui(Gtk.Grid):
     def __init__(self):
-        Gtk.Grid.__init__(self, hexpand=True, vexpand=True)
+        Gtk.Grid.__init__(self, expand=True)
         logger.debug("Preparing GUI...")
 
         # Add Video
@@ -61,7 +61,7 @@ class Gui(Gtk.Grid):
         logger.debug("Building Video...")
 
         # Create Video Component
-        self.video = video = Gtk.DrawingArea(vexpand=True, hexpand=True)
+        self.video = video = Gtk.DrawingArea(expand=True)
         video.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .9))
         video.show()
 
@@ -114,7 +114,7 @@ class Gui(Gtk.Grid):
         self.user_list_store = Gtk.ListStore()
 
         # Create User List (Tree View)
-        user_list_tree_view = Gtk.TreeView(hexpand=True, vexpand=True)
+        user_list_tree_view = Gtk.TreeView(expand=True)
         user_list_tree_view.set_model(self.user_list_store)
         # user_list_tree_view.set_search_column()
         user_list_tree_view.set_search_entry(user_list_search_entry)
