@@ -114,14 +114,13 @@ class Gui(Gtk.Grid):
         self.user_list_store = Gtk.ListStore()
 
         # Create User List (Tree View)
-        user_list_tree_view = Gtk.TreeView()
+        user_list_tree_view = Gtk.TreeView(min_content_height=MIN_CHAT_HEIGHT)
         user_list_tree_view.set_model(self.user_list_store)
         # user_list_tree_view.set_search_column()
         user_list_tree_view.set_search_entry(user_list_search_entry)
 
         # Tell the Tree View to expand (won't accept these in constructor)
-        user_list_tree_view.set_vexpand(True)
-        # user_list_tree_view.set_hexpand(True)
+        # user_list_tree_view.set_vexpand(True)
 
         # Define Storage Container & Attach Components
         user_list_grid = Gtk.Grid()
