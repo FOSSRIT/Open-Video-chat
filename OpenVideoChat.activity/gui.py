@@ -31,6 +31,9 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gettext import gettext as _
 
+# Testing GtkTreeIter with defined classes
+from gi.repository.TelepathyGLib import Contact
+
 
 # Define Logger for Logging & DEBUG level for Development
 logging.basicConfig(level=logging.DEBUG)
@@ -111,7 +114,7 @@ class Gui(Gtk.Grid):
         user_list_search_entry.set_tooltip_text(_("Search for contacts..."))
 
         # Create Buffer for user storage
-        self.user_list_store = Gtk.ListStore()
+        self.user_list_store = Gtk.ListStore(str, Contact)
 
         # Create User List (Tree View)
         user_list_tree_view = Gtk.TreeView()
@@ -141,6 +144,10 @@ class Gui(Gtk.Grid):
     def send_message(self, sender):
         # Send a message over the tubes
         return False
+
+    def add_a_contact(self, contact):
+        # No log output because it would be shown hundreds of times
+
 
     """ Chat Methods """
 
