@@ -117,8 +117,8 @@ class Gui(Gtk.Grid):
         self.user_list_store = Gtk.ListStore(str, Contact)
 
         # Create User List (Tree View)
-        user_list_tree_view = Gtk.TreeView()
-        user_list_tree_view.set_model(self.user_list_store)
+        user_list_tree_view = Gtk.TreeView(self.user_list_store)
+        # user_list_tree_view.set_model(self.user_list_store)
         # user_list_tree_view.set_search_column()
         user_list_tree_view.set_search_entry(user_list_search_entry)
 
@@ -148,9 +148,6 @@ class Gui(Gtk.Grid):
     def add_a_contact(self, contact):
         # Simply add a user (logs would fill fast if I added one here)
         self.user_list_store.append([contact.get_alias(), contact])
-
-        # Try printing the alias?
-        print contact.get_alias()
 
     """ Chat Methods """
 
