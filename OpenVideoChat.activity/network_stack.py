@@ -63,11 +63,17 @@ class NetworkStack(object):
         # Grab the account manager
         self.account_manager = Tp.AccountManager.dup()
 
-        # Grab the factory & tell it to get us a list of users by setting appropriate quarks
+        # Grab the ambiguous factory object
         factory = self.account_manager.get_factory()
+
+        # Using quarks tell the factory to pull the connection with the account
         factory.add_account_features([Tp.Account.get_feature_quark_connection()])
+
+        # Using quarks tell the factory to pull the contact list with the connection
         factory.add_connection_features([Tp.Connection.get_feature_quark_contact_list()])
-        factory.add_contact_features([Tp.ContactFeature.CONTACT_GROUPS])
+
+        # Tell the factory to include contact aliases
+        factory.add_contact_features([Tp.ContactFeature.ALIAS])
 
         # Wait for the account to be ready to ensure the channel
         self.account_manager.prepare_async(None, self.setup_stack_components, None)
