@@ -94,7 +94,7 @@ class Gui(Gtk.Grid):
         logger.debug("Built Chat Grid")
 
         # Add Users List
-        chat_grid.attach(self.build_user_list(), 2, 0, 1, 1)
+        chat_grid.attach(self.build_user_list(), 2, 0, 1, 2)
 
         # Create Expander, Add Grid & Display
         chat_expander = Gtk.Expander(expanded=True, label=_("Chat"))
@@ -169,9 +169,8 @@ class Gui(Gtk.Grid):
         # We can pull the contact object from our store
         contact = self.user_list_store[selected_index][1]
 
-        # The question is, does the selected user match when the tree view is sorted?
-        # AKA does the sort apply to the model or just the view, and does it retain index?
-        print self.user_list_store[selected_index][0]
+        # Now we need a callback to the network stack
+        # to establish a channel for communication
 
     """ Chat Methods """
 
