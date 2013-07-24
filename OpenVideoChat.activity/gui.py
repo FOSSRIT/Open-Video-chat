@@ -133,7 +133,7 @@ class Gui(Gtk.Grid):
         user_list_scrolled_window.add(user_list_tree_view)
 
         # Add a click handler to the tree view for user selection
-        user_list_tree_view.connect('row-activated', self.select_user)
+        user_list_tree_view.connect('row-activated', self.user_selected)
 
         # Build Search Entry
         user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
