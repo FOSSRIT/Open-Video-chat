@@ -125,8 +125,8 @@ class Gui(Gtk.Grid):
 
         # Define Storage Container & Attach Components
         user_list_grid = Gtk.Grid()
-        user_list_grid.attach(user_list_search_entry, 0, 0, 1, 1)
-        user_list_grid.attach(user_list_scrolled_window, 0, 1, 1, 1)
+        user_list_grid.attach(user_list_scrolled_window, 0, 0, 1, 1)
+        user_list_grid.attach(user_list_search_entry, 0, 1, 1, 1)
 
         # Create an expander to show the users on-demand & display all components
         user_list_expander = Gtk.Expander(label=_("Users"))
