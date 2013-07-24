@@ -115,6 +115,7 @@ class Gui(Gtk.Grid):
 
         # Create User List (Tree View)
         user_list_tree_view = Gtk.TreeView()
+        user_list_tree_view.set_model(self.user_list_store)
 
         # Define Storage Container & Attach Components
         user_list_grid = Gtk.Grid()
