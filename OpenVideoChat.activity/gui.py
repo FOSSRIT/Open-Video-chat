@@ -166,10 +166,11 @@ class Gui(Gtk.Grid):
     def user_selected(self, tree_view, selected_index, column_object):
         logger.debug("Identifying selected user to initiate communication...")
 
-        # Can we pull the index from our List Store?
-        # and Does it match when we sort?
+        # We can pull the contact object from our store
+        contact = self.user_list_store[selected_index][1]
 
-        # First, can we access it via treeiter?
+        # The question is, does the selected user match when the tree view is sorted?
+        # AKA does the sort apply to the model or just the view, and does it retain index?
         print self.user_list_store[selected_index][0]
 
     """ Chat Methods """
