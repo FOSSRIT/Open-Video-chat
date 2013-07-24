@@ -119,11 +119,12 @@ class Gui(Gtk.Grid):
         user_list_tree_view.append_column(Gtk.TreeViewColumn(
             "User Alias",            # Column Title (is displayed)
             Gtk.CellRendererText(),  # Renderer Component
-            text=0                   # Column Index
+            text=0,                  # Column Index
+            sort_column_id=0         # Sort by this column
         ))
 
-        # user_list_tree_view.set_model(self.user_list_store)
-        # user_list_tree_view.set_search_column()
+        # Sort by the alias column
+
 
         # Create a scrollbox for user list
         user_list_scrolled_window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
