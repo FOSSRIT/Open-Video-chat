@@ -120,7 +120,7 @@ class Gui(Gtk.Grid):
         user_list_tree_view.set_search_entry(user_list_search_entry)
 
         # Create a scrollbox for user list
-        user_list_scrolled_window = Gtk.ScrolledWindow(vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
+        user_list_scrolled_window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         user_list_scrolled_window.add(user_list_tree_view)
 
         # Define Storage Container & Attach Components
