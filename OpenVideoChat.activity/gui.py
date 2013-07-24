@@ -121,7 +121,7 @@ class Gui(Gtk.Grid):
 
         # Tell the Tree View to expand (won't accept these in constructor)
         user_list_tree_view.set_vexpand(True)
-        user_list_tree_view.set_hexpand(True)
+        # user_list_tree_view.set_hexpand(True)
 
         # Define Storage Container & Attach Components
         user_list_grid = Gtk.Grid()
