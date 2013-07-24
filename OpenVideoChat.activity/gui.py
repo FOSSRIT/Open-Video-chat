@@ -163,13 +163,14 @@ class Gui(Gtk.Grid):
         # Simply add a user (logs would fill fast if I added one here)
         self.user_list_store.append([contact.get_alias(), contact])
 
-    def user_selected(self, tree_view, arg2, arg3):
+    def user_selected(self, tree_view, selected_index, column_object):
         logger.debug("Identifying selected user to initiate communication...")
 
-        # Let's test some info
-        logger.debug(tree_view)
-        logger.debug(arg2)
-        logger.debug(arg3)
+        # Can we pull the index from our List Store?
+        # and Does it match when we sort?
+
+        # First, can we access it via treeiter?
+        print self.user_list_store[treeiter]
 
     """ Chat Methods """
 
