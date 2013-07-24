@@ -114,15 +114,15 @@ class Gui(Gtk.Grid):
         self.user_list_store = Gtk.ListStore()
 
         # Create User List (Tree View)
-        user_list_tree_view = Gtk.TreeView()
+        user_list_tree_view = Gtk.TreeView(hexpand=True, vexpand=True)
         user_list_tree_view.set_model(self.user_list_store)
         # user_list_tree_view.set_search_column()
         user_list_tree_view.set_search_entry(user_list_search_entry)
 
         # Define Storage Container & Attach Components
         user_list_grid = Gtk.Grid()
-        user_list_grid.attach(user_list_tree_view, 0, 0, 1, 1)
-        user_list_grid.attach(user_list_search_entry, 0, 1, 1, 1)
+        user_list_grid.attach(user_list_search_entry, 0, 0, 1, 1)
+        user_list_grid.attach(user_list_tree_view, 0, 1, 1, 1)
 
         # Create an expander to show the users on-demand & display all components
         user_list_expander = Gtk.Expander(label=_("Users"))
