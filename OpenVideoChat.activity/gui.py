@@ -149,8 +149,8 @@ class Gui(Gtk.Grid):
         # Simply add a user (logs would fill fast if I added one here)
         self.user_list_store.append([contact.get_alias(), contact])
 
-        # Temporarily track length?
-        print len(self.user_list_store)
+        # Try printing the alias?
+        print contact.get_alias()
 
     """ Chat Methods """
 
