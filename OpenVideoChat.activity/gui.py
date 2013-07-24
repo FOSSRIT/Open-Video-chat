@@ -163,12 +163,13 @@ class Gui(Gtk.Grid):
         # Simply add a user (logs would fill fast if I added one here)
         self.user_list_store.append([contact.get_alias(), contact])
 
-    def user_selected(self, tree_view, arg2):
+    def user_selected(self, tree_view, arg2, arg3):
         logger.debug("Identifying selected user to initiate communication...")
 
         # Let's test some info
         logger.debug(tree_view)
         logger.debug(arg2)
+        logger.debug(arg3)
 
     """ Chat Methods """
 
