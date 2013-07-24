@@ -114,18 +114,19 @@ class Gui(Gtk.Grid):
         self.user_list_store = Gtk.ListStore()
 
         # Create User List (Tree View)
-        user_list_tree_view = Gtk.TreeView(min_content_height=MIN_CHAT_HEIGHT)
+        user_list_tree_view = Gtk.TreeView()
         user_list_tree_view.set_model(self.user_list_store)
         # user_list_tree_view.set_search_column()
         user_list_tree_view.set_search_entry(user_list_search_entry)
 
-        # Tell the Tree View to expand (won't accept these in constructor)
-        # user_list_tree_view.set_vexpand(True)
+        # Create a scrollbox for user list
+        user_list_scrolled_window = Gtk.ScrolledWindow(vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
+        user_list_scrolled_window.add(user_list_tree_view)
 
         # Define Storage Container & Attach Components
         user_list_grid = Gtk.Grid()
         user_list_grid.attach(user_list_search_entry, 0, 0, 1, 1)
-        user_list_grid.attach(user_list_tree_view, 0, 1, 1, 1)
+        user_list_grid.attach(user_list_scrolled_window, 0, 1, 1, 1)
 
         # Create an expander to show the users on-demand & display all components
         user_list_expander = Gtk.Expander(label=_("Users"))
