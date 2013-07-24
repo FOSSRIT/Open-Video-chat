@@ -146,8 +146,8 @@ class Gui(Gtk.Grid):
         return False
 
     def add_a_contact(self, contact):
-        # No log output because it would be shown hundreds of times
-
+        # Simply add a user (logs would fill fast if I added one here)
+        self.user_list_store.append(contact.get_alias(), contact)
 
     """ Chat Methods """
 

@@ -103,12 +103,27 @@ class NetworkStack(object):
         if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
             self.populate_users_list(connection.dup_contact_list())
 
+        # **FIXME** Further abstraction to adding contacts should be added to manage
+        #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
+
         """ Sugar handling for if connection established through sugar sharing process """
 
         # Run through channel setup procedures
         # self.setup_chat_channel()
         # self.setup_command_channel()
         # self.setup_stream_channel()
+
+    def populate_users_list(self, contacts):
+        logger.debug("Adding contacts to gui...")
+
+        for contact in contacts:
+            self.add_user_to_gui(contact)
+
+        logger.debug("Sent users to gui")
+
+    def set_populate_users(self, callback):
+        logger.debug("Adding callback to add users to gui...")
+        self.add_user_to_gui = callback
 
     def setup_chat_channel(self):
         logger.debug("Setting up chat channel...")
@@ -145,44 +160,13 @@ class NetworkStack(object):
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
 
-
-    # def channel_setup_callback(self):
-    #     logger.debug("Handle channel setup callback...")
-
-    #     # Setup an account manager
-    #     account_manager = Tp.AccountManager.dup()
-
-    #     # Prepare to create channel
-    #     handler = Tp.SimpleHandler.new_with_am(
-    #         account_manager,
-    #         False,                        # Bypass Approval
-    #         False,                        # Implement Requests
-    #         username + '.chat',   # Name of service
-    #         False,                        # Unique Name
-    #         self.channel_setup_callback,  # Callback
-    #         None                          # Custom Data supplied to callback
-    #     )
-
-    #     # Define Channel
-    #     handler.add_handler_filter({
-    #         Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,
-    #         Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),
-    #         Tp.PROP_CHANNEL_REQUESTED: False,
-    #     })
-
-    #     # Register Channel
-    #     handler.register()
+        # Iterate the list and send them to the gui's List Store
 
     def setup_command_channel(self):
         logger.debug("Setting up command channel...")
 
     def setup_stream_channel(self):
         logger.debug("Setting up stream channel...")
-
-    def populate_users_list(self, users_list):
-        logger.debug("Getting user list...")
-
-        # Take the users list and send them one-by-one to the GUI?
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference

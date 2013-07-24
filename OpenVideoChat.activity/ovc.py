@@ -62,6 +62,7 @@ class OpenVideoChat(Gtk.Window):
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
+        self.network_stack.set_populate_users(self.get_child().add_a_contact)
 
         """ Setup GStreamer Stack """
 
