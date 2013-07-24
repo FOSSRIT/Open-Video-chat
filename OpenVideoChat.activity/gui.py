@@ -170,7 +170,7 @@ class Gui(Gtk.Grid):
         # and Does it match when we sort?
 
         # First, can we access it via treeiter?
-        print self.user_list_store[selected_index]
+        print self.user_list_store[selected_index][0]
 
     """ Chat Methods """
 
