@@ -72,6 +72,9 @@ class OpenVideoChat(Gtk.Window):
         # Supply gui with network channel establishment callback
         self.get_child().set_chat_channel_initializer(self.network_stack.setup_chat_channel)
 
+        # Supply gui with send_message network callback
+        self.get_child().set_send_chat_message(self.network_stack.send_chat_message)
+
         """ Setup GStreamer Stack """
 
         # Proceed with Application Loop
