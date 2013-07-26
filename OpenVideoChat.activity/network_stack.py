@@ -243,7 +243,7 @@ class NetworkStack(object):
         # Send asynchronous message
         self.chat_channel.send_message_async(
             message_container,  # Telepathy ClientMessage object
-            [],                 # Optional Message Sending Flags (Telepathy Constants)
+            0,                  # Optional Message Sending Flags (Telepathy Constants)
             None,               # Callback (server-received confirmation)
             None                # Data for callback
         )
