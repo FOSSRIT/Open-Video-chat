@@ -27,11 +27,10 @@
 
 # Imports
 import logging
+import datetime
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gettext import gettext as _
-
-# Testing GtkTreeIter with defined classes
 from gi.repository.TelepathyGLib import Contact
 
 
