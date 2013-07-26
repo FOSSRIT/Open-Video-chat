@@ -143,13 +143,11 @@ class NetworkStack(object):
         handler.add_handler_filter({
             Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
             Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_REQUESTED: False,
         })
 
         # Register the handler
-        result = handler.register()
-
-        # Did it work?
-        logger.debug(result)
+        handler.register()
 
         logger.debug("Now listening for incoming chat requests...")
 
