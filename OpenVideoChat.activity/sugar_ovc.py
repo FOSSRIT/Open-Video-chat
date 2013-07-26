@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class OpenVideoChatActivity(Activity):
+class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
 
     def __init__(self, handle):
         Activity.__init__(self, handle)
