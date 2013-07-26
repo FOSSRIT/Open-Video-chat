@@ -109,7 +109,8 @@ class Gui(Gtk.Grid):
         logger.debug("Building User List...")
 
         # Create Buffer for user storage
-        self.user_list_store = Gtk.ListStore(str, Contact)
+        # self.user_list_store = Gtk.ListStore(str, Contact)
+        self.user_list_store = Gtk.ListStore(str, object)
 
         # Create a Tree View and supply it the List Store
         user_list_tree_view = Gtk.TreeView(self.user_list_store)
