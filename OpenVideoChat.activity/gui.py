@@ -80,9 +80,9 @@ class Gui(Gtk.Grid):
         chat_text_view = Gtk.TextView(editable=False, buffer=chat_text_buffer, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
         chat_scrollable_history = Gtk.ScrolledWindow(hexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         chat_scrollable_history.add(chat_text_view)
-        chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE)
+        chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE, sensitive=False)
         chat_entry.connect("activate", self.send_message)
-        chat_send_message_button = Gtk.Button(_("Send"))
+        chat_send_message_button = Gtk.Button(_("Send"), sensitive=False)
         chat_send_message_button.connect("clicked", self.send_message)
         logger.debug("Built Chat Buffer, History, and Input")
 
@@ -196,8 +196,8 @@ class Gui(Gtk.Grid):
     def chat_write_line(self, line):
         self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), line, -1)
 
-    def receive_message(self, username, message):
-        self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), "%s [%s]: %s\n" % (username, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
+    def receive_message(self, contact, message):
+        self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), "%s [%s]: %s\n" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
 
         # Can we acquire the parent object?
         logger.debug(self.chat_text_buffer.get_parent())
