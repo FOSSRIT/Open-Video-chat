@@ -113,7 +113,8 @@ class NetworkStack(object):
         #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
 
         # Testing listener for contacts changed:
-            connection.connect('ContactsChangedWithID', self.contacts_changed_callback)
+            # connection.connect('ContactsChangedWithID', self.contacts_changed_callback)
+            connection.connect('ContactsChanged', self.contacts_changed_callback)
 
         """ Sugar handling for if connection established through sugar sharing process """
 
