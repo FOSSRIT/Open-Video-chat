@@ -109,6 +109,10 @@ class NetworkStack(object):
         if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
             self.populate_users_list(connection.dup_contact_list())
 
+        # Print out the dir of the contact list (can't find it in bpython)
+        contact_list = connection.dup_contact_list()
+        loger.debug(contact_list)
+
         # **FIXME** Further abstraction to adding contacts should be added to manage
         #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
 
