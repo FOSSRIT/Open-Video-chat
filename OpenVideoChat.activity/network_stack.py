@@ -137,7 +137,7 @@ class NetworkStack(object):
         channel_description = {
             Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
             Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT)   # What it is tied to (A Contact)
-            Tp.PROP_CHANNEL_TARGET_ID: contact.get_() # Who to open the channel with
+            # Tp.PROP_CHANNEL_TARGET_ID: contact.get_username() # Who to open the channel with
         }
 
         # # **FIXME** Still investigating how to name the channel
