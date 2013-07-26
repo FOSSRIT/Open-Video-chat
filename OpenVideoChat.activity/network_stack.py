@@ -179,12 +179,18 @@ class NetworkStack(object):
 
         # Run this asynchronously
         # request.ensure_channel_async(
+        #     "ChatHandler",                     # Preferred Handler (Must be named AND DEFINED or it opens a window)
+        #     None,                              # Whether it can be canceled
+        #     self.chat_channel_setup_callback,  # Callback
+        #     None                               # Custom Data for callback
+        # )
+        # Alternative syntax?
         request.ensure_and_handle_channel_async(
-            "ChatHandler",                     # Preferred Handler (Must be named AND DEFINED or it opens a window)
             None,                              # Whether it can be canceled
             self.chat_channel_setup_callback,  # Callback
             None                               # Custom Data for callback
         )
+
 
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat channel approved and initiating...")
