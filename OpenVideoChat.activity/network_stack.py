@@ -112,20 +112,10 @@ class NetworkStack(object):
         # **FIXME** Further abstraction to adding contacts should be added to manage
         #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
 
-        # Testing listener for contacts changed:
-            # connection.connect('ContactsChangedWithID', self.contacts_changed_callback)
-            # connection.connect('notify', self.contacts_changed_callback)
-
-        # Test contact list class?
-        contact_list = connection.dup_contact_list()
-        logger.debug(contact_list.__class__)
-
         """ Sugar handling for if connection established through sugar sharing process """
 
         # Run through channel setup procedures
         # self.setup_chat_channel()
-        # self.setup_command_channel()
-        # self.setup_stream_channel()
 
     def populate_users_list(self, contacts):
         logger.debug("Adding contacts to gui...")
@@ -135,61 +125,55 @@ class NetworkStack(object):
 
         logger.debug("Sent users to gui")
 
-
-    def contacts_changed_callback(self, arg1, arg2, arg3):
-        logger.debug("Contacts List Changed!")
-
-        # Test args
-        logger.debug(arg1)  # Assumed connection?
-        logger.debug(arg2)
-        logger.debug(arg3)
-
-    def set_populate_users(self, callback):
-        logger.debug("Adding callback to add users to gui...")
-        self.add_user_to_gui = callback
+    """ Chat Channel Methods """
 
     def setup_chat_channel(self):
         logger.debug("Setting up chat channel...")
 
-        # Describe the channel type (text)
-        channel_description = {
-            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT)   # What it is tied to (A Contact)
-            # Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()  # Who to open the channel with
-        }
+        # # Describe the channel type (text)
+        # channel_description = {
+        #     Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+        #     Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT)   # What it is tied to (A Contact)
+        #     # Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()  # Who to open the channel with
+        # }
 
-        # **FIXME** Still investigating how to name the channel
+        # # **FIXME** Still investigating how to name the channel
 
-        # Request the channel
-        request = Tp.AccountChannelRequest.new(
-            self.account,                              # Account
-            channel_description,                       # Dict of channel properties
-            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
-        )
+        # # Request the channel
+        # request = Tp.AccountChannelRequest.new(
+        #     self.account,                              # Account
+        #     channel_description,                       # Dict of channel properties
+        #     Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
+        # )
 
-        # Run this asynchronously
-        request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
+        # # Run this asynchronously
+        # request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
 
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat Channel Setup Completed")
 
-        # Grab the channel while removing the asynchronous listener
-        (self.chat_channel, context) = request.create_and_handle_channel_finish(status)
+        # # Grab the channel while removing the asynchronous listener
+        # (self.chat_channel, context) = request.create_and_handle_channel_finish(status)
 
-        # If the chat channel was made connect message received handler
-        if self.chat_channel:
-            self.chat_channel.connect('message-received', self.chat_message_received)
+        # # If the chat channel was made connect message received handler
+        # if self.chat_channel:
+        #     self.chat_channel.connect('message-received', self.chat_message_received)
+
+    def send_chat_message(self, message):
+        logger.debug("Sending a message over the wire...")
 
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
 
         # Iterate the list and send them to the gui's List Store
 
-    def setup_command_channel(self):
-        logger.debug("Setting up command channel...")
+    """ Custom Setters for External Callbacks """
 
-    def setup_stream_channel(self):
-        logger.debug("Setting up stream channel...")
+    def set_populate_users(self, callback):
+        logger.debug("Adding callback to add users to gui...")
+        self.add_user_to_gui = callback
+
+    """ Old Code (Deprecated & scheduled for removal after testing) """
 
     # def setup(self, activity, get_buddy):
     #     # Grab Shared Activity Reference
