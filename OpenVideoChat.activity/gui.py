@@ -189,10 +189,10 @@ class Gui(Gtk.Grid):
         self.chat_entry.set_sensitive(True)
         self.chat_send_message_button.set_sensitive(True)
 
-    """ Chat Methods """
+        # Set focus into chat entry
+        self.chat_entry.grab_focus()
 
-    def activate_chat_area(self):
-        logger.debug("Channel established, activating chat services...")
+    """ Chat Methods """
 
     def send_message(self, sender):
         if self.chat_entry.get_text() != "":
