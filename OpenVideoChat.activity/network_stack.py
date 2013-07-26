@@ -66,17 +66,20 @@ class NetworkStack(object):
         # Grab the ambiguous factory object
         factory = self.account_manager.get_factory()
 
-        # Using quarks tell the factory to pull the connection with the account
-        factory.add_account_features([Tp.Account.get_feature_quark_connection()])
-
-        # Using quarks tell the factory to pull the contact list with the connection
-        factory.add_connection_features([Tp.Connection.get_feature_quark_contact_list(), Tp.Connection.get_feature_quark_core()])
-
-        # Tell the factory to include contact aliases
-        factory.add_contact_features([Tp.ContactFeature.ALIAS])
-
-        # Tell our factory to add channel core features
-        factory.add_channel_features([Tp.Channel.get_feature_quark_core()])
+        # Add features to the shared abstract factory (used by all components)
+        factory.add_account_features([
+            Tp.Account.get_feature_quark_connection()        # Pull the connections for the accounts
+        ])
+        factory.add_connection_features([
+            Tp.Connection.get_feature_quark_contact_list(),  # Get the contact list as a "feature"
+            # Tp.Connection.get_feature_quark_core()           # the core? (Not sure what this quark adds)
+        ])
+        factory.add_contact_features([
+            Tp.ContactFeature.ALIAS                          # Get contact ALIAS's from system
+        ])
+        # factory.add_channel_features([
+        #     Tp.Channel.get_feature_quark_core()              # Include channel features! (no clue)
+        # ])
 
         # Wait for the account to be ready to ensure the channel
         self.account_manager.prepare_async(None, self.setup_stack_components, None)
