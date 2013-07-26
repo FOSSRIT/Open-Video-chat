@@ -204,13 +204,16 @@ class NetworkStack(object):
 
     #     context.accept()
 
-    def chat_channel_setup_callback(self, request, status, data):
+    def chat_channel_setup_callback(self, channel, status, data):
         logger.debug("Chat Channel Approved and initiating")
 
         # Limit chat to one-on-one by unregistering the handler
         if self.chat_handler is not None:
             self.chat_handler.unregister()
             self.chat_handler = None
+
+        # Test supplied info?
+        logger.debug(channel)
 
         # Assign channel to class variable
 
