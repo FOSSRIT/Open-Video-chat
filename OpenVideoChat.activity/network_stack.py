@@ -238,7 +238,7 @@ class NetworkStack(object):
         logger.debug("Sending a message over the wire...")
 
         # Send asynchronous message
-        self.chat_channel.send_message_async(message)
+        self.chat_channel.send_message_async(message, None, None, None)
 
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
