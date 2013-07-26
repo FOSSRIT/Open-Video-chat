@@ -86,7 +86,7 @@ class NetworkStack(object):
 
         # Grab the first available "jabber" account
         for account in self.account_manager.get_valid_accounts():
-            if account.get_protocol() is "jabber":
+            if account.get_protocol() == "jabber":
                 self.account = account
                 break
 
