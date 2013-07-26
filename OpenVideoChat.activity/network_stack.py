@@ -179,55 +179,55 @@ class NetworkStack(object):
         # Run this asynchronously
         request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
 
-    # This is how the callback looks for the simplehandler, not sure if the same callback can be used with
-    # both async channel ensure and simple handler, testing required...
-    # def handle_channels_cb(
-    #     self,
-    #     handler,
-    #     account,
-    #     connection,
-    #     channels,
-    #     requests,
-    #     user_action_time,
-    #     context,
-    #     loop
-    # ):
-    #     for channel in channels:
-    #         if not isinstance(channel, Tp.StreamTubeChannel):
-    #             continue
-
-    #         print "Accepting tube"
-
-    #         channel.connect('invalidated', tube_invalidated_cb, loop)
-
-    #         channel.accept_async(tube_accept_cb, loop)
-
-    #     context.accept()
-
     def chat_channel_setup_callback(self, channel, status, data):
         logger.debug("Chat Channel Approved and initiating")
+
+        # Remove asynchronous listener
+        channel.create_and_handle_channel_finish(status)
+
+        # Call shared-setup process
+        self.process_chat_channel_setup(channel)
+
+    def handler_chat_channel_setup_callback(
+        self,
+        handler,
+        account,
+        connection,
+        channels,
+        requests,
+        user_action_time,
+        context,
+        loop
+    ):
+        logger.debug("SimpleHandler received request for channel...")
 
         # Limit chat to one-on-one by unregistering the handler
         if self.chat_handler is not None:
             self.chat_handler.unregister()
             self.chat_handler = None
 
-        # Test supplied info?
-        logger.debug(channel)
+        # for channel in channels:
+        #     if not isinstance(channel, Tp.StreamTubeChannel):
+        #         continue
+
+        #     print "Accepting tube"
+
+        #     channel.connect('invalidated', tube_invalidated_cb, loop)
+
+        #     channel.accept_async(tube_accept_cb, loop)
+
+        # context.accept()
+
+    def process_chat_channel_setup(self, channel):
 
         # Assign channel to class variable
+        self.chat_channel = channel
 
         # Add listener for received messages
+        channel.connect('message-received', self.chat_message_received)
 
         # Activate Chat Services
         self.activate_chat()
-
-        # # Grab the channel while removing the asynchronous listener
-        # (self.chat_channel, context) = request.create_and_handle_channel_finish(status)
-
-        # # If the chat channel was made connect message received handler
-        # if self.chat_channel:
-        #     self.chat_channel.connect('message-received', self.chat_message_received)
 
     def send_chat_message(self, message):
         logger.debug("Sending a message over the wire...")
