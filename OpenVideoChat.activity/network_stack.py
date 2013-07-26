@@ -183,7 +183,7 @@ class NetworkStack(object):
         logger.debug("Chat Channel Approved and initiating")
 
         # Try this?
-        request.ensure_channel_finish(status)
+        logger.debug(request.ensure_channel_finish(status))
 
         # What is going on?
         # logger.debug(dir(request))
