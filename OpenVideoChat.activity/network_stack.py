@@ -234,11 +234,14 @@ class NetworkStack(object):
         # Activate Chat Services
         self.activate_chat()
 
-    def send_chat_message(self, message):
+    def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
         logger.debug("Sending a message over the wire...")
 
+        # Wrap our message in a Telepathy Message object
+        message_container = Tp.ClientMessage.new_text(message_type, message)
+
         # Send asynchronous message
-        self.chat_channel.send_message_async(message, None, None, None)
+        self.chat_channel.send_message_async(message_container, None, None, None)
 
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
