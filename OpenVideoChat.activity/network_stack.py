@@ -76,7 +76,16 @@ class NetworkStack(object):
             Tp.Connection.get_feature_quark_contact_blocking(),  # Contact Blocking?
         ])
         factory.add_contact_features([
-            Tp.ContactFeature.ALIAS                              # Get contact ALIAS's from system
+            Tp.ContactFeature.ALIAS,                             # Get contact ALIAS's from system
+            Tp.ContactFeature.CONTACT_GROUPS,                    #
+            Tp.ContactFeature.PRESENCE,                          #
+            Tp.ContactFeature.AVATAR_DATA,                       #
+            Tp.ContactFeature.SUBSCRIPTION_STATES,               #
+            Tp.ContactFeature.CAPABILITIES,                      #
+            Tp.ContactFeature.CONTACT_INFO,                      #
+            Tp.ContactFeature.LOCATION,                          #
+            Tp.ContactFeature.CONTACT_BLOCKING,                  #
+
         ])
 
         # Wait for the account to be ready to ensure the channel
