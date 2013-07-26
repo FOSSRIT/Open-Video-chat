@@ -225,7 +225,7 @@ class NetworkStack(object):
 
         if self.chat_channel is not None:
             # Try async with lambda to catch & finish
-            self.chat_channel.close_async(lambda c, s, d: c.finish_async(s))
+            self.chat_channel.close_async(lambda c, s, d: c.finish_async(s), None)
             # logger.debug(dir(self.chat_channel))
             # logger.debug(self.chat_channel)
             # self.chat_channel.call_close(
