@@ -114,7 +114,7 @@ class NetworkStack(object):
 
         """ Sugar handling for if connection established through sugar sharing process """
 
-        # Run through channel setup procedures
+        # Listen for incoming connections
         # self.setup_chat_channel()
 
     def populate_users_list(self, contacts):
@@ -127,15 +127,18 @@ class NetworkStack(object):
 
     """ Chat Channel Methods """
 
-    def setup_chat_channel(self):
-        logger.debug("Setting up chat channel...")
+    def listen_for_chat_channel(self):
+        logger.debug("Listening for incoming connections...")
 
-        # # Describe the channel type (text)
-        # channel_description = {
-        #     Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-        #     Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT)   # What it is tied to (A Contact)
-        #     # Tp.PROP_CHANNEL_TARGET_ID: self.account.get_normalized_name()  # Who to open the channel with
-        # }
+    def setup_chat_channel(self, contact):
+        logger.debug("Setting up outgoing chat channel...")
+
+        # Describe the channel type (text)
+        channel_description = {
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT)   # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_TARGET_ID: contact.get_() # Who to open the channel with
+        }
 
         # # **FIXME** Still investigating how to name the channel
 
