@@ -75,7 +75,7 @@ class Gui(Gtk.Grid):
         logger.debug("Building Chat...")
 
         # Create Chat Components
-        self.chat_text_buffer = chat_text_buffer = Gtk.TextBuffer()
+        chat_text_buffer = Gtk.TextBuffer()
         self.chat_text_view = chat_text_view = Gtk.TextView(editable=False, buffer=chat_text_buffer, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
         chat_scrollable_history = Gtk.ScrolledWindow(hexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         chat_scrollable_history.add(chat_text_view)
@@ -203,18 +203,16 @@ class Gui(Gtk.Grid):
         return False
 
     def chat_write_line(self, line):
-        self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), line + "\n", -1)
+        self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), line + "\n", -1)
 
     def receive_message(self, contact, message):
-        # self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), "%s [%s]: %s\n" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
+        logger.debug("Posting received message...")
 
-        # Test message using view and get_buffer instead (less class-variables the better/cleaner)
+        # Add Message
         self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), "%s [%s]: %s\n" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
 
+        # Scroll to bottom
         self.chat_text_view.scroll_to_iter(self.chat_text_view.get_buffer().get_end_iter(), 0.1, False, 0.0, 0.0)
-
-        # Can we acquire the parent object?
-        # logger.debug(self.chat_text_buffer.get_parent())
 
     # def get_history(self):
     #     return self.chat_text.get_text(
