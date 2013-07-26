@@ -154,6 +154,9 @@ class NetworkStack(object):
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
 
+        # Call Channel closure for previously opened channels
+        self.close_chat_channel()
+
         # Remove handler for listener, since we are establishing the connection ourselves
         if self.chat_handler is not None:
             self.chat_handler.unregister()
@@ -184,15 +187,6 @@ class NetworkStack(object):
             None                               # Custom Data for callback
         )
 
-    def chat_channel_setup_callback(self, request, status, data):
-        logger.debug("Chat channel approved and initiating...")
-
-        # Remove async process & grab channel plus context
-        (channel, context) = request.ensure_and_handle_channel_finish(status)
-
-        # Call shared-setup process
-        self.process_chat_channel_setup(channel)
-
     def handler_chat_channel_setup_callback(
         self,
         handler,
@@ -222,6 +216,27 @@ class NetworkStack(object):
         #     channel.accept_async(tube_accept_cb, loop)
 
         # context.accept()
+
+    def close_chat_channel(self):
+        logger.debug("Closing any existing chat channels...")
+
+        if self.chat_channel is not None:
+            self.chat_channel.call_close(
+                -1,    # Millisecond timeout for request
+                None,  # Callback
+                None,  # Custom Data
+                None,  # Secondary Callback Argument (labeled destroy)?
+                None   # Weakly referenced gobject for?
+            )
+
+    def chat_channel_setup_callback(self, request, status, data):
+        logger.debug("Chat channel approved and initiating...")
+
+        # Remove async process & grab channel plus context
+        (channel, context) = request.ensure_and_handle_channel_finish(status)
+
+        # Call shared-setup process
+        self.process_chat_channel_setup(channel)
 
     def process_chat_channel_setup(self, channel):
 
