@@ -52,7 +52,7 @@ class OpenVideoChat(Gtk.Window):
         self.set_default_size(DEFAULT_WINDOW_SIZE['width'], DEFAULT_WINDOW_SIZE['height'])
 
         # Connect Window Event Signals
-        self.connect("delete-event", lambda: self.can_close() and Gtk.main_quit)
+        self.connect("delete-event", lambda w, s: self.can_close() and Gtk.main_quit)
         self.connect('check-resize', self.on_resize)
 
         """ Setup GUI """
