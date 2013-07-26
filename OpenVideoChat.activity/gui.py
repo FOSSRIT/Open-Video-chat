@@ -31,7 +31,6 @@ import datetime
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gettext import gettext as _
-from gi.repository.TelepathyGLib import Contact
 
 
 # Define Logger for Logging & DEBUG level for Development
@@ -109,7 +108,6 @@ class Gui(Gtk.Grid):
         logger.debug("Building User List...")
 
         # Create Buffer for user storage
-        # self.user_list_store = Gtk.ListStore(str, Contact)
         self.user_list_store = Gtk.ListStore(str, object)
 
         # Create a Tree View and supply it the List Store
