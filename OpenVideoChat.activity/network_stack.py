@@ -185,7 +185,12 @@ class NetworkStack(object):
         )
 
     def chat_channel_setup_callback(self, request, status, data):
-        logger.debug("Chat Channel Approved and initiating")
+        logger.debug("Chat channel approved and initiating...")
+
+        # Remove async process & grab channel?
+        test = request.ensure_and_handle_channel_finish(status)
+
+        logger.debug(test)
 
         # This works to desync but no channel acquired?
         # request.ensure_channel_finish(status)
@@ -194,9 +199,6 @@ class NetworkStack(object):
         # logger.debug(dir(request))
         # logger.debug(request)
         # logger.debug(status)
-
-        # Remove async process & grab channel?
-        # test = request.ensure_and_handle_channel_finish(status)
 
         # Remove asynchronous listener & grab channel at the same time
         # (channel, context) = request.create_and_handle_channel_finish(status)
