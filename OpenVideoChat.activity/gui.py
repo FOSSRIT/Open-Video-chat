@@ -173,6 +173,8 @@ class Gui(Gtk.Grid):
         # self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_username() + ")...]")
 
         # Test valuable contact methods
+        logger.debug(dir(contact))
+        logger.debug(contact.get_username())
 
         # Send request to network stack /w callback to activate chat
         self.chat_channel_initializer(contact)
