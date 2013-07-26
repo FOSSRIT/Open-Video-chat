@@ -174,9 +174,6 @@ class Gui(Gtk.Grid):
         # Send request to network stack /w callback to activate chat
         self.chat_channel_initializer(contact)
 
-        # Test receive message using selected contact
-        self.receive_message(contact, "Test Message!")
-
     def set_chat_channel_initializer(self, callback):
         logger.debug("Assigning callback for chat-channel initialization...")
         self.chat_channel_initializer = callback
