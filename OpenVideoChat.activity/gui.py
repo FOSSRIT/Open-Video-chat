@@ -169,32 +169,45 @@ class Gui(Gtk.Grid):
         # We can pull the contact object from our store
         contact = self.user_list_store[selected_index][1]
 
-        # Now we need a callback to the network stack
-        # to establish a channel for communication
+        # Local message notifying chat is being enabled with selected user
+        # self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_username() + ")...]")
+
+        # Test valuable contact methods
+
+        # Send request to network stack /w callback to activate chat
+        self.chat_channel_initializer(contact)
+
+    def set_chat_channel_initializer(self, callback):
+        logger.debug("Assigning callback for chat-channel initialization...")
+        self.chat_channel_initializer = callback
 
     """ Chat Methods """
 
+    def activate_chat_area(self):
+        logger.debug("Channel established, activating chat services...")
+
     def send_message(self, sender):
-        # Send a message over the tubes
+        # if self.chat_entry.get_text() != "":
+        #     message = self.chat_entry.get_text()
+        #     self.receive_message(self.network_stack.username, message)
+        #     self.network_stack.send_message(message)
+        #     self.chat_entry.set_text("")
+        #     self.chat_entry.grab_focus()
         return False
+
+    def chat_write_line(self, line):
+        self.chat_text_buffer.insert(self.chat_text.get_end_iter(), line, -1)
+
+    def receive_message(self, username, message):
+        self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), "%s [%s]: %s\n" % (username, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
+
+        # Can we acquire the parent object?
+        logger.debug(self.chat_text_buffer.get_parent())
+
+        # self.text_view.scroll_to_iter(self.chat_text_buffer.get_end_iter(), 0.1, False, 0.0, 0.0)
 
     # def get_history(self):
     #     return self.chat_text.get_text(
     #             self.chat_text.get_start_iter(),
     #             self.chat_text.get_end_iter(),
     #             True)
-
-    # def chat_write_line(self, line):
-    #     self.chat_text.insert(self.chat_text.get_end_iter(), line, -1)
-
-    # def receive_message(self, username, message):
-    #     self.chat_text.insert(self.chat_text.get_end_iter(), "%s [%s]: %s\n" % (username, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
-    #     self.text_view.scroll_to_iter(self.chat_text.get_end_iter(), 0.1, False, 0.0, 0.0)
-
-    # def send_message(self, sender):
-    #     if self.chat_entry.get_text() != "":
-    #         message = self.chat_entry.get_text()
-    #         self.receive_message(self.network_stack.username, message)
-    #         self.network_stack.send_message(message)
-    #         self.chat_entry.set_text("")
-    #         self.chat_entry.grab_focus()
