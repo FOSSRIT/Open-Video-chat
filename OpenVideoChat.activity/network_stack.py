@@ -112,6 +112,9 @@ class NetworkStack(object):
         if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
             self.populate_users_list(connection.dup_contact_list())
 
+            # Listener for changes to contact list
+            connection.connect('contact-list-changed', self.update_contact_list)
+
         # **FIXME** Further abstraction to adding contacts should be added to manage
         #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
 
@@ -127,6 +130,13 @@ class NetworkStack(object):
             self.add_user_to_gui(contact)
 
         logger.debug("Sent users to gui")
+
+    def update_contact_list(self, added, removed, data):
+        logger.debug("Contact list changed...")
+
+        # Test contents of added & removed
+        logger.debug(added)
+        logger.debug(removed)
 
     def listen_for_chat_channel(self):
         logger.debug("Listening for incoming connections...")
