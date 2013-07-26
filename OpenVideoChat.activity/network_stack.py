@@ -111,7 +111,8 @@ class NetworkStack(object):
 
         # Print out the dir of the contact list (can't find it in bpython)
         contact_list = connection.dup_contact_list()
-        loger.debug(contact_list)
+        logger.debug(contact_list)
+        logger.debug(dir(contact_list))
 
         # **FIXME** Further abstraction to adding contacts should be added to manage
         #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
