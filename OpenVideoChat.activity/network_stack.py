@@ -70,10 +70,13 @@ class NetworkStack(object):
         factory.add_account_features([Tp.Account.get_feature_quark_connection()])
 
         # Using quarks tell the factory to pull the contact list with the connection
-        factory.add_connection_features([Tp.Connection.get_feature_quark_contact_list()])
+        factory.add_connection_features([Tp.Connection.get_feature_quark_contact_list(), Tp.Connection.get_feature_quark_core()])
 
         # Tell the factory to include contact aliases
         factory.add_contact_features([Tp.ContactFeature.ALIAS])
+
+        # Tell our factory to add channel core features
+        factory.add_channel_features([Tp.Channel.get_feature_quark_core()])
 
         # Wait for the account to be ready to ensure the channel
         self.account_manager.prepare_async(None, self.setup_stack_components, None)
