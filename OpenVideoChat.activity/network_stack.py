@@ -125,8 +125,6 @@ class NetworkStack(object):
 
         logger.debug("Sent users to gui")
 
-    """ Chat Channel Methods """
-
     def listen_for_chat_channel(self):
         logger.debug("Listening for incoming connections...")
 
@@ -168,9 +166,9 @@ class NetworkStack(object):
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
 
-        # Iterate the list and send them to the gui's List Store
-
-    """ Custom Setters for External Callbacks """
+    def set_chat_activation(self, callback):
+        logger.debug("Defined chat activation in network stack...")
+        self.activate_chat = callback
 
     def set_populate_users(self, callback):
         logger.debug("Adding callback to add users to gui...")
