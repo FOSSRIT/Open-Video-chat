@@ -224,8 +224,10 @@ class NetworkStack(object):
         logger.debug("Closing any existing chat channels...")
 
         if self.chat_channel is not None:
-            logger.debug(dir(self.chat_channel))
-            logger.debug(self.chat_channel)
+            # Try async with lambda to catch & finish
+            self.chat_channel.close_async(lambda c, s, d: c.finish_async(s))
+            # logger.debug(dir(self.chat_channel))
+            # logger.debug(self.chat_channel)
             # self.chat_channel.call_close(
             #     -1,    # Millisecond timeout for request
             #     None,  # Callback
