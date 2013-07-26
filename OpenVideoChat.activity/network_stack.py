@@ -114,7 +114,11 @@ class NetworkStack(object):
 
         # Testing listener for contacts changed:
             # connection.connect('ContactsChangedWithID', self.contacts_changed_callback)
-            connection.connect('notify', self.contacts_changed_callback)
+            # connection.connect('notify', self.contacts_changed_callback)
+
+        # Test contact list class?
+        contact_list = connection.dup_contact_list()
+        logger.debug(contact_list.__class__)
 
         """ Sugar handling for if connection established through sugar sharing process """
 
