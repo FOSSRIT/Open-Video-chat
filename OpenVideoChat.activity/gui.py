@@ -176,7 +176,7 @@ class Gui(Gtk.Grid):
         self.chat_channel_initializer(contact)
 
         # Test premature sensitive enabling
-        self.activate_chat
+        self.activate_chat()
 
     def set_chat_channel_initializer(self, callback):
         logger.debug("Assigning callback for chat-channel initialization...")
