@@ -188,10 +188,10 @@ class NetworkStack(object):
         logger.debug("Chat channel approved and initiating...")
 
         # Remove async process & grab channel plus context
-        # (channel, context) = request.ensure_and_handle_channel_finish(status)
+        (channel, context) = request.ensure_and_handle_channel_finish(status)
 
         # Call shared-setup process
-        # self.process_chat_channel_setup(channel)
+        self.process_chat_channel_setup(channel)
 
     def handler_chat_channel_setup_callback(
         self,
