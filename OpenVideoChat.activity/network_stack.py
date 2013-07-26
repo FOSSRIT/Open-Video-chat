@@ -90,8 +90,13 @@ class NetworkStack(object):
             self.account = valid_accounts[1]
             # **FIXME** assumptions are bad, allow the user to select from their available accounts
 
-        # Test whether the first local-only account has a connection (as a way to auto-select a valid account)
-        logger.debug(valid_accounts[0].get_connection().dup_contact_list())
+        # Testing the count (len) of contacts is one hacky option:
+        # logger.debug(valid_accounts[0].get_connection().dup_contact_list())
+
+        # Let's try iterating the accounts and checking prootocol?
+        for account in valid_accounts:
+            print dir(account)
+            print account.get_protocol()
 
         # If no account exists (eg. None), print error and end setup
         if not self.account:
