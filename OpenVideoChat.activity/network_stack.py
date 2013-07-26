@@ -178,44 +178,20 @@ class NetworkStack(object):
         )
 
         # Run this asynchronously
-        # request.ensure_channel_async(
-        #     "ChatHandler",                     # Preferred Handler (Must be named AND DEFINED or it opens a window)
-        #     None,                              # Whether it can be canceled
-        #     self.chat_channel_setup_callback,  # Callback
-        #     None                               # Custom Data for callback
-        # )
-        # Alternative syntax?
         request.ensure_and_handle_channel_async(
             None,                              # Whether it can be canceled
             self.chat_channel_setup_callback,  # Callback
             None                               # Custom Data for callback
         )
 
-
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat channel approved and initiating...")
 
-        # Remove async process & grab channel?
-        test = request.ensure_and_handle_channel_finish(status)
-
-        logger.debug(test)
-
-        # This works to desync but no channel acquired?
-        # request.ensure_channel_finish(status)
-
-        # What is going on?
-        # logger.debug(dir(request))
-        # logger.debug(request)
-        # logger.debug(status)
-
-        # Remove asynchronous listener & grab channel at the same time
-        # (channel, context) = request.create_and_handle_channel_finish(status)
-
-        # Verify it is in fact a channel object?
-        # logger.debug(channel)
+        # Remove async process & grab channel plus context
+        (channel, context) = request.ensure_and_handle_channel_finish(status)
 
         # Call shared-setup process
-        # self.process_chat_channel_setup(channel)
+        self.process_chat_channel_setup(channel)
 
     def handler_chat_channel_setup_callback(
         self,
