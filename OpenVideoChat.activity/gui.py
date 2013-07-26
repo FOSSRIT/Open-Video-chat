@@ -174,7 +174,7 @@ class Gui(Gtk.Grid):
 
         # Test valuable contact methods
         logger.debug(dir(contact))
-        logger.debug(contact.get_username())
+        logger.debug(contact.get_identifier())
 
         # Send request to network stack /w callback to activate chat
         self.chat_channel_initializer(contact)
