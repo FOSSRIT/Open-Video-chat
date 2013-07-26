@@ -153,6 +153,11 @@ class NetworkStack(object):
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
 
+        # Remove handler for listener, since we are establishing the connection ourselves
+        if self.chat_handler is not None:
+            self.chat_handler.unregister()
+            self.chat_handler = None
+
         # Describe the channel type (text)
         channel_description = {
             Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
@@ -171,9 +176,11 @@ class NetworkStack(object):
             Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
         )
 
-        # # Run this asynchronously
-        # request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
+        # Run this asynchronously
+        request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
 
+    # This is how the callback looks for the simplehandler, not sure if the same callback can be used with
+    # both async channel ensure and simple handler, testing required...
     # def handle_channels_cb(
     #     self,
     #     handler,
