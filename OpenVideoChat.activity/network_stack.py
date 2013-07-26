@@ -182,14 +182,18 @@ class NetworkStack(object):
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat Channel Approved and initiating")
 
+        # What is going on?
+        logger.debug(dir(request))
+        logger.debug(request)
+
         # Remove asynchronous listener & grab channel at the same time
-        (channel, context) = request.create_and_handle_channel_finish(status)
+        # (channel, context) = request.create_and_handle_channel_finish(status)
 
         # Verify it is in fact a channel object?
-        logger.debug(channel)
+        # logger.debug(channel)
 
         # Call shared-setup process
-        self.process_chat_channel_setup(channel)
+        # self.process_chat_channel_setup(channel)
 
     def handler_chat_channel_setup_callback(
         self,
