@@ -224,13 +224,15 @@ class NetworkStack(object):
         logger.debug("Closing any existing chat channels...")
 
         if self.chat_channel is not None:
-            self.chat_channel.call_close(
-                -1,    # Millisecond timeout for request
-                None,  # Callback
-                None,  # Custom Data
-                None,  # Secondary Callback Argument (labeled destroy)?
-                None   # Weakly referenced gobject for?
-            )
+            logger.debug(dir(self.chat_channel))
+            logger.debug(self.chat_channel)
+            # self.chat_channel.call_close(
+            #     -1,    # Millisecond timeout for request
+            #     None,  # Callback
+            #     None,  # Custom Data
+            #     None,  # Secondary Callback Argument (labeled destroy)?
+            #     None   # Weakly referenced gobject for?
+            # )
 
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat channel approved and initiating...")
