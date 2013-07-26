@@ -194,7 +194,7 @@ class Gui(Gtk.Grid):
         return False
 
     def chat_write_line(self, line):
-        self.chat_text_buffer.insert(self.chat_text.get_end_iter(), line, -1)
+        self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), line, -1)
 
     def receive_message(self, username, message):
         self.chat_text_buffer.insert(self.chat_text_buffer.get_end_iter(), "%s [%s]: %s\n" % (username, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
