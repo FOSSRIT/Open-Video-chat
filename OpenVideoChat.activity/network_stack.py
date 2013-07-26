@@ -237,6 +237,9 @@ class NetworkStack(object):
     def send_chat_message(self, message):
         logger.debug("Sending a message over the wire...")
 
+        # Send message using send_message?
+        logger.debug(dir(self.chat_channel))
+
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
 
