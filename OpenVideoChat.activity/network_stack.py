@@ -190,9 +190,6 @@ class NetworkStack(object):
         # Remove async process & grab channel plus context
         (channel, context) = request.ensure_and_handle_channel_finish(status)
 
-        # Accept context
-        context.accept()
-
         # Call shared-setup process
         self.process_chat_channel_setup(channel)
 
