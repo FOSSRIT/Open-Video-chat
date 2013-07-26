@@ -243,10 +243,20 @@ class NetworkStack(object):
         # Send asynchronous message
         self.chat_channel.send_message_async(
             message_container,  # Telepathy ClientMessage object
-            0,                  # Optional Message Sending Flags (Telepathy Constants)
+            0,                  # Optional Message Sending Flags
             None,               # Callback (server-received confirmation)
             None                # Data for callback
         )
+
+        # The message sending flags are numeric constants representing features
+        # currently these include delivery, read, and deleted confirmation
+        # The numeric representation uses bit-mapping increments (1, 2, 4, etc)
+        # in this way 3 represents the combination of 1 + 2, or two-enabled features
+
+        # Technically, they are missing a NONE constant to represent 0
+        # hence why supplying 0 is the same as saying "use no features"
+
+        # **Also** server callback is not the same as user-delivery confirmation
 
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
