@@ -170,11 +170,7 @@ class Gui(Gtk.Grid):
         contact = self.user_list_store[selected_index][1]
 
         # Local message notifying chat is being enabled with selected user
-        # self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_username() + ")...]")
-
-        # Test valuable contact methods
-        logger.debug(dir(contact))
-        logger.debug(contact.get_identifier())
+        self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
 
         # Send request to network stack /w callback to activate chat
         self.chat_channel_initializer(contact)
