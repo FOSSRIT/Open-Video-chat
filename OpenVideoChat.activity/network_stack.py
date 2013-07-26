@@ -185,6 +185,10 @@ class NetworkStack(object):
         # What is going on?
         logger.debug(dir(request))
         logger.debug(request)
+        logger.debug(status)
+
+        # Remove async process & grab channel?
+        test = request.ensure_and_handle_channel_finish(status)
 
         # Remove asynchronous listener & grab channel at the same time
         # (channel, context) = request.create_and_handle_channel_finish(status)
