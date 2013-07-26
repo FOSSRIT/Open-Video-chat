@@ -200,16 +200,17 @@ class NetworkStack(object):
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat Channel Approved and initiating")
 
+        # Limit chat to one-on-one by unregistering the handler
+        if self.chat_handler is not None:
+            self.chat_handler.unregister()
+            self.chat_handler = None
+
         # Assign channel to class variable
 
         # Add listener for received messages
 
         # Activate Chat Services
         self.activate_chat()
-
-        # Limit chat to one-on-one by unregistering the handler
-        self.chat_handler.unregister()
-        self.chat_handler = None
 
         # # Grab the channel while removing the asynchronous listener
         # (self.chat_channel, context) = request.create_and_handle_channel_finish(status)
