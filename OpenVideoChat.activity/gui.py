@@ -195,13 +195,15 @@ class Gui(Gtk.Grid):
         logger.debug("Channel established, activating chat services...")
 
     def send_message(self, sender):
-        # if self.chat_entry.get_text() != "":
-        #     message = self.chat_entry.get_text()
-        #     self.receive_message(self.network_stack.username, message)
-        #     self.network_stack.send_message(message)
-        #     self.chat_entry.set_text("")
-        #     self.chat_entry.grab_focus()
-        return False
+        if self.chat_entry.get_text() != "":
+            message = self.chat_entry.get_text()
+            self.send_chat_message(message)   # Send message over the wire
+
+            # Post message from self immediately?
+            # self.receive_message(self.network_stack.username, message)
+
+            self.chat_entry.set_text("")      # Empty Chat Entry
+            self.chat_entry.grab_focus()      # Set focus back to chat entry
 
     def chat_write_line(self, line):
         self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), line + "\n", -1)
