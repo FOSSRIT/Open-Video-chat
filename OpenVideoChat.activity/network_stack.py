@@ -146,7 +146,10 @@ class NetworkStack(object):
         })
 
         # Register the handler
-        handler.register()
+        result = handler.register()
+
+        # Did it work?
+        logger.debug(result)
 
         logger.debug("Now listening for incoming chat requests...")
 
