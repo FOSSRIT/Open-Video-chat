@@ -80,9 +80,9 @@ class Gui(Gtk.Grid):
         chat_text_view = Gtk.TextView(editable=False, buffer=chat_text_buffer, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
         chat_scrollable_history = Gtk.ScrolledWindow(hexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         chat_scrollable_history.add(chat_text_view)
-        chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE, sensitive=False)
+        self.chat_entry = chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE, sensitive=False)
         chat_entry.connect("activate", self.send_message)
-        chat_send_message_button = Gtk.Button(_("Send"), sensitive=False)
+        self.chat_send_message_button = chat_send_message_button = Gtk.Button(_("Send"), sensitive=False)
         chat_send_message_button.connect("clicked", self.send_message)
         logger.debug("Built Chat Buffer, History, and Input")
 
@@ -175,9 +175,19 @@ class Gui(Gtk.Grid):
         # Send request to network stack /w callback to activate chat
         self.chat_channel_initializer(contact)
 
+        # Test premature sensitive enabling
+        self.activate_chat
+
     def set_chat_channel_initializer(self, callback):
         logger.debug("Assigning callback for chat-channel initialization...")
         self.chat_channel_initializer = callback
+
+    def activate_chat(self):
+        logger.debug("Chat services enabled on first-channel established...")
+
+        # Enable Chat GtkButton & GtkEntry
+        self.chat_entry.set_sensitive(True)
+        self.chat_send_message_button.set_sensitive(True)
 
     """ Chat Methods """
 
