@@ -91,7 +91,7 @@ class NetworkStack(object):
             # **FIXME** assumptions are bad, allow the user to select from their available accounts
 
         # Test whether the first local-only account has a connection (as a way to auto-select a valid account)
-        logger.debug(valid_accounts[0].get_connection().get_contact_list_state())
+        logger.debug(valid_accounts[0].get_connection().dup_contact_list())
 
         # If no account exists (eg. None), print error and end setup
         if not self.account:
