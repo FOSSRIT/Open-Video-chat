@@ -128,6 +128,28 @@ class NetworkStack(object):
     def listen_for_chat_channel(self):
         logger.debug("Listening for incoming connections...")
 
+        # Define handler for new channels
+        self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
+            self.account_manager,              # As specified in the method name
+            False,                             # bypass approval (dbus related)
+            False,                             # Whether to implement requests (more work but allows optional accept or deny)
+            "ChatHandler",                     # Name of handler
+            False,                             # dbus uniquify-name token
+            self.chat_channel_setup_callback,  # The callback
+            None                               # Custom data to pass to callback
+        )
+
+        # Describe the channel (a chat channel)
+        handler.add_handler_filter({
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+        })
+
+        # Register the handler
+        handler.register()
+
+        logger.debug("Now listening for incoming chat requests...")
+
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
 
@@ -138,20 +160,56 @@ class NetworkStack(object):
             Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
         }
 
-        # # **FIXME** Still investigating how to name the channel
+        # Private channels are not named, only group channels (MUC for Multi-User Channel)
+        # Because they are not named, only one can exist at a time
+        # This also means that `ensure` is better than create in this case
 
-        # # Request the channel
-        # request = Tp.AccountChannelRequest.new(
-        #     self.account,                              # Account
-        #     channel_description,                       # Dict of channel properties
-        #     Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
-        # )
+        # Request the channel
+        request = Tp.AccountChannelRequest.new(
+            self.account,                              # Account
+            channel_description,                       # Dict of channel properties
+            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
+        )
 
         # # Run this asynchronously
         # request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
 
+    # def handle_channels_cb(
+    #     self,
+    #     handler,
+    #     account,
+    #     connection,
+    #     channels,
+    #     requests,
+    #     user_action_time,
+    #     context,
+    #     loop
+    # ):
+    #     for channel in channels:
+    #         if not isinstance(channel, Tp.StreamTubeChannel):
+    #             continue
+
+    #         print "Accepting tube"
+
+    #         channel.connect('invalidated', tube_invalidated_cb, loop)
+
+    #         channel.accept_async(tube_accept_cb, loop)
+
+    #     context.accept()
+
     def chat_channel_setup_callback(self, request, status, data):
-        logger.debug("Chat Channel Setup Completed")
+        logger.debug("Chat Channel Approved and initiating")
+
+        # Assign channel to class variable
+
+        # Add listener for received messages
+
+        # Activate Chat Services
+        self.activate_chat()
+
+        # Limit chat to one-on-one by unregistering the handler
+        self.chat_handler.unregister()
+        self.chat_handler = None
 
         # # Grab the channel while removing the asynchronous listener
         # (self.chat_channel, context) = request.create_and_handle_channel_finish(status)
