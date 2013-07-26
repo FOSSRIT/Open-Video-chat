@@ -84,19 +84,30 @@ class NetworkStack(object):
         # Remove Async Listener from account_manager
         self.account_manager.prepare_finish(status)
 
-        # Grab the first available account
-        valid_accounts = self.account_manager.get_valid_accounts()
-        if len(valid_accounts) > 1:
-            self.account = valid_accounts[1]
+        # Grab the first available "jabber" account
+        for account in self.account_manager.get_valid_accounts():
+            if account.get_protocol() is "jabber":
+                self.account = account
+                break
+
+        # Use of break terminates the loop early
+        # We could use a while loop and a separately incremented index
+        # but this would create an extra variable we won't need after
+        # Or we could add `self.account is None` to the if statement
+        # but that would waste cycles
+
+        # valid_accounts = self.account_manager.get_valid_accounts()
+        # if len(valid_accounts) > 1:
+        #     self.account = valid_accounts[1]
             # **FIXME** assumptions are bad, allow the user to select from their available accounts
 
         # Testing the count (len) of contacts is one hacky option:
         # logger.debug(valid_accounts[0].get_connection().dup_contact_list())
 
         # Let's try iterating the accounts and checking prootocol?
-        for account in valid_accounts:
-            print dir(account)
-            print account.get_protocol()
+        # for account in valid_accounts:
+        #     print dir(account)
+        #     print account.get_protocol()
 
         # If no account exists (eg. None), print error and end setup
         if not self.account:
