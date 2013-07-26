@@ -96,21 +96,8 @@ class NetworkStack(object):
         # Or we could add `self.account is None` to the if statement
         # but that would waste cycles
 
-        # valid_accounts = self.account_manager.get_valid_accounts()
-        # if len(valid_accounts) > 1:
-        #     self.account = valid_accounts[1]
-            # **FIXME** assumptions are bad, allow the user to select from their available accounts
-
-        # Testing the count (len) of contacts is one hacky option:
-        # logger.debug(valid_accounts[0].get_connection().dup_contact_list())
-
-        # Let's try iterating the accounts and checking prootocol?
-        # for account in valid_accounts:
-        #     print dir(account)
-        #     print account.get_protocol()
-
-        # If no account exists (eg. None), print error and end setup
-        if not self.account:
+        # If no account exists, print error and end setup
+        if self.account is None:
             logger.debug("Failed to acquire account...")
             # **FIXME** if no valid accounts need to open account management window
             return False
