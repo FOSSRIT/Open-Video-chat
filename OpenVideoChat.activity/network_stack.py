@@ -109,13 +109,11 @@ class NetworkStack(object):
         if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
             self.populate_users_list(connection.dup_contact_list())
 
-        # Print out the dir of the contact list (can't find it in bpython)
-        contact_list = connection.dup_contact_list()
-        logger.debug(contact_list)
-        logger.debug(dir(contact_list))
-
         # **FIXME** Further abstraction to adding contacts should be added to manage
         #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
+
+        # Testing listener for contacts changed:
+            connection.connect('ContactsChangedWithID', self.contacts_changed_callback)
 
         """ Sugar handling for if connection established through sugar sharing process """
 
@@ -131,6 +129,15 @@ class NetworkStack(object):
             self.add_user_to_gui(contact)
 
         logger.debug("Sent users to gui")
+
+
+    def contacts_changed_callback(self, arg1, arg2, arg3):
+        logger.debug("Contacts List Changed!")
+
+        # Test args
+        logger.debug(arg1)  # Assumed connection?
+        logger.debug(arg2)
+        logger.debug(arg3)
 
     def set_populate_users(self, callback):
         logger.debug("Adding callback to add users to gui...")
