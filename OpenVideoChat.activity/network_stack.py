@@ -241,7 +241,12 @@ class NetworkStack(object):
         message_container = Tp.ClientMessage.new_text(message_type, message)
 
         # Send asynchronous message
-        self.chat_channel.send_message_async(message_container, None, None, None)
+        self.chat_channel.send_message_async(
+            message_container,  # Telepathy ClientMessage object
+            {},                 # Optional Message Sending Flags (Telepathy Constants)
+            None,               # Callback (server-received confirmation)
+            None                # Data for callback
+        )
 
     def chat_message_received(self, channel, message):
         logger.debug("Processing received message...")
