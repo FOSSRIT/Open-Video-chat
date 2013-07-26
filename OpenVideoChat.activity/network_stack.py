@@ -226,18 +226,9 @@ class NetworkStack(object):
         if self.chat_channel is not None:
             # Try async with lambda to catch & finish
             self.chat_channel.close_async(
-                lambda c, s, d: c.close_finish(s),  # Callback
-                None                                # User Data
+                lambda c, s, d: c.close_finish(s) and logger.debug("Existing channel closed..."),  # Callback
+                None                                                                               # User Data
             )
-            # logger.debug(dir(self.chat_channel))
-            # logger.debug(self.chat_channel)
-            # self.chat_channel.call_close(
-            #     -1,    # Millisecond timeout for request
-            #     None,  # Callback
-            #     None,  # Custom Data
-            #     None,  # Secondary Callback Argument (labeled destroy)?
-            #     None   # Weakly referenced gobject for?
-            # )
 
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat channel approved and initiating...")
