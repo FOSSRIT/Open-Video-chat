@@ -115,7 +115,7 @@ class NetworkStack(object):
         """ Sugar handling for if connection established through sugar sharing process """
 
         # Listen for incoming connections
-        # self.setup_chat_channel()
+        self.setup_chat_channel()
 
     def populate_users_list(self, contacts):
         logger.debug("Adding contacts to gui...")
