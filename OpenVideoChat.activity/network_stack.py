@@ -177,13 +177,18 @@ class NetworkStack(object):
         )
 
         # Run this asynchronously
-        request.ensure_channel_async("", None, self.chat_channel_setup_callback, None)
+        request.ensure_channel_async(
+            "ChatHandler",                     # Preferred Handler (Must be named AND DEFINED or it opens a window)
+            None,                              # Whether it can be canceled
+            self.chat_channel_setup_callback,  # Callback
+            None                               # Custom Data for callback
+        )
 
     def chat_channel_setup_callback(self, request, status, data):
         logger.debug("Chat Channel Approved and initiating")
 
-        # Try this?
-        logger.debug(request.ensure_channel_finish(status))
+        # This works to desync but no channel acquired?
+        # request.ensure_channel_finish(status)
 
         # What is going on?
         # logger.debug(dir(request))
@@ -216,9 +221,9 @@ class NetworkStack(object):
         logger.debug("SimpleHandler received request for channel...")
 
         # Limit chat to one-on-one by unregistering the handler
-        if self.chat_handler is not None:
-            self.chat_handler.unregister()
-            self.chat_handler = None
+        # if self.chat_handler is not None:
+        #     self.chat_handler.unregister()
+        #     self.chat_handler = None
 
         # for channel in channels:
         #     if not isinstance(channel, Tp.StreamTubeChannel):
