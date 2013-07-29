@@ -139,5 +139,24 @@
            height="191.42857"
            x="442.85715"
            y="165.71428" /></flowRegion><flowPara
-         id="flowPara3911">Open Video Chat is a video communication software originally developed in 2010 for the XO laptops as part of the One Laptop per Child program, and was originally intended to aid the hard of hearing.</flowPara></flowRoot>  </g>
+         id="flowPara3911">Open Video Chat is a video communication software originally developed in 2010 for the XO laptops as part of the One Laptop per Child program, and was originally intended to aid the hard of hearing.</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3913"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(0,-27.637817)"><flowRegion
+         id="flowRegion3915"><rect
+           id="rect3917"
+           width="860"
+           height="608.57135"
+           x="51.42857"
+           y="431.42856" /></flowRegion><flowPara
+         id="flowPara3919"
+         style="font-weight:bold;-inkscape-font-specification:Sans Bold;font-size:56px">Project Objectives</flowPara><flowPara
+         id="flowPara3925" /><flowPara
+         id="flowPara3941">The original version was built in 2010, and the code has since deprecated.  My aim is to revise the code, add audio, and make it functional across multiple linux distributions.</flowPara><flowPara
+         id="flowPara3927" /><flowPara
+         id="flowPara3929">- Revise code</flowPara><flowPara
+         id="flowPara3931">- Add audio</flowPara><flowPara
+         id="flowPara3933">- Cross platform</flowPara><flowPara
+         id="flowPara3935" /></flowRoot>  </g>
 </svg>
