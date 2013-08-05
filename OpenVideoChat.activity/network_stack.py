@@ -308,7 +308,7 @@ class NetworkStack(object):
         logger.debug("Sending a message over the wire...")
 
         # Verifiy connection status before trying to send a message
-        if self.connection.get_status() is not Tp.ConnectionStatus.CONNECTED:
+        if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
             logger.debug("Disconnected, cannot send a message")
             # **FIXME** Add handling to message user that they are disconnected and no message could be sent
             return False
