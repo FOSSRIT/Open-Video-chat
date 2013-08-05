@@ -44,11 +44,7 @@ class NetworkStack(object):
         self.account_manager = None
         self.account = None
         self.connection = None
-
-        # Channels for chat, stream, and commands
-        # self.chat_channel = None
-        # self.stream_channel = None
-        # self.command_channel = None
+        self.chat_channel = None
 
         """ Sugar Specific Handling """
 
