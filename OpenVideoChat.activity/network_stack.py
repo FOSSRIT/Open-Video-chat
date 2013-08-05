@@ -129,7 +129,7 @@ class NetworkStack(object):
         if not self.account.is_enabled:
             self.account.set_enabled_async(True, None, None)
         if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
-            self.account.request_presence_async(Tp.ConnectionPresenceStatus.AVAILABLE, "", "", None, None)
+            self.account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", None, None)
         else:
             self.setup_connection_logic()
 
