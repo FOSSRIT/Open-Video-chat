@@ -127,7 +127,8 @@ class NetworkStack(object):
             logger.debug("Account is not connected, waiting for status change...")
             self.account.connect('status-changed', self.test_method)
             # Add async to account for status-change?
-            self.account.prepare_async(None, None, None)
+            # self.account.prepare_async(None, None, None)
+            self.account.reconnect_async(self.account_reconnect, None)
 
         # # Grab the connection from the account
         # self.connection = connection = self.account.get_connection()
@@ -207,6 +208,12 @@ class NetworkStack(object):
         print arg1
         print arg2
         print arg3
+
+    def account_reconnect(self, account, arg2, arg3):
+        logger.debug("Account connected")
+
+        # Disconnect reconnect async?
+        account.reconnect_finish()
 
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
