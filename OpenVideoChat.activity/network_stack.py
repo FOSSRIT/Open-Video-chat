@@ -126,7 +126,7 @@ class NetworkStack(object):
         # **FIXME** Future iterations will not automatically use the first account
         #           Subsequently, no automatic connection logic will be required either
         self.account = self.accounts[0]
-        if not self.account.is_enabled:
+        if not self.account.is_enabled():
             logger.debug("TEMP: Enabling account...")
             self.account.set_enabled_async(True, self.enable_account_callback, None)
         elif self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
