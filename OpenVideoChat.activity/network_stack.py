@@ -220,6 +220,10 @@ class NetworkStack(object):
         if account.get_connection_status() is Tp.ConnectionStatus.CONNECTED:
             print "Success!"
 
+        # Try grabbing the connection and seeing its status directly?
+        connection = account.get_connection()
+        print connection.get_status()
+
         # Disconnect async process
         account.reconnect_finish(result)
 
