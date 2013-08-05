@@ -215,6 +215,11 @@ class NetworkStack(object):
     def account_reconnect(self, account, result, data):
         logger.debug("Account connected")
 
+        connection = account.get_connection()
+        print connection
+        if connection is not None:
+            print connection.get_status()
+
         # Disconnect async process
         account.reconnect_finish(result)
 
