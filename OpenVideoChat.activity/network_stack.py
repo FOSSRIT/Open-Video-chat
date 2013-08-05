@@ -151,16 +151,11 @@ class NetworkStack(object):
         # Async into the connection logic
         self.account.prepare_async(None, self.setup_connection_logic, None)
 
-        # Call connection handling
-        # self.setup_connection_logic()
-
     def setup_connection_logic(self, account, status, data):
         logger.debug("Setting up the connection components...")
 
         # Kill async process
         account.prepare_finish(status)
-
-        print account.get_connection()
 
         # Grab the connection from our account
         connection = account.get_connection()
