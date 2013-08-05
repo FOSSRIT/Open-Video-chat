@@ -142,12 +142,12 @@ class NetworkStack(object):
 
     def change_account_presence_available(self):
         logger.debug("TEMP: Connecting async...")
-        print self.account.is_enabled()
         self.account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", self.force_connect_callback, None)
 
     def force_connect_callback(self, account, status, data):
         logger.debug("User is now available")
-        account.request_presence_finish(status)
+        result = account.request_presence_finish(status)
+        print result
 
         # Call connection handling
         self.setup_connection_logic()
