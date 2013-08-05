@@ -40,10 +40,15 @@ class NetworkStack(object):
     def __init__(self, owner=None, get_buddy=None):
         logger.debug("Preparing Network Stack...")
 
+        # Network Components
+        self.account_manager = None
+        self.account = None
+        self.connection = None
+
         # Channels for chat, stream, and commands
-        self.chat_channel = None
-        self.stream_channel = None
-        self.command_channel = None
+        # self.chat_channel = None
+        # self.stream_channel = None
+        # self.command_channel = None
 
         """ Sugar Specific Handling """
 
