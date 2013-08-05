@@ -98,7 +98,7 @@ class NetworkStack(object):
         self.account_manager.prepare_finish(status)
 
         # Grab the accounts the right way (dup not get)
-        self.accounts = self.account_manager.dup_valid_accounts()
+        self.accounts = accounts = self.account_manager.dup_valid_accounts()
 
         # Grab the first available "jabber" account
         for account in accounts:
