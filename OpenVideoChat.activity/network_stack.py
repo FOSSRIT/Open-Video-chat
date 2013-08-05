@@ -46,7 +46,7 @@ class NetworkStack(object):
         self.connection = None
 
         # Channels for chat, stream, and commands
-        # self.chat_channel = None
+        self.chat_channel = None
         # self.stream_channel = None
         # self.command_channel = None
 
@@ -178,7 +178,7 @@ class NetworkStack(object):
         # Also does this handle more than one contact-list-changed event or just one per?  In which case closing and re-opening in an "infinite" loop is good
 
         # Listen for incoming channel requests
-        # self.listen_for_chat_channel()
+        self.listen_for_chat_channel()
 
         """ Sugar handling for if connection established through sugar sharing process """
 
@@ -195,31 +195,31 @@ class NetworkStack(object):
         logger.debug(added)
         logger.debug(removed)
 
-    # def listen_for_chat_channel(self):
-    #     logger.debug("Listening for incoming connections...")
+    def listen_for_chat_channel(self):
+        logger.debug("Listening for incoming connections...")
 
-    #     # Define handler for new channels
-    #     self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
-    #         self.account_manager,              # As specified in the method name
-    #         False,                             # bypass approval (dbus related)
-    #         False,                             # Whether to implement requests (more work but allows optional accept or deny)
-    #         "ChatHandler",                     # Name of handler
-    #         False,                             # dbus uniquify-name token
-    #         self.chat_channel_setup_callback,  # The callback
-    #         None                               # Custom data to pass to callback
-    #     )
+        # Define handler for new channels
+        self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
+            self.account_manager,              # As specified in the method name
+            False,                             # bypass approval (dbus related)
+            False,                             # Whether to implement requests (more work but allows optional accept or deny)
+            "ChatHandler",                     # Name of handler
+            False,                             # dbus uniquify-name token
+            self.chat_channel_setup_callback,  # The callback
+            None                               # Custom data to pass to callback
+        )
 
-    #     # Describe the channel (a chat channel)
-    #     handler.add_handler_filter({
-    #         Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-    #         Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
-    #         Tp.PROP_CHANNEL_REQUESTED: False,
-    #     })
+        # Describe the channel (a chat channel)
+        handler.add_handler_filter({
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_REQUESTED: False,
+        })
 
-    #     # Register the handler
-    #     handler.register()
+        # Register the handler
+        handler.register()
 
-    #     logger.debug("Now listening for incoming chat requests...")
+        logger.debug("Now listening for incoming chat requests...")
 
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
@@ -257,35 +257,35 @@ class NetworkStack(object):
             None                               # Custom Data for callback
         )
 
-    # def handler_chat_channel_setup_callback(
-    #     self,
-    #     handler,
-    #     account,
-    #     connection,
-    #     channels,
-    #     requests,
-    #     user_action_time,
-    #     context,
-    #     loop
-    # ):
-    #     logger.debug("SimpleHandler received request for channel...")
+    def handler_chat_channel_setup_callback(
+        self,
+        handler,
+        account,
+        connection,
+        channels,
+        requests,
+        user_action_time,
+        context,
+        loop
+    ):
+        logger.debug("SimpleHandler received request for channel...")
 
-    #     # Limit chat to one-on-one by unregistering the handler
-    #     # if self.chat_handler is not None:
-    #     #     self.chat_handler.unregister()
-    #     #     self.chat_handler = None
+        # Limit chat to one-on-one by unregistering the handler
+        # if self.chat_handler is not None:
+        #     self.chat_handler.unregister()
+        #     self.chat_handler = None
 
-    #     # for channel in channels:
-    #     #     if not isinstance(channel, Tp.StreamTubeChannel):
-    #     #         continue
+        # for channel in channels:
+        #     if not isinstance(channel, Tp.StreamTubeChannel):
+        #         continue
 
-    #     #     print "Accepting tube"
+        #     print "Accepting tube"
 
-    #     #     channel.connect('invalidated', tube_invalidated_cb, loop)
+        #     channel.connect('invalidated', tube_invalidated_cb, loop)
 
-    #     #     channel.accept_async(tube_accept_cb, loop)
+        #     channel.accept_async(tube_accept_cb, loop)
 
-    #     # context.accept()
+        # context.accept()
 
     def close_chat_channel(self):
         logger.debug("Closing any existing chat channels...")
