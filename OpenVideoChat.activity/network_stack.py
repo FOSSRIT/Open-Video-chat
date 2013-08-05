@@ -97,17 +97,22 @@ class NetworkStack(object):
         # Remove Async Listener from account_manager
         self.account_manager.prepare_finish(status)
 
+        # Grab the accounts the right way (dup not get)
+        self.accounts = self.account_manager.dup_valid_accounts()
+
         # Grab the first available "jabber" account
-        for account in self.account_manager.get_valid_accounts():
+        for account in accounts:
             if account.get_protocol() == "jabber":
                 self.account = account
                 break
 
-        # Use of break terminates the loop early
-        # We could use a while loop and a separately incremented index
-        # but this would create an extra variable we won't need after
-        # Or we could add `self.account is None` to the if statement
-        # but that would waste cycles
+        # Break from for loop to terminate when first jabber account is acquired
+        # The break was the most efficient choice here, the alternative was to
+        # run the loop with a condition `if self.account is none`, which adds extra
+        # processing both for the condition and all the cycles past acquiring the
+        # first account.
+
+        # Ideally jabber accounts will be loaded into a management gui
 
         # If no account exists, print error and end setup
         if self.account is None:
