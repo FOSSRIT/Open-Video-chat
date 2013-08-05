@@ -133,7 +133,7 @@ class NetworkStack(object):
             self.change_account_presence_available()
         else:
             logger.debug("TEMP: Connecting...")
-            self.setup_connection_logic()
+            self.account.prepare_async(None, self.setup_connection_logic, None)
 
     def enable_account_callback(self, account, status, data):
         logger.debug("Account is now enabled")
@@ -148,16 +148,22 @@ class NetworkStack(object):
         logger.debug("User is now available")
         account.request_presence_finish(status)
 
-        print account.get_current_presence()
+        # Async into the connection logic
+        self.account.prepare_async(None, self.setup_connection_logic, None)
 
         # Call connection handling
-        self.setup_connection_logic()
+        # self.setup_connection_logic()
 
-    def setup_connection_logic(self):
+    def setup_connection_logic(self, account, status, data):
         logger.debug("Setting up the connection components...")
 
+        # Kill async process
+        account.prepare_finish(status)
+
+        print account.get_connection()
+
         # Grab the connection from our account
-        connection = self.account.get_connection()
+        connection = account.get_connection()
 
         # If connection is (ever) None at this stage we have done something wrong
         if connection is None:
