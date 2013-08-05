@@ -203,14 +203,20 @@ class NetworkStack(object):
 
     #     logger.debug("Now listening for incoming chat requests...")
 
-    def test_method(self, arg1, arg2, arg3):
+    def test_method(self, arg1, arg2, arg3, arg4, arg5, arg6):
         logger.debug("Connection status-change triggered...")
         print arg1
         print arg2
         print arg3
+        print arg4
+        print arg5
+        print arg6
 
     def account_reconnect(self, account, arg2, arg3):
         logger.debug("Account connected")
+
+        print arg2
+        print arg3
 
         # Disconnect reconnect async?
         account.reconnect_finish()
