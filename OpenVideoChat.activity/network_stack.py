@@ -129,11 +129,14 @@ class NetworkStack(object):
         if not self.account.is_enabled():
             logger.debug("TEMP: Enabling account...")
             self.account.set_enabled_async(True, self.enable_account_callback, None)
-        elif self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
-            self.change_account_presence_available()
         else:
-            logger.debug("TEMP: Connecting...")
-            self.setup_connection_logic()
+            print self.account.get_connection_status()
+
+        # elif self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
+        #     self.change_account_presence_available()
+        # else:
+        #     logger.debug("TEMP: Connecting...")
+        #     self.setup_connection_logic()
 
     def enable_account_callback(self, account, status, data):
         logger.debug("Account is now enabled")
