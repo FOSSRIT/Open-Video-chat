@@ -89,55 +89,62 @@ class NetworkStack(object):
         ])
 
         # Wait for the account to be ready to ensure the channel
-        self.account_manager.prepare_async(None, self.setup_stack_components, None)
+        self.account_manager.prepare_async(None, self.setup_accounts, None)
 
-    def setup_stack_components(self, account_manager, status, data):
+    def setup_accounts(self, account_manager, status, data):
         logger.debug("Setting up asynchronous stack components...")
 
-        # Remove Async Listener from account_manager
-        # self.account_manager.prepare_finish(status)
+        # Cease waiting on async event from account_manager
+        self.account_manager.prepare_finish(status)
 
-        # Grab the accounts the right way (dup not get)
-        self.accounts = accounts = self.account_manager.dup_valid_accounts()
-
-        for account in accounts:
-            print account.get_protocol(), account.get_connection()
-
-
-        # Grab the first available "jabber" account
-        for account in accounts:
+        # Grab accounts into locally stored list
+        self.accounts = []
+        for account in self.account_manager.dup_valid_accounts():
             if account.get_protocol() == "jabber":
-                self.account = account
-                break
+                self.accounts.append(account)
 
-        # Break from for loop to terminate when first jabber account is acquired
-        # The break was the most efficient choice here, the alternative was to
-        # run the loop with a condition `if self.account is none`, which adds extra
-        # processing both for the condition and all the cycles past acquiring the
-        # first account.
-
-        # Ideally jabber accounts will be loaded into a management gui
-
-        # If no valid account was found log the error
-        #                               open the account management gui
-        #                               and exit the function
-        if self.account is None:
-            logger.debug("Failed to acquire account...")
-            # **FIXME** if no valid accounts need to open account management window
+        # If no accounts were found exit and notify
+        if len(self.accounts) == 0:
+            logger.debug("No accounts found...")
+            # **FIXME** Add alert to UI and open the account manager
             return False
 
-        connection = self.account.get_connection()
-        print connection
-        if connection is not None:
-            print "Connection is not None!"
+        # Attempt to find an enabled & connected account
+        for account in self.accounts:
+            if self.account is None and account.is_enabled and account.get_connection_status() is Tp.ConnectionStatus.CONNECTED:
+                self.account = account
+        if self.account is None:
+            logger.debug("No enabled and connected accounts found...")
+            # **FIXME** Add alert to UI and open the account manager
+            return False
 
-        # Verify connection status of account
+        # **FIXME** Future iterations will not automatically use the first account
+        #           Subsequently, no automatic connection logic will be required either
+        self.account = self.accounts[0]
+        if not self.account.is_enabled:
+            self.account.set_enabled_async(True, None, None)
         if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
-            logger.debug("Account is not connected, waiting for status change...")
-            self.account.connect('status-changed', self.test_method)
-            # Add async to account for status-change?
-            # self.account.prepare_async(None, None, None)
-            self.account.reconnect_async(self.account_reconnect, None)
+            self.account.request_presence_async(Tp.ConnectionPresenceStatus.AVAILABLE, "", "", None, None)
+        else:
+            self.setup_connection_logic()
+
+    def force_connect_callback(self, account, status, data):
+        logger.debug("User is not available")
+        account.request_presence_finish(status)
+
+        # Call connection handling
+        self.setup_connection_logic()
+
+    def setup_connection_logic(self):
+        logger.debug("Setting up the connection components...")
+
+        # Grab the connection from our account
+        connection = self.account.get_connection()
+
+        # Test connection is not None
+        logger.debug(connection)
+
+
 
         # # Grab the connection from the account
         # self.connection = connection = self.account.get_connection()
@@ -211,15 +218,6 @@ class NetworkStack(object):
     #     handler.register()
 
     #     logger.debug("Now listening for incoming chat requests...")
-
-    def test_method(self, arg1, arg2, arg3, arg4, arg5, arg6):
-        logger.debug("Connection status-change triggered...")
-        print arg1
-        print arg2
-        print arg3
-        print arg4
-        print arg5
-        print arg6
 
     def account_reconnect(self, account, result, data):
         logger.debug("Account connected")
