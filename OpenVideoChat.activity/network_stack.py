@@ -215,8 +215,13 @@ class NetworkStack(object):
     def account_reconnect(self, account, result, data):
         logger.debug("Account connected")
 
-        # Disconnect reconnect async?
-        print account.reconnect_finish(result)
+        # Print status of connection
+        print account.get_connection_status()
+        if account.get_connection_status() is Tp.ConnectionStatus.CONNECTED:
+            print "Success!"
+
+        # Disconnect async process
+        account.reconnect_finish(result)
 
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
