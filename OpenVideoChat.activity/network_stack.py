@@ -122,7 +122,7 @@ class NetworkStack(object):
             # **FIXME** if no valid accounts need to open account management window
             return False
 
-        connection = account.get_connection()
+        connection = self.account.get_connection()
         print connection
         if connection is not None:
             print "Connection is not None!"
