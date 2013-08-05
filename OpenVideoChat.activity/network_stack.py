@@ -149,57 +149,40 @@ class NetworkStack(object):
         # Grab the connection from our account
         connection = self.account.get_connection()
 
-        # Test connection is not None
-        logger.debug(connection)
+        # If connection is (ever) None at this stage we have done something wrong
+        if connection is None:
+            logger.critical("Connection should not be none!")
+            return False
 
+        # Dup contact list & begin populating the UI user list
+        if connection.get_contact_list_state() is Tp.ContactListState.SUCCESS:
+            self.populate_users_list(connection.dup_contact_list())
 
+        # Connect handler for contact list
+        connection.connect('contact-list-changed', self.contacts_changed_callback)
 
-        # # Grab the connection from the account
-        # self.connection = connection = self.account.get_connection()
+        # Setup async on connection to handler changes to contact list
+        connection.prepare_async(None, None, None)
+        # **FIXME** Perhaps this needs to be closed later?  How can we do that?  Handler that stores gasyncresult object for running finish?
+        # Also does this handle more than one contact-list-changed event or just one per?  In which case closing and re-opening in an "infinite" loop is good
 
-        # # If the connection is not connected log the error
-        # #                                    connect status change event
-        # if connection.get_status() is Tp.ConnectionStatus.DISCONNECTED:
-        #     logger.debug("Connection Status is DISCONNECTED, establishing async on status change...")
-        #     # **FIXME** Add async function for connection status change to continue connection setup
-        #     # Name of the signal is unknown (method defined in docs `tp_cli_connection_signal_callback_status_changed`, does not exist)
-        #     # Perhaps it is actually connected to account and not connection?
-
-        # # Test status-changed exists?
-        # connection.connect('status-changed', self.test_method)
-
-        # Setup async on connection
-
-
-        # # Dup the users & populate our users list for selecting a contact
-        # if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
-        #     self.populate_users_list(connection.dup_contact_list())
-
-        #     # Listener for changes to contact list
-        #     connection.connect('contact-list-changed', self.update_contact_list)
-
-        # # **FIXME** Further abstraction to adding contacts should be added to manage
-        # #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
-
-        # """ Sugar handling for if connection established through sugar sharing process """
-
-        # # Listen for incoming connections
+        # Listen for incoming channel requests
         # self.listen_for_chat_channel()
 
-    # def populate_users_list(self, contacts):
-    #     logger.debug("Adding contacts to gui...")
+        """ Sugar handling for if connection established through sugar sharing process """
 
-    #     for contact in contacts:
-    #         self.add_user_to_gui(contact)
+    def populate_users_list(self, contacts):
+        logger.debug("Adding contacts to gui...")
 
-    #     logger.debug("Sent users to gui")
+        for contact in contacts:
+            self.add_user_to_gui(contact)
 
-    # def update_contact_list(self, added, removed, data):
-    #     logger.debug("Contact list changed...")
+        logger.debug("Sent users to gui")
 
-    #     # Test contents of added & removed
-    #     logger.debug(added)
-    #     logger.debug(removed)
+    def contacts_changed_callback(self, added, removed, data):
+        logger.debug("Contacts have been updated!!!")
+        logger.debug(added)
+        logger.debug(removed)
 
     # def listen_for_chat_channel(self):
     #     logger.debug("Listening for incoming connections...")
@@ -226,17 +209,6 @@ class NetworkStack(object):
     #     handler.register()
 
     #     logger.debug("Now listening for incoming chat requests...")
-
-    def account_reconnect(self, account, result, data):
-        logger.debug("Account connected")
-
-        connection = account.get_connection()
-        print connection
-        if connection is not None:
-            print connection.get_status()
-
-        # Disconnect async process
-        account.reconnect_finish(result)
 
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
