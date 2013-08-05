@@ -121,7 +121,7 @@ class NetworkStack(object):
         if self.account is None:
             logger.debug("No enabled and connected accounts found...")
             # **FIXME** Add alert to UI and open the account manager
-            return False
+            # return False
 
         # **FIXME** Future iterations will not automatically use the first account
         #           Subsequently, no automatic connection logic will be required either
