@@ -131,7 +131,7 @@ class NetworkStack(object):
             self.account.set_enabled_async(True, None, None)
         if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
             logger.debug("TEMP: Connecting async...")
-            self.account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", None, None)
+            self.account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", self.force_connect_callback, None)
         else:
             logger.debug("TEMP: Connecting...")
             self.setup_connection_logic()
