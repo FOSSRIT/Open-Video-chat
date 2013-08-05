@@ -27,6 +27,7 @@
 
 # Imports
 import logging
+import datetime
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gettext import gettext as _
@@ -44,8 +45,8 @@ MAX_CHAT_MESSAGE_SIZE = 200
 
 class Gui(Gtk.Grid):
     def __init__(self):
-        Gtk.Grid.__init__(self, hexpand=True, vexpand=True)
-        logger.debug("Preparing GUI")
+        Gtk.Grid.__init__(self, expand=True)
+        logger.debug("Preparing GUI...")
 
         # Add Video
         self.attach(self.build_video(), 0, 1, 1, 1)
@@ -58,10 +59,10 @@ class Gui(Gtk.Grid):
         logger.debug("GUI Prepared")
 
     def build_video(self):
-        logger.debug("Building Video")
+        logger.debug("Building Video...")
 
         # Create Video Component
-        self.video = video = Gtk.DrawingArea(vexpand=True, hexpand=True)
+        self.video = video = Gtk.DrawingArea(expand=True)
         video.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.01, .01, .01, .9))
         video.show()
 
@@ -70,16 +71,16 @@ class Gui(Gtk.Grid):
         return video
 
     def build_chat(self):
-        logger.debug("Building Chat")
+        logger.debug("Building Chat...")
 
         # Create Chat Components
-        self.chat_text_buffer = chat_text_buffer = Gtk.TextBuffer()
-        chat_text_view = Gtk.TextView(editable=False, buffer=chat_text_buffer, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
+        chat_text_buffer = Gtk.TextBuffer()
+        self.chat_text_view = chat_text_view = Gtk.TextView(editable=False, buffer=chat_text_buffer, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
         chat_scrollable_history = Gtk.ScrolledWindow(hexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         chat_scrollable_history.add(chat_text_view)
-        chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE)
+        self.chat_entry = chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE, sensitive=False, placeholder_text="message...")
         chat_entry.connect("activate", self.send_message)
-        chat_send_message_button = Gtk.Button(_("Send"))
+        self.chat_send_message_button = chat_send_message_button = Gtk.Button(_("Send"), sensitive=False)
         chat_send_message_button.connect("clicked", self.send_message)
         logger.debug("Built Chat Buffer, History, and Input")
 
@@ -90,8 +91,8 @@ class Gui(Gtk.Grid):
         chat_grid.attach(chat_send_message_button, 1, 1, 1, 1)
         logger.debug("Built Chat Grid")
 
-        # Add User List (Multi-User Feature - Not yet ready for implementation)
-        # self.chat_grid.attach(self.build_user_list(), 2, 0, 1, 1)
+        # Add Users List
+        chat_grid.attach(self.build_user_list(), 2, 0, 1, 2)
 
         # Create Expander, Add Grid & Display
         chat_expander = Gtk.Expander(expanded=True, label=_("Chat"))
@@ -104,44 +105,119 @@ class Gui(Gtk.Grid):
         return chat_expander
 
     def build_user_list(self):
-        # logger.debug("Building User List")
-        # # Create User List Components
-        # self.user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
-        # self.user_list_search_button = Gtk.Button(_("Search"))
-        # # self.user_list_search_entry.connect("clicked", undefined_user_search_function)
-        # self.user_list_grid = Gtk.Grid()
-        # # self.user_list_grid.attach(self.user_list, 0, 0, 2, 1)
-        # self.user_list_grid.attach(self.user_list_search_entry, 0, 1, 1, 1)
-        # self.user_list_grid.attach(self.user_list_search_button, 1, 1, 1, 1)
-        # self.user_list_expander = Gtk.Expander(label=_("Users"))
-        # self.user_list_expander.add(self.user_list_grid)
-        # self.user_list_expander.show_all()
-        # logger.debug("Built User List")
-        return False
+        logger.debug("Building User List...")
 
-    def send_message(self, sender):
-        # Send a message over the tubes
-        return False
+        # Create Buffer for user storage
+        self.user_list_store = Gtk.ListStore(str, object)
+
+        # Create a Tree View and supply it the List Store
+        user_list_tree_view = Gtk.TreeView(self.user_list_store)
+
+        # Define the columns of the Tree View to render the data
+        user_tree_view_column = Gtk.TreeViewColumn(
+            "User Alias",            # Column Title (is displayed)
+            Gtk.CellRendererText(),  # Renderer Component
+            text=0                   # Column Index
+        )
+
+        # Sort by the alias column
+        user_tree_view_column.set_sort_column_id(0)
+
+        # Add the column to the Tree View
+        user_list_tree_view.append_column(user_tree_view_column)
+
+        # Create a scrollbox for user list
+        user_list_scrolled_window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=(MIN_CHAT_HEIGHT - 20))
+        user_list_scrolled_window.add(user_list_tree_view)
+
+        # Add a click handler to the tree view for user selection
+        user_list_tree_view.connect('row-activated', self.user_selected)
+
+        # Build Search Entry
+        user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE, placeholder_text="username...")
+        user_list_search_entry.set_tooltip_text(_("Search for contacts..."))
+
+        # Apply the search entry to the Tree View
+        user_list_tree_view.set_search_entry(user_list_search_entry)
+
+        # Define Storage Container & Attach Components
+        user_list_grid = Gtk.Grid()
+        user_list_grid.attach(user_list_scrolled_window, 0, 0, 1, 1)
+        user_list_grid.attach(user_list_search_entry, 0, 1, 1, 1)
+
+        # Create an expander to show the users on-demand & display all components
+        user_list_expander = Gtk.Expander(label=_("Users"))
+        user_list_expander.add(user_list_grid)
+        user_list_expander.show_all()
+
+        logger.debug("Built User List")
+
+        # Return the top-level container
+        return user_list_expander
+
+    """ Network & User Methods """
+
+    def set_chat_channel_initializer(self, callback):
+        logger.debug("Assigning callback for chat-channel initialization...")
+        self.chat_channel_initializer = callback
+
+    def set_send_chat_message(self, callback):
+        logger.debug("Assigning callback for send-message over chat channel...")
+        self.send_chat_message = callback
+
+    def add_a_contact(self, contact):
+        # Simply add a user (logs would fill fast if I added one here)
+        self.user_list_store.append([contact.get_alias(), contact])
+
+    def user_selected(self, tree_view, selected_index, column_object):
+        logger.debug("Identifying selected user to initiate communication...")
+
+        # We can pull the contact object from our store
+        contact = self.user_list_store[selected_index][1]
+
+        # Local message notifying chat is being enabled with selected user
+        self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
+
+        # Send request to network stack /w callback to activate chat
+        self.chat_channel_initializer(contact)
+
+    def activate_chat(self):
+        logger.debug("Chat services enabled on first-channel established...")
+
+        # Enable Chat GtkButton & GtkEntry
+        self.chat_entry.set_sensitive(True)
+        self.chat_send_message_button.set_sensitive(True)
+
+        # Set focus into chat entry
+        self.chat_entry.grab_focus()
 
     """ Chat Methods """
+
+    def send_message(self, sender):
+        if self.chat_entry.get_text() != "":
+            message = self.chat_entry.get_text()
+            self.send_chat_message(message)   # Send message over the wire
+
+            # Post message from self immediately?
+            # self.receive_message(self.network_stack.username, message)
+
+            self.chat_entry.set_text("")      # Empty Chat Entry
+            self.chat_entry.grab_focus()      # Set focus back to chat entry
+
+    def chat_write_line(self, line):
+        self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), line + "\n", -1)
+
+    def receive_message(self, contact, message):
+        logger.debug("Posting received message...")
+
+        # Add Message
+        self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), "%s [%s]: %s\n" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
+
+        # Scroll to bottom
+        self.chat_text_view.scroll_to_iter(self.chat_text_view.get_buffer().get_end_iter(), 0.1, False, 0.0, 0.0)
 
     # def get_history(self):
     #     return self.chat_text.get_text(
     #             self.chat_text.get_start_iter(),
     #             self.chat_text.get_end_iter(),
     #             True)
-
-    # def chat_write_line(self, line):
-    #     self.chat_text.insert(self.chat_text.get_end_iter(), line, -1)
-
-    # def receive_message(self, username, message):
-    #     self.chat_text.insert(self.chat_text.get_end_iter(), "%s [%s]: %s\n" % (username, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
-    #     self.text_view.scroll_to_iter(self.chat_text.get_end_iter(), 0.1, False, 0.0, 0.0)
-
-    # def send_message(self, sender):
-    #     if self.chat_entry.get_text() != "":
-    #         message = self.chat_entry.get_text()
-    #         self.receive_message(self.network_stack.username, message)
-    #         self.network_stack.send_message(message)
-    #         self.chat_entry.set_text("")
-    #         self.chat_entry.grab_focus()

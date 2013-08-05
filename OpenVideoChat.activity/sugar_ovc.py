@@ -49,10 +49,11 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class OpenVideoChatActivity(Activity):
+class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
 
     def __init__(self, handle):
         Activity.__init__(self, handle)
+        logger.debug("Preparing Open Video Chat...")
 
         # Self-Enforced max_participants
         self.max_participants = SUGAR_MAX_PARTICIPANTS
@@ -61,7 +62,7 @@ class OpenVideoChatActivity(Activity):
         self.network_stack = None
         self.gstreamer_stack = None
 
-        # Set Owner
+        # Acquire Owner
         self.owner = presenceservice.get_instance().get_owner()
 
         """ Setup GUI """
@@ -69,20 +70,24 @@ class OpenVideoChatActivity(Activity):
         self.get_canvas().attach(Toolbar(self), 0, 0, 1, 1)
         self.show()
 
-    #     logger.debug("Preparing GUI")
-    #     self.set_title(_("OpenVideoChat"))
-    #     self.set_canvas(Gui(self))
-    #     self.set_toolbar_box(Toolbar())
-    #     # activity.set_toolbar_box(self.build_toolbar(activity))
+        """ Setup Network Stack """
+        self.network_stack = NetworkStack()
+        # self.network_stack = NetworkStack(self.owner, self.get_buddy)
 
-    #     # Setup GStreamer Stack
-    #     logger.debug("Setting up GSTStack")
-    #     self.gststack = GSTStack()
-    #     self.get_canvas().set_gstreamer_stack(self.gststack);
+        logger.debug("Open Video Chat Prepared")
 
-    #     # Setup Network Stack
-    #     logger.debug("Connect Event to Setup Network Stack on Demand")
-    #     self.establish_activity_sharing(handle)
+        # logger.debug("Connect Event to Setup Network Stack on Demand")
+        # self.establish_activity_sharing(handle)
+
+        # self.gststack = GSTStack()
+        # self.get_canvas().set_gstreamer_stack(self.gststack);
+
+    # This method is to obfuscate sugar from the network stack
+    # def get_buddy(self, handle):
+    #     pservice = presenceservice.get_instance()
+    #     tp_name, tp_path = pservice.get_preferred_connection()
+    #     return pservice.get_buddy_by_telepathy_handle(tp_name, tp_path, handle)
+
 
     # """ Networking & Network Stack Setup """
 
@@ -106,11 +111,6 @@ class OpenVideoChatActivity(Activity):
 
     #     # Supply Network Stack to GUI
     #     sender.get_canvas().set_network_stack(sender.network_stack)
-
-    # def get_buddy(self, handle):
-    #     pservice = presenceservice.get_instance()
-    #     tp_name, tp_path = pservice.get_preferred_connection()
-    #     return pservice.get_buddy_by_telepathy_handle(tp_name, tp_path, handle)
 
     # """ Tear-Down Handling """
 

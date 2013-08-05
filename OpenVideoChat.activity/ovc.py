@@ -28,6 +28,7 @@ from gi.repository import Gtk
 #Local Imports
 from gui import Gui
 from toolbar import Toolbar
+from network_stack import NetworkStack
 
 
 # Define Logger for Logging & DEBUG level for Development
@@ -37,21 +38,21 @@ logger = logging.getLogger(__name__)
 
 # Constants
 DEFAULT_WINDOW_SIZE = {
-    'width': 800,
-    'height': 600
+    'width': 1200,
+    'height': 900
 }
 
 
 class OpenVideoChat(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Open Video Chat")
-        logger.debug("Preparing Open Video Chat")
+        logger.debug("Preparing Open Video Chat...")
 
-        # Assume a default size of 800x600
+        # Assume a default size of 1200x900
         self.set_default_size(DEFAULT_WINDOW_SIZE['width'], DEFAULT_WINDOW_SIZE['height'])
 
         # Connect Window Event Signals
-        self.connect("delete-event", Gtk.main_quit)
+        self.connect("delete-event", lambda w, s: self.can_close() and Gtk.main_quit())
         self.connect('check-resize', self.on_resize)
 
         """ Setup GUI """
@@ -60,11 +61,30 @@ class OpenVideoChat(Gtk.Window):
         self.show()
 
         """ Setup Network Stack """
+        self.network_stack = NetworkStack()
+
+        # Supply network stack with user population method to add to list
+        self.network_stack.set_populate_users(self.get_child().add_a_contact)
+
+        # Supply network stack with gui chat enabled callback on channel activation
+        self.network_stack.set_chat_activation(self.get_child().activate_chat)
+
+        # Supply gui with network channel establishment callback
+        self.get_child().set_chat_channel_initializer(self.network_stack.setup_chat_channel)
+
+        # Supply gui with send_message network callback
+        self.get_child().set_send_chat_message(self.network_stack.send_chat_message)
+
         """ Setup GStreamer Stack """
 
         # Proceed with Application Loop
         logger.debug("Open Video Chat Prepared")
         Gtk.main()
+
+    def can_close(self):
+        self.network_stack.close_chat_channel()  # Close Chat Channel(s)
+        # **FIXME** Does not wait for async closures
+        return True
 
     def on_resize(self, trigger):
         # On resize adjust displayed components (may not be needed)
