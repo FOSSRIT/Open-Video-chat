@@ -212,14 +212,11 @@ class NetworkStack(object):
         print arg5
         print arg6
 
-    def account_reconnect(self, account, arg2, arg3):
+    def account_reconnect(self, account, result, data):
         logger.debug("Account connected")
 
-        print arg2
-        print arg3
-
         # Disconnect reconnect async?
-        account.reconnect_finish()
+        account.reconnect_finish(result)
 
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
