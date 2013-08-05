@@ -114,201 +114,214 @@ class NetworkStack(object):
 
         # Ideally jabber accounts will be loaded into a management gui
 
-        # If no account exists, print error and end setup
+        # If no valid account was found log the error
+        #                               open the account management gui
+        #                               and exit the function
         if self.account is None:
             logger.debug("Failed to acquire account...")
             # **FIXME** if no valid accounts need to open account management window
             return False
 
-        # Get connection
+        # Grab the connection from the account
         connection = self.account.get_connection()
 
-        # Dup the users & populate our users list for selecting a contact
-        if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
-            self.populate_users_list(connection.dup_contact_list())
+        # If the connection is not connected log the error
+        #                                    setup an async on status change
+        #                                    Exit the function
+        if connection.get_status() is Tp.ConnectionStatus.DISCONNECTED:
+            logger.debug("Connection Status is DISCONNECTED, establishing async on status change...")
+            # **FIXME** Add async function for connection status change to continue connection setup
+            return False
 
-            # Listener for changes to contact list
-            connection.connect('contact-list-changed', self.update_contact_list)
 
-        # **FIXME** Further abstraction to adding contacts should be added to manage
-        #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
 
-        """ Sugar handling for if connection established through sugar sharing process """
 
-        # Listen for incoming connections
-        self.listen_for_chat_channel()
+        # # Dup the users & populate our users list for selecting a contact
+        # if connection is not None and connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
+        #     self.populate_users_list(connection.dup_contact_list())
 
-    def populate_users_list(self, contacts):
-        logger.debug("Adding contacts to gui...")
+        #     # Listener for changes to contact list
+        #     connection.connect('contact-list-changed', self.update_contact_list)
 
-        for contact in contacts:
-            self.add_user_to_gui(contact)
+        # # **FIXME** Further abstraction to adding contacts should be added to manage
+        # #           live updates for contacts with TelepathyGLib and reflecting it in Gtk3
 
-        logger.debug("Sent users to gui")
+        # """ Sugar handling for if connection established through sugar sharing process """
 
-    def update_contact_list(self, added, removed, data):
-        logger.debug("Contact list changed...")
+        # # Listen for incoming connections
+        # self.listen_for_chat_channel()
 
-        # Test contents of added & removed
-        logger.debug(added)
-        logger.debug(removed)
+    # def populate_users_list(self, contacts):
+    #     logger.debug("Adding contacts to gui...")
 
-    def listen_for_chat_channel(self):
-        logger.debug("Listening for incoming connections...")
+    #     for contact in contacts:
+    #         self.add_user_to_gui(contact)
 
-        # Define handler for new channels
-        self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
-            self.account_manager,              # As specified in the method name
-            False,                             # bypass approval (dbus related)
-            False,                             # Whether to implement requests (more work but allows optional accept or deny)
-            "ChatHandler",                     # Name of handler
-            False,                             # dbus uniquify-name token
-            self.chat_channel_setup_callback,  # The callback
-            None                               # Custom data to pass to callback
-        )
+    #     logger.debug("Sent users to gui")
 
-        # Describe the channel (a chat channel)
-        handler.add_handler_filter({
-            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
-            Tp.PROP_CHANNEL_REQUESTED: False,
-        })
+    # def update_contact_list(self, added, removed, data):
+    #     logger.debug("Contact list changed...")
 
-        # Register the handler
-        handler.register()
+    #     # Test contents of added & removed
+    #     logger.debug(added)
+    #     logger.debug(removed)
 
-        logger.debug("Now listening for incoming chat requests...")
+    # def listen_for_chat_channel(self):
+    #     logger.debug("Listening for incoming connections...")
 
-    def setup_chat_channel(self, contact):
-        logger.debug("Setting up outgoing chat channel...")
+    #     # Define handler for new channels
+    #     self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
+    #         self.account_manager,              # As specified in the method name
+    #         False,                             # bypass approval (dbus related)
+    #         False,                             # Whether to implement requests (more work but allows optional accept or deny)
+    #         "ChatHandler",                     # Name of handler
+    #         False,                             # dbus uniquify-name token
+    #         self.chat_channel_setup_callback,  # The callback
+    #         None                               # Custom data to pass to callback
+    #     )
 
-        # Call Channel closure for previously opened channels
-        self.close_chat_channel()
+    #     # Describe the channel (a chat channel)
+    #     handler.add_handler_filter({
+    #         Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+    #         Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+    #         Tp.PROP_CHANNEL_REQUESTED: False,
+    #     })
 
-        # Remove handler for listener, since we are establishing the connection ourselves
-        if self.chat_handler is not None:
-            self.chat_handler.unregister()
-            self.chat_handler = None
+    #     # Register the handler
+    #     handler.register()
 
-        # Describe the channel type (text)
-        channel_description = {
-            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
-            Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
-        }
+    #     logger.debug("Now listening for incoming chat requests...")
 
-        # Private channels are not named, only group channels (MUC for Multi-User Channel)
-        # Because they are not named, only one can exist at a time
-        # This also means that `ensure` is better than create in this case
+    # def setup_chat_channel(self, contact):
+    #     logger.debug("Setting up outgoing chat channel...")
 
-        # Request the channel
-        request = Tp.AccountChannelRequest.new(
-            self.account,                              # Account
-            channel_description,                       # Dict of channel properties
-            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
-        )
+    #     # Call Channel closure for previously opened channels
+    #     self.close_chat_channel()
 
-        # Run this asynchronously
-        request.ensure_and_handle_channel_async(
-            None,                              # Whether it can be canceled
-            self.chat_channel_setup_callback,  # Callback
-            None                               # Custom Data for callback
-        )
+    #     # Remove handler for listener, since we are establishing the connection ourselves
+    #     if self.chat_handler is not None:
+    #         self.chat_handler.unregister()
+    #         self.chat_handler = None
 
-    def handler_chat_channel_setup_callback(
-        self,
-        handler,
-        account,
-        connection,
-        channels,
-        requests,
-        user_action_time,
-        context,
-        loop
-    ):
-        logger.debug("SimpleHandler received request for channel...")
+    #     # Describe the channel type (text)
+    #     channel_description = {
+    #         Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+    #         Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+    #         Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
+    #     }
 
-        # Limit chat to one-on-one by unregistering the handler
-        # if self.chat_handler is not None:
-        #     self.chat_handler.unregister()
-        #     self.chat_handler = None
+    #     # Private channels are not named, only group channels (MUC for Multi-User Channel)
+    #     # Because they are not named, only one can exist at a time
+    #     # This also means that `ensure` is better than create in this case
 
-        # for channel in channels:
-        #     if not isinstance(channel, Tp.StreamTubeChannel):
-        #         continue
+    #     # Request the channel
+    #     request = Tp.AccountChannelRequest.new(
+    #         self.account,                              # Account
+    #         channel_description,                       # Dict of channel properties
+    #         Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
+    #     )
 
-        #     print "Accepting tube"
+    #     # Run this asynchronously
+    #     request.ensure_and_handle_channel_async(
+    #         None,                              # Whether it can be canceled
+    #         self.chat_channel_setup_callback,  # Callback
+    #         None                               # Custom Data for callback
+    #     )
 
-        #     channel.connect('invalidated', tube_invalidated_cb, loop)
+    # def handler_chat_channel_setup_callback(
+    #     self,
+    #     handler,
+    #     account,
+    #     connection,
+    #     channels,
+    #     requests,
+    #     user_action_time,
+    #     context,
+    #     loop
+    # ):
+    #     logger.debug("SimpleHandler received request for channel...")
 
-        #     channel.accept_async(tube_accept_cb, loop)
+    #     # Limit chat to one-on-one by unregistering the handler
+    #     # if self.chat_handler is not None:
+    #     #     self.chat_handler.unregister()
+    #     #     self.chat_handler = None
 
-        # context.accept()
+    #     # for channel in channels:
+    #     #     if not isinstance(channel, Tp.StreamTubeChannel):
+    #     #         continue
 
-    def close_chat_channel(self):
-        logger.debug("Closing any existing chat channels...")
+    #     #     print "Accepting tube"
 
-        if self.chat_channel is not None:
-            # Try async with lambda to catch & finish
-            self.chat_channel.close_async(
-                lambda c, s, d: c.close_finish(s) and logger.debug("Existing channel closed"),  # Callback
-                None                                                                            # User Data
-            )
+    #     #     channel.connect('invalidated', tube_invalidated_cb, loop)
 
-    def chat_channel_setup_callback(self, request, status, data):
-        logger.debug("Chat channel approved and initiating...")
+    #     #     channel.accept_async(tube_accept_cb, loop)
 
-        # Remove async process & grab channel plus context
-        (channel, context) = request.ensure_and_handle_channel_finish(status)
+    #     # context.accept()
 
-        # Call shared-setup process
-        self.process_chat_channel_setup(channel)
+    # def close_chat_channel(self):
+    #     logger.debug("Closing any existing chat channels...")
 
-    def process_chat_channel_setup(self, channel):
+    #     if self.chat_channel is not None:
+    #         # Try async with lambda to catch & finish
+    #         self.chat_channel.close_async(
+    #             lambda c, s, d: c.close_finish(s) and logger.debug("Existing channel closed"),  # Callback
+    #             None                                                                            # User Data
+    #         )
 
-        # Assign channel to class variable
-        self.chat_channel = channel
+    # def chat_channel_setup_callback(self, request, status, data):
+    #     logger.debug("Chat channel approved and initiating...")
 
-        # Add listener for received messages
-        channel.connect('message-received', self.chat_message_received)
+    #     # Remove async process & grab channel plus context
+    #     (channel, context) = request.ensure_and_handle_channel_finish(status)
 
-        # Activate Chat Services
-        self.activate_chat()
+    #     # Call shared-setup process
+    #     self.process_chat_channel_setup(channel)
 
-    def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
-        logger.debug("Sending a message over the wire...")
+    # def process_chat_channel_setup(self, channel):
 
-        # Wrap our message in a Telepathy Message object
-        message_container = Tp.ClientMessage.new_text(message_type, message)
+    #     # Assign channel to class variable
+    #     self.chat_channel = channel
 
-        # Send asynchronous message
-        self.chat_channel.send_message_async(
-            message_container,  # Telepathy ClientMessage object
-            0,                  # Optional Message Sending Flags
-            None,               # Callback (server-received confirmation)
-            None                # Data for callback
-        )
+    #     # Add listener for received messages
+    #     channel.connect('message-received', self.chat_message_received)
 
-        # The message sending flags are numeric constants representing features
-        # currently these include delivery, read, and deleted confirmation
-        # The numeric representation uses bit-mapping increments (1, 2, 4, etc)
-        # in this way 3 represents the combination of 1 + 2, or two-enabled features
+    #     # Activate Chat Services
+    #     self.activate_chat()
 
-        # Technically, they are missing a NONE constant to represent 0
-        # hence why supplying 0 is the same as saying "use no features"
+    # def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
+    #     logger.debug("Sending a message over the wire...")
 
-        # **Also** server callback is not the same as user-delivery confirmation
+    #     # Wrap our message in a Telepathy Message object
+    #     message_container = Tp.ClientMessage.new_text(message_type, message)
 
-    def chat_message_received(self, channel, message):
-        logger.debug("Processing received message...")
+    #     # Send asynchronous message
+    #     self.chat_channel.send_message_async(
+    #         message_container,  # Telepathy ClientMessage object
+    #         0,                  # Optional Message Sending Flags
+    #         None,               # Callback (server-received confirmation)
+    #         None                # Data for callback
+    #     )
 
-    def set_chat_activation(self, callback):
-        logger.debug("Defined chat activation in network stack...")
-        self.activate_chat = callback
+    #     # The message sending flags are numeric constants representing features
+    #     # currently these include delivery, read, and deleted confirmation
+    #     # The numeric representation uses bit-mapping increments (1, 2, 4, etc)
+    #     # in this way 3 represents the combination of 1 + 2, or two-enabled features
 
-    def set_populate_users(self, callback):
-        logger.debug("Adding callback to add users to gui...")
-        self.add_user_to_gui = callback
+    #     # Technically, they are missing a NONE constant to represent 0
+    #     # hence why supplying 0 is the same as saying "use no features"
+
+    #     # **Also** server callback is not the same as user-delivery confirmation
+
+    # def chat_message_received(self, channel, message):
+    #     logger.debug("Processing received message...")
+
+    # def set_chat_activation(self, callback):
+    #     logger.debug("Defined chat activation in network stack...")
+    #     self.activate_chat = callback
+
+    # def set_populate_users(self, callback):
+    #     logger.debug("Adding callback to add users to gui...")
+    #     self.add_user_to_gui = callback
 
     """ Old Code (Deprecated & scheduled for removal after testing) """
 
