@@ -137,7 +137,7 @@ class NetworkStack(object):
 
     def enable_account_callback(self, account, status, data):
         logger.debug("Account is now enabled")
-        account.set_enabled_finish(status)
+        print account.set_enabled_finish(status)
         self.change_account_presence_available()
 
     def change_account_presence_available(self):
@@ -146,7 +146,7 @@ class NetworkStack(object):
 
     def force_connect_callback(self, account, status, data):
         logger.debug("User is now available")
-        account.request_presence_finish(status)
+        print account.request_presence_finish(status)
 
         # Async into the connection logic
         self.account.prepare_async(None, self.setup_connection_logic, None)
@@ -155,7 +155,7 @@ class NetworkStack(object):
         logger.debug("Setting up the connection components...")
 
         # Kill async process
-        account.prepare_finish(status)
+        print account.prepare_finish(status)
 
         # Test connection returned?
         print account.get_connection()
