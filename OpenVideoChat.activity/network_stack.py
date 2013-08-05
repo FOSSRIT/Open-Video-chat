@@ -95,7 +95,7 @@ class NetworkStack(object):
         logger.debug("Setting up asynchronous stack components...")
 
         # Remove Async Listener from account_manager
-        self.account_manager.prepare_finish(status)
+        # self.account_manager.prepare_finish(status)
 
         # Grab the accounts the right way (dup not get)
         self.accounts = accounts = self.account_manager.dup_valid_accounts()
@@ -214,15 +214,6 @@ class NetworkStack(object):
 
     def account_reconnect(self, account, result, data):
         logger.debug("Account connected")
-
-        # Print status of connection
-        print account.get_connection_status()
-        if account.get_connection_status() is Tp.ConnectionStatus.CONNECTED:
-            print "Success!"
-
-        # Try grabbing the connection and seeing its status directly?
-        connection = account.get_connection()
-        print connection.get_status()
 
         # Disconnect async process
         account.reconnect_finish(result)
