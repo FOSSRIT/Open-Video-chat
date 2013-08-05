@@ -192,41 +192,41 @@ class NetworkStack(object):
 
     #     logger.debug("Now listening for incoming chat requests...")
 
-    # def setup_chat_channel(self, contact):
-    #     logger.debug("Setting up outgoing chat channel...")
+    def setup_chat_channel(self, contact):
+        logger.debug("Setting up outgoing chat channel...")
 
-    #     # Call Channel closure for previously opened channels
-    #     self.close_chat_channel()
+        # Call Channel closure for previously opened channels
+        self.close_chat_channel()
 
-    #     # Remove handler for listener, since we are establishing the connection ourselves
-    #     if self.chat_handler is not None:
-    #         self.chat_handler.unregister()
-    #         self.chat_handler = None
+        # Remove handler for listener, since we are establishing the connection ourselves
+        if self.chat_handler is not None:
+            self.chat_handler.unregister()
+            self.chat_handler = None
 
-    #     # Describe the channel type (text)
-    #     channel_description = {
-    #         Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-    #         Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
-    #         Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
-    #     }
+        # Describe the channel type (text)
+        channel_description = {
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
+        }
 
-    #     # Private channels are not named, only group channels (MUC for Multi-User Channel)
-    #     # Because they are not named, only one can exist at a time
-    #     # This also means that `ensure` is better than create in this case
+        # Private channels are not named, only group channels (MUC for Multi-User Channel)
+        # Because they are not named, only one can exist at a time
+        # This also means that `ensure` is better than create in this case
 
-    #     # Request the channel
-    #     request = Tp.AccountChannelRequest.new(
-    #         self.account,                              # Account
-    #         channel_description,                       # Dict of channel properties
-    #         Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
-    #     )
+        # Request the channel
+        request = Tp.AccountChannelRequest.new(
+            self.account,                              # Account
+            channel_description,                       # Dict of channel properties
+            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
+        )
 
-    #     # Run this asynchronously
-    #     request.ensure_and_handle_channel_async(
-    #         None,                              # Whether it can be canceled
-    #         self.chat_channel_setup_callback,  # Callback
-    #         None                               # Custom Data for callback
-    #     )
+        # Run this asynchronously
+        request.ensure_and_handle_channel_async(
+            None,                              # Whether it can be canceled
+            self.chat_channel_setup_callback,  # Callback
+            None                               # Custom Data for callback
+        )
 
     # def handler_chat_channel_setup_callback(
     #     self,
@@ -258,62 +258,63 @@ class NetworkStack(object):
 
     #     # context.accept()
 
-    # def close_chat_channel(self):
-    #     logger.debug("Closing any existing chat channels...")
+    def close_chat_channel(self):
+        logger.debug("Closing any existing chat channels...")
 
-    #     if self.chat_channel is not None:
-    #         # Try async with lambda to catch & finish
-    #         self.chat_channel.close_async(
-    #             lambda c, s, d: c.close_finish(s) and logger.debug("Existing channel closed"),  # Callback
-    #             None                                                                            # User Data
-    #         )
+        if self.chat_channel is not None:
+            # Try async with lambda to catch & finish
+            self.chat_channel.close_async(
+                lambda c, s, d: c.close_finish(s) and logger.debug("Existing channel closed"),  # Callback
+                None                                                                            # User Data
+            )
 
-    # def chat_channel_setup_callback(self, request, status, data):
-    #     logger.debug("Chat channel approved and initiating...")
+    def chat_channel_setup_callback(self, request, status, data):
+        logger.debug("Chat channel approved and initiating...")
 
-    #     # Remove async process & grab channel plus context
-    #     (channel, context) = request.ensure_and_handle_channel_finish(status)
+        # Remove async process & grab channel plus context
+        (channel, context) = request.ensure_and_handle_channel_finish(status)
 
-    #     # Call shared-setup process
-    #     self.process_chat_channel_setup(channel)
+        # Call shared-setup process
+        self.process_chat_channel_setup(channel)
 
-    # def process_chat_channel_setup(self, channel):
+    def process_chat_channel_setup(self, channel):
 
-    #     # Assign channel to class variable
-    #     self.chat_channel = channel
+        # Assign channel to class variable
+        self.chat_channel = channel
 
-    #     # Add listener for received messages
-    #     channel.connect('message-received', self.chat_message_received)
+        # Add listener for received messages
+        channel.connect('message-received', self.chat_message_received)
 
-    #     # Activate Chat Services
-    #     self.activate_chat()
+        # Activate Chat Services
+        self.activate_chat()
 
-    # def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
-    #     logger.debug("Sending a message over the wire...")
+    def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
+        logger.debug("Sending a message over the wire...")
 
-    #     # Wrap our message in a Telepathy Message object
-    #     message_container = Tp.ClientMessage.new_text(message_type, message)
+        # Wrap our message in a Telepathy Message object
+        message_container = Tp.ClientMessage.new_text(message_type, message)
 
-    #     # Send asynchronous message
-    #     self.chat_channel.send_message_async(
-    #         message_container,  # Telepathy ClientMessage object
-    #         0,                  # Optional Message Sending Flags
-    #         None,               # Callback (server-received confirmation)
-    #         None                # Data for callback
-    #     )
+        # Send asynchronous message
+        self.chat_channel.send_message_async(
+            message_container,  # Telepathy ClientMessage object
+            0,                  # Optional Message Sending Flags
+            None,               # Callback (server-received confirmation)
+            None                # Data for callback
+        )
 
-    #     # The message sending flags are numeric constants representing features
-    #     # currently these include delivery, read, and deleted confirmation
-    #     # The numeric representation uses bit-mapping increments (1, 2, 4, etc)
-    #     # in this way 3 represents the combination of 1 + 2, or two-enabled features
+        # The message sending flags are numeric constants representing features
+        # currently these include delivery, read, and deleted confirmation
+        # The numeric representation uses bit-mapping increments (1, 2, 4, etc)
+        # in this way 3 represents the combination of 1 + 2, or two-enabled features
 
-    #     # Technically, they are missing a NONE constant to represent 0
-    #     # hence why supplying 0 is the same as saying "use no features"
+        # Technically, they are missing a NONE constant to represent 0
+        # hence why supplying 0 is the same as saying "use no features"
+        # and supplying None will throw an error
 
-    #     # **Also** server callback is not the same as user-delivery confirmation
+        # **Also** server callback is not the same as user-delivery confirmation
 
-    # def chat_message_received(self, channel, message):
-    #     logger.debug("Processing received message...")
+    def chat_message_received(self, channel, message):
+        logger.debug("Processing received message...")
 
     def set_chat_activation(self, callback):
         logger.debug("Defined chat activation in network stack...")
