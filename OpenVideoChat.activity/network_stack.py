@@ -100,6 +100,10 @@ class NetworkStack(object):
         # Grab the accounts the right way (dup not get)
         self.accounts = accounts = self.account_manager.dup_valid_accounts()
 
+        for account in accounts:
+            print account.get_protocol(), account.get_connection()
+
+
         # Grab the first available "jabber" account
         for account in accounts:
             if account.get_protocol() == "jabber":
