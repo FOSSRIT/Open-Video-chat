@@ -123,7 +123,7 @@ class NetworkStack(object):
             return False
 
         # Grab the connection from the account
-        connection = self.account.get_connection()
+        self.connection = connection = self.account.get_connection()
 
         # If the connection is not connected log the error
         #                                    setup an async on status change
@@ -290,6 +290,12 @@ class NetworkStack(object):
 
     def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
         logger.debug("Sending a message over the wire...")
+
+        # Verifiy connection status before trying to send a message
+        if self.connection.get_status() is not Tp.ConnectionStatus.CONNECTED:
+            logger.debug("Disconnected, cannot send a message")
+            # **FIXME** Add handling to message user that they are disconnected and no message could be sent
+            return False
 
         # Wrap our message in a Telepathy Message object
         message_container = Tp.ClientMessage.new_text(message_type, message)
