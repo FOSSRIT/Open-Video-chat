@@ -315,13 +315,13 @@ class NetworkStack(object):
     # def chat_message_received(self, channel, message):
     #     logger.debug("Processing received message...")
 
-    # def set_chat_activation(self, callback):
-    #     logger.debug("Defined chat activation in network stack...")
-    #     self.activate_chat = callback
+    def set_chat_activation(self, callback):
+        logger.debug("Defined chat activation in network stack...")
+        self.activate_chat = callback
 
-    # def set_populate_users(self, callback):
-    #     logger.debug("Adding callback to add users to gui...")
-    #     self.add_user_to_gui = callback
+    def set_populate_users(self, callback):
+        logger.debug("Adding callback to add users to gui...")
+        self.add_user_to_gui = callback
 
     """ Old Code (Deprecated & scheduled for removal after testing) """
 
