@@ -122,6 +122,11 @@ class NetworkStack(object):
             # **FIXME** if no valid accounts need to open account management window
             return False
 
+        connection = account.get_connection()
+        print connection
+        if connection is not None:
+            print "Connection is not None!"
+
         # Verify connection status of account
         if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
             logger.debug("Account is not connected, waiting for status change...")
