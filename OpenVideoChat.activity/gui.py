@@ -78,7 +78,7 @@ class Gui(Gtk.Grid):
         self.chat_text_view = chat_text_view = Gtk.TextView(editable=False, buffer=chat_text_buffer, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
         chat_scrollable_history = Gtk.ScrolledWindow(hexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         chat_scrollable_history.add(chat_text_view)
-        self.chat_entry = chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE, sensitive=False)
+        self.chat_entry = chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE, sensitive=False, placeholder_text="message...")
         chat_entry.connect("activate", self.send_message)
         self.chat_send_message_button = chat_send_message_button = Gtk.Button(_("Send"), sensitive=False)
         chat_send_message_button.connect("clicked", self.send_message)
@@ -134,7 +134,7 @@ class Gui(Gtk.Grid):
         user_list_tree_view.connect('row-activated', self.user_selected)
 
         # Build Search Entry
-        user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE)
+        user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE, placeholder_text="username...")
         user_list_search_entry.set_tooltip_text(_("Search for contacts..."))
 
         # Apply the search entry to the Tree View
