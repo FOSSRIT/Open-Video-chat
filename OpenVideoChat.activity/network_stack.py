@@ -146,8 +146,9 @@ class NetworkStack(object):
 
     def force_connect_callback(self, account, status, data):
         logger.debug("User is now available")
-        result = account.request_presence_finish(status)
-        print result
+        account.request_presence_finish(status)
+
+        print account.get_current_presence()
 
         # Call connection handling
         self.setup_connection_logic()
