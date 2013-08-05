@@ -126,14 +126,17 @@ class NetworkStack(object):
         self.connection = connection = self.account.get_connection()
 
         # If the connection is not connected log the error
-        #                                    setup an async on status change
-        #                                    Exit the function
+        #                                    connect status change event
         if connection.get_status() is Tp.ConnectionStatus.DISCONNECTED:
             logger.debug("Connection Status is DISCONNECTED, establishing async on status change...")
             # **FIXME** Add async function for connection status change to continue connection setup
-            return False
+            # Name of the signal is unknown (method defined in docs `tp_cli_connection_signal_callback_status_changed`, does not exist)
+            # Perhaps it is actually connected to account and not connection?
 
+        # Test status-changed exists?
+        connection.connect('status-changed', self.test_method)
 
+        # Setup async on connection
 
 
         # # Dup the users & populate our users list for selecting a contact
@@ -191,6 +194,9 @@ class NetworkStack(object):
     #     handler.register()
 
     #     logger.debug("Now listening for incoming chat requests...")
+
+    def test_method(self, connection, arg2, arg3):
+        logger.debug("Connection status-change triggered...")
 
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
