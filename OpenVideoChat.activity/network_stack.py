@@ -133,7 +133,7 @@ class NetworkStack(object):
             self.change_account_presence_available()
         else:
             logger.debug("TEMP: Connecting...")
-            self.account.prepare_async(None, self.setup_connection_logic, None)
+            self.account.prepare_async([Tp.Account.get_feature_quark_connection()], self.setup_connection_logic, None)
 
     def enable_account_callback(self, account, status, data):
         logger.debug("Account is now enabled")
@@ -149,7 +149,7 @@ class NetworkStack(object):
         account.request_presence_finish(status)
 
         # Async into the connection logic
-        self.account.prepare_async(None, self.setup_connection_logic, None)
+        self.account.prepare_async([Tp.Account.get_feature_quark_connection()], self.setup_connection_logic, None)
 
     def setup_connection_logic(self, account, status, data):
         logger.debug("Setting up the connection components...")
