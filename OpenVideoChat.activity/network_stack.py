@@ -216,7 +216,7 @@ class NetworkStack(object):
         logger.debug("Account connected")
 
         # Disconnect reconnect async?
-        account.reconnect_finish(result)
+        print account.reconnect_finish(result)
 
     def setup_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
