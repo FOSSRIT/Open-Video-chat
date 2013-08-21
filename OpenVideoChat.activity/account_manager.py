@@ -112,9 +112,26 @@ class AccountManager(Gtk.Grid):
 
         # Create a grid with labels
         account_info_grid = Gtk.Grid()
-        account_info_grid.attach(Gtk.Label(label=_("Username: ")), 0, 0, 1, 1)
-        account_info_grid.attach(Gtk.Label(label=_("Password: ")), 0, 1, 1, 1)
-        account_info_grid.attach(Gtk.Label(label=_("Server: ")), 0, 2, 1, 1)
+        account_info_grid.attach(
+            Gtk.Label(
+                halign=Gtk.Align.START,
+                justify=Gtk.Justification.LEFT,
+                label=_("Username: ")
+            ),
+            0, 0, 1, 1)
+        account_info_grid.attach(
+            Gtk.Label(
+                halign=Gtk.Align.START,
+                justify=Gtk.Justification.LEFT,
+                label=_("Password: ")
+            ),
+            0, 1, 1, 1)
+        account_info_grid.attach(Gtk.Label(
+            halign=Gtk.Align.START,
+            justify=Gtk.Justification.LEFT,
+            label=_("Server: ")
+            ),
+            0, 2, 1, 1)
         account_info_grid.attach(account_name_entry, 1, 0, 1, 1)
         account_info_grid.attach(account_password_entry, 1, 1, 1, 1)
         account_info_grid.attach(server_entry, 1, 2, 1, 1)
