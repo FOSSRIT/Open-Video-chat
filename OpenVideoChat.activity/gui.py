@@ -49,10 +49,10 @@ class Gui(Gtk.Grid):
         logger.debug("Preparing GUI...")
 
         # Add Video
-        self.attach(self.build_video(), 0, 1, 1, 1)
+        self.attach(self.build_video(), 0, 0, 1, 1)
 
         # Add Chat
-        self.attach(self.build_chat(), 0, 2, 1, 1)
+        self.attach(self.build_chat(), 0, 1, 1, 1)
 
         # Display Grid
         self.show()
