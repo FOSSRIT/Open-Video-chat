@@ -66,7 +66,7 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
         self.owner = presenceservice.get_instance().get_owner()
 
         """ Setup GUI """
-        self.set_toolbox(Toolbar(self))
+        self.set_toolbar_box(Toolbar(self))
         self.set_canvas(Gui())
         self.show()
 
