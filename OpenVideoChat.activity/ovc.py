@@ -93,7 +93,7 @@ class OpenVideoChat(Gtk.Window):
         # On resize adjust displayed components (may not be needed)
         return False
 
-    def swap_grids(self):
+    def swap_grids(self, *args):
         logger.debug("Swapping gui to accounts...")
         if self.gui is self.get_child():
             self.remove(self.get_child())
