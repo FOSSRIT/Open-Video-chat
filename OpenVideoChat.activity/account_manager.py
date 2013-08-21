@@ -150,5 +150,6 @@ class AccountManager(Gtk.Grid):
     def delete_account(self):
         logger.debug("Account Deletion is Incomplete...")
 
-    def add_account_to_list(self):
+    def add_account_to_list(self, account):
         logger.debug("Adding account to accounts list...")
+        logger.debug(account)

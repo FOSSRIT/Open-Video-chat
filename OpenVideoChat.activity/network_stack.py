@@ -45,14 +45,23 @@ class NetworkStack(object):
         self.account = None
         self.connection = None
         self.chat_channel = None
+        self.add_account = None
 
         """ Sugar Specific Handling """
-
-        # Grab Account Details
-        self.prepare_account()
+        # Such as determining whether the application opened as a result of another user
+        # and automatically connecting to them...
 
         # Completed
         logger.debug("Network Stack Initialized")
+
+    def populate_accounts_callback(self, populate_accounts_callback_method):
+        self.add_account = populate_accounts_callback_method
+
+    def setup(self):
+        logger.debug("Migrating setup procedure to this thing...")
+
+        # Grab Account Details
+        self.prepare_account()
 
     def prepare_account(self):
         logger.debug("Preparing account asynchronously...")
@@ -82,7 +91,6 @@ class NetworkStack(object):
             Tp.ContactFeature.CONTACT_INFO,                      #
             Tp.ContactFeature.LOCATION,                          #
             Tp.ContactFeature.CONTACT_BLOCKING,                  #
-
         ])
 
         # Wait for the account to be ready to ensure the channel
@@ -110,6 +118,10 @@ class NetworkStack(object):
         for account in self.accounts:
             if self.account is None and account.is_enabled and account.get_connection_status() is Tp.ConnectionStatus.CONNECTED:
                 self.account = account
+                # Send accounts to account manager
+                if self.add_account:
+                    self.add_account(account)
+        # This is probably duplicate logic and will be adjusted when cleanup time comes
         if self.account is None:
             logger.debug("No enabled and connected accounts found...")
             # **FIXME** Add alert to UI and open the account manager

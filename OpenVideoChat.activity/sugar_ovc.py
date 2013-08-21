@@ -69,6 +69,7 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
+        self.network_stack.setup()
 
         logger.debug("Open Video Chat Prepared")
 
