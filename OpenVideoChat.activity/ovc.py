@@ -27,6 +27,7 @@ from gi.repository import Gtk
 
 #Local Imports
 from gui import Gui
+from account_manager import AccountManager
 from toolbar import Toolbar
 from network_stack import NetworkStack
 
@@ -56,24 +57,26 @@ class OpenVideoChat(Gtk.Window):
         self.connect('check-resize', self.on_resize)
 
         """ Setup GUI """
-        self.add(Gui())
-        self.get_child().attach(Toolbar(), 0, 0, 1, 1)
+        self.gui = Gui()
+        self.accounts = AccountManager()
+        self.add(self.gui)
+        self.gui.attach(Toolbar(self.swap_grids), 0, 0, 1, 1)
         self.show()
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
 
         # Supply network stack with user population method to add to list
-        self.network_stack.set_populate_users(self.get_child().add_a_contact)
+        self.network_stack.set_populate_users(self.gui.add_a_contact)
 
         # Supply network stack with gui chat enabled callback on channel activation
-        self.network_stack.set_chat_activation(self.get_child().activate_chat)
+        self.network_stack.set_chat_activation(self.gui.activate_chat)
 
         # Supply gui with network channel establishment callback
-        self.get_child().set_chat_channel_initializer(self.network_stack.setup_chat_channel)
+        self.gui.set_chat_channel_initializer(self.network_stack.setup_chat_channel)
 
         # Supply gui with send_message network callback
-        self.get_child().set_send_chat_message(self.network_stack.send_chat_message)
+        self.gui.set_send_chat_message(self.network_stack.send_chat_message)
 
         """ Setup GStreamer Stack """
 
@@ -89,3 +92,12 @@ class OpenVideoChat(Gtk.Window):
     def on_resize(self, trigger):
         # On resize adjust displayed components (may not be needed)
         return False
+
+    def swap_grids(self):
+        logger.debug("Swapping gui to accounts...")
+        if self.gui is self.get_child():
+            self.remove(self.get_child())
+            self.add(self.accounts)
+        else:
+            self.remove(self.get_child())
+            self.add(self.gui)
