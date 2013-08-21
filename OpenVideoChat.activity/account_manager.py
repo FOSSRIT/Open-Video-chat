@@ -31,6 +31,10 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
+# Constants
+MAX_ACCOUNTS_WIDTH = 200
+
+
 class AccountManager(Gtk.Grid):
     def __init__(self):
         Gtk.Grid.__init__(self, expand=True)
@@ -67,7 +71,8 @@ class AccountManager(Gtk.Grid):
         # Create a scrollbox for user list
         account_list_scrolled_window = Gtk.ScrolledWindow(
             hscrollbar_policy=Gtk.PolicyType.NEVER,
-            vscrollbar_policy=Gtk.PolicyType.AUTOMATIC
+            vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+            width_request=MAX_ACCOUNTS_WIDTH
         )
         account_list_scrolled_window.add(account_list_tree_view)
 
@@ -78,8 +83,8 @@ class AccountManager(Gtk.Grid):
         logger.debug("Creating Account Buttons...")
 
         # Create Buttons for add & remove
-        create_account_button = Gtk.Button(label="+", hexpand=True)
-        delete_account_button = Gtk.Button(label="-", hexpand=True)
+        create_account_button = Gtk.Button(label="+", tooltip_text=_("Create a jabber account."), hexpand=True)
+        delete_account_button = Gtk.Button(label="-", tooltip_text=_("Delete a jabber aaccount"),  hexpand=True)
 
         # Add handler functions (incomplete)
         create_account_button.connect('clicked', self.create_account)
@@ -90,25 +95,34 @@ class AccountManager(Gtk.Grid):
 
         # Append to grid
         self.attach(account_list_scrolled_window, 0, 0, 2, 2)
-        self.attach(create_account_button, 0, 1, 1, 1)
-        self.attach(delete_account_button, 1, 1, 1, 1)
+        self.attach(create_account_button, 0, 2, 1, 1)
+        self.attach(delete_account_button, 1, 2, 1, 1)
 
         logger.debug("Built Account List")
 
     def build_info_container(self):
 
         # Entry fields for account
-        self.account_name_entry = account_name_entry = Gtk.Entry()
-        self.account_password_entry = account_password_entry = Gtk.Entry(visible=False)
-        self.server_entry = server_entry = Gtk.Entry()
+        self.account_name_entry = account_name_entry = Gtk.Entry(hexpand=True)
+        self.account_password_entry = account_password_entry = Gtk.Entry(hexpand=True)
+        self.server_entry = server_entry = Gtk.Entry(hexpand=True)
 
         # Hide Password Value
-        # account_password_entry.set_visibility(False)
+        account_password_entry.set_visibility(False)
 
-        # Append to grid
-        self.attach(account_name_entry, 2, 0, 1, 1)
-        self.attach(account_password_entry, 2, 1, 1, 1)
-        self.attach(server_entry, 2, 2, 1, 1)
+        # Create a grid with labels
+        account_info_grid = Gtk.Grid()
+        account_info_grid.attach(Gtk.Label(label=_("Username: ")), 0, 0, 1, 1)
+        account_info_grid.attach(Gtk.Label(label=_("Password: ")), 0, 1, 1, 1)
+        account_info_grid.attach(Gtk.Label(label=_("Server: ")), 0, 2, 1, 1)
+        account_info_grid.attach(account_name_entry, 1, 0, 1, 1)
+        account_info_grid.attach(account_password_entry, 1, 1, 1, 1)
+        account_info_grid.attach(server_entry, 1, 2, 1, 1)
+
+        # **FIXME** Add buttons for update/create handling tied to actual functionality
+
+        # Attach grid to grid
+        self.attach(account_info_grid, 2, 0, 1, 1)
 
     def account_selected(self, tree_view, selected_index, column_object):
         logger.debug("Testing Account Selection...")
