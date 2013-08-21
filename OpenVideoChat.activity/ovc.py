@@ -56,10 +56,8 @@ class OpenVideoChat(Gtk.Window):
         self.connect("delete-event", lambda w, s: self.can_close() and Gtk.main_quit())
         self.connect('check-resize', self.on_resize)
 
-        """ Prepare Container """
-        # self.add(Gtk.Grid(expand=True))
-
         """ Setup GUI """
+        self.add(Gtk.Grid(expand=True))
         self.get_child().attach(Toolbar(self.swap_grids), 0, 0, 1, 1)
         self.gui = Gui()
         self.accounts = AccountManager()
