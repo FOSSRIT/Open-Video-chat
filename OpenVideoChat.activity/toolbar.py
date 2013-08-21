@@ -93,7 +93,7 @@ class Toolbar(Gtk.Expander):
         spacer = Gtk.SeparatorToolItem(draw=False)
         spacer.set_expand(True)
         toolbar.insert(spacer, 6)
-        toolbar.insert(self.toggles['manage-accounts'], 6)
+        toolbar.insert(self.toggles['manage-accounts'], 7)
         logger.debug("Buttons Added")
 
         # Override Background Color
