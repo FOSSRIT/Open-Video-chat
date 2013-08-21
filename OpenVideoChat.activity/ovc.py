@@ -57,7 +57,7 @@ class OpenVideoChat(Gtk.Window):
         self.connect('check-resize', self.on_resize)
 
         """ Setup GUI """
-        self.add(Gtk.Grid(expand=True))
+        self.add(Gtk.Grid(expand=True, visible=True))
         self.get_child().attach(Toolbar(self.swap_grids), 0, 0, 1, 1)
         self.gui = Gui()
         self.accounts = AccountManager()
@@ -96,7 +96,7 @@ class OpenVideoChat(Gtk.Window):
 
     def swap_grids(self, *args):
         logger.debug("Swapping gui to accounts...")
-        if self.is_ancestor(self.gui):
+        if self.gui in self.get_child().get_children():
             self.get_child().remove(self.gui)
             self.get_child().attach(self.accounts, 0, 1, 1, 1)
         else:
