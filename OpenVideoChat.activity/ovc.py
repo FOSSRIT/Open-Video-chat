@@ -56,11 +56,14 @@ class OpenVideoChat(Gtk.Window):
         self.connect("delete-event", lambda w, s: self.can_close() and Gtk.main_quit())
         self.connect('check-resize', self.on_resize)
 
+        """ Prepare Container """
+        # self.add(Gtk.Grid(expand=True))
+
         """ Setup GUI """
+        self.get_child().attach(Toolbar(self.swap_grids), 0, 0, 1, 1)
         self.gui = Gui()
         self.accounts = AccountManager()
-        self.add(self.gui)
-        self.gui.attach(Toolbar(self.swap_grids), 0, 0, 1, 1)
+        self.get_child().attach(self.gui, 0, 1, 1, 1)
         self.show()
 
         """ Setup Network Stack """
@@ -95,9 +98,9 @@ class OpenVideoChat(Gtk.Window):
 
     def swap_grids(self, *args):
         logger.debug("Swapping gui to accounts...")
-        if self.gui is self.get_child():
-            self.remove(self.get_child())
-            self.add(self.accounts)
+        if self.is_ancestor(self.gui):
+            self.get_child().remove(self.gui)
+            self.get_child().attach(self.accounts, 0, 1, 1, 1)
         else:
-            self.remove(self.get_child())
-            self.add(self.gui)
+            self.get_child().remove(self.accounts)
+            self.get_child().attach(self.gui, 0, 1, 1, 1)
