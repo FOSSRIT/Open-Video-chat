@@ -37,7 +37,7 @@ logger.setLevel(logging.DEBUG)
 
 class NetworkStack(object):
 
-    def __init__(self, owner=None, get_buddy=None):
+    def __init__(self):
         logger.debug("Preparing Network Stack...")
 
         # Network Components
@@ -47,10 +47,6 @@ class NetworkStack(object):
         self.chat_channel = None
 
         """ Sugar Specific Handling """
-
-        # Assign owner if exists (???)
-
-        # Assign buddy callback if exists (???)
 
         # Grab Account Details
         self.prepare_account()

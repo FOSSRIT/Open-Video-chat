@@ -62,9 +62,6 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
         self.network_stack = None
         self.gstreamer_stack = None
 
-        # Acquire Owner
-        self.owner = presenceservice.get_instance().get_owner()
-
         """ Setup GUI """
         self.set_toolbar_box(Toolbar(self))
         self.set_canvas(Gui())
@@ -72,7 +69,6 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
-        # self.network_stack = NetworkStack(self.owner, self.get_buddy)
 
         logger.debug("Open Video Chat Prepared")
 
