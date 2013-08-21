@@ -47,12 +47,12 @@ ICONS = {
 
 
 class Toolbar(Gtk.Expander):
-    def __init__(self):
+    def __init__(self, swap_gui_method):
         Gtk.Expander.__init__(self, expanded=True, label=_('Toolbar'))
         logger.debug("Preparing Toolbar...")
 
         # Define Buttons
-        self.build_buttons()
+        self.build_buttons(swap_gui_method)
 
         # Build Menu
         self.add(self.build_toolbar())
@@ -61,7 +61,7 @@ class Toolbar(Gtk.Expander):
         self.show_all()
         logger.debug("Toolbar Prepared")
 
-    def build_buttons(self):
+    def build_buttons(self, swap_gui_method):
 
         # Create Toggles
         logger.debug("Defining Toolbar Buttons...")
@@ -75,6 +75,7 @@ class Toolbar(Gtk.Expander):
         logger.debug("Defined Toolbar Buttons")
 
         # Define Signal Events
+        self.toggles['manage-accounts'].connect('clicked', swap_gui_method)
 
     def build_toolbar(self):
 
@@ -94,6 +95,7 @@ class Toolbar(Gtk.Expander):
         spacer.set_expand(True)
         toolbar.insert(spacer, 6)
         toolbar.insert(self.toggles['manage-accounts'], 7)
+        toolbar.insert(Gtk.SeparatorToolItem(draw=False), 8)
         logger.debug("Buttons Added")
 
         # Override Background Color
