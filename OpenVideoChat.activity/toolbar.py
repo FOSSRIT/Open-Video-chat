@@ -70,7 +70,7 @@ class Toolbar(Gtk.Expander):
             'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['onmic'])),
             'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['play'])),
             'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['unmute'])),
-            'manage-accounts': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['accounts']))
+            'manage-accounts': Gtk.ToolButton(tooltip_text="Manage Jabber Accounts", icon_widget=Gtk.Image(file=ICONS['accounts']))
         }
         logger.debug("Defined Toolbar Buttons")
 
