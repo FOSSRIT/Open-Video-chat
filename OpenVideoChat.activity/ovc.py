@@ -66,20 +66,20 @@ class OpenVideoChat(Gtk.Window):
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
-        self.network_stack.populate_accounts_callback(self.accounts.add_account_to_list)
-        self.network_stack.setup()
+        # self.network_stack.populate_accounts_callback(self.accounts.add_account_to_list)
+        # self.network_stack.setup()
 
         # Supply network stack with user population method to add to list
-        self.network_stack.set_populate_users(self.gui.add_a_contact)
+        # self.network_stack.set_populate_users(self.gui.add_a_contact)
 
         # Supply network stack with gui chat enabled callback on channel activation
-        self.network_stack.set_chat_activation(self.gui.activate_chat)
+        # self.network_stack.set_chat_activation(self.gui.activate_chat)
 
         # Supply gui with network channel establishment callback
-        self.gui.set_chat_channel_initializer(self.network_stack.setup_chat_channel)
+        # self.gui.set_chat_channel_initializer(self.network_stack.setup_chat_channel)
 
         # Supply gui with send_message network callback
-        self.gui.set_send_chat_message(self.network_stack.send_chat_message)
+        # self.gui.set_send_chat_message(self.network_stack.send_chat_message)
 
         """ Setup GStreamer Stack """
 
