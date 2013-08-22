@@ -45,11 +45,16 @@ class NetworkStack(object):
         self.network_stack_callbacks = callbacks
 
         # Grab the account manager to begin the setup process
-        account_manager = Tp.AccountManager.dup()
-        if account_manager:
-            self.configure_network_stack(account_manager)
-            # Wait for the account to be ready to ensure the channel
-            # self.account_manager.prepare_async(None, self.setup_accounts, None)
+        self.account_manager = Tp.AccountManager.dup()
+        if self.account_manager:
+            self.configure_network_stack(self.account_manager)
+
+            # Register initial callbacks
+            self.register_callback('get_jabber_accounts', self.initialize_account)
+
+            # Run first async process to startup the system
+            self.account_manager_async()
+
         else:
             logger.error("Unable to acquire the account manager, software will not be usable...")
 
@@ -87,3 +92,58 @@ class NetworkStack(object):
         # Once everything is working we can systematically remove features to see what breaks
 
         logger.debug("Configured Telepathy")
+
+    def account_manager_async(self):
+        logger.debug("Processing account manager async...")
+        self.account_manager.prepare_async(None, self.account_manager_async_callback, None)
+
+    def account_manager_async_callback(self, account_manager, status, data):
+        logger.debug("Removing account manager async...")
+        account_manager.prepare_finish(status)
+
+        # Run Jabber Accounts
+        self.get_jabber_accounts(account_manager)
+
+        # Test
+        if self.active_account:
+            logger.debug("Active Account is Ready!")
+
+    def get_jabber_accounts(self, account_manager):
+        logger.debug("Getting jabber accounts list...")
+
+        accounts = []
+        for account in account_manager.dup_valid_accounts():
+            if account.get_protocol() == "jabber":
+                accounts.append(account)
+
+        # Handle Registered Callbacks & remove them after
+        self.run_callbacks('get_jabber_accounts', accounts)
+
+    def initialize_account(self, accounts):
+        for account in accounts:
+            if account.is_enabled and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+                self.active_account = account
+
+        if not self.active_account:
+            logger.warning("No enabled and connected accounts were found...")
+
+
+    """ Callback Handling """
+
+    def remove_callback(self, event, callback):
+        for cb in self.network_stack_callbacks[event]:
+            if callback is cb:
+                self.network_stack_callbacks[event].remove(callback)
+
+    def register_callback(self, event, callback):
+        # If no key exists define it with a list
+        if not self.network_stack_callbacks[event]:
+            self.network_stack_callbacks[event] = []
+
+        # Add callback
+        self.network_stack_callbacks[event].append(callback)
+
+    def run_callbacks(self, event, *args):
+        for callback in self.network_stack_callbacks[event]:
+            callback(args)
+            self.remove_callback(event, callback)
