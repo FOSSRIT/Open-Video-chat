@@ -151,9 +151,5 @@ class AccountManager(Gtk.Grid):
         logger.debug("Account Deletion is Incomplete...")
 
     def add_account_to_list(self, account):
-        logger.debug("Adding account to accounts list...")
-        logger.debug(account)
-        logger.debug(dir(account))
-
-        # Attempt to add the account
-        self.account_list_store.append([account.get_alias(), account])
+        # logger.debug("Adding account to accounts list...")
+        self.account_list_store.append([account.get_nickname(), account])
