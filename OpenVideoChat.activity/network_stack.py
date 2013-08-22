@@ -37,7 +37,7 @@ logger.setLevel(logging.DEBUG)
 
 class NetworkStack(object):
 
-    def __init__(self, owner=None, get_buddy=None):
+    def __init__(self):
         logger.debug("Preparing Network Stack...")
 
         # Network Components
@@ -45,18 +45,23 @@ class NetworkStack(object):
         self.account = None
         self.connection = None
         self.chat_channel = None
+        self.add_account = None
 
         """ Sugar Specific Handling """
-
-        # Assign owner if exists (???)
-
-        # Assign buddy callback if exists (???)
-
-        # Grab Account Details
-        self.prepare_account()
+        # Such as determining whether the application opened as a result of another user
+        # and automatically connecting to them...
 
         # Completed
         logger.debug("Network Stack Initialized")
+
+    def populate_accounts_callback(self, populate_accounts_callback_method):
+        self.add_account = populate_accounts_callback_method
+
+    def setup(self):
+        logger.debug("Migrating setup procedure to this thing...")
+
+        # Grab Account Details
+        self.prepare_account()
 
     def prepare_account(self):
         logger.debug("Preparing account asynchronously...")
@@ -86,7 +91,6 @@ class NetworkStack(object):
             Tp.ContactFeature.CONTACT_INFO,                      #
             Tp.ContactFeature.LOCATION,                          #
             Tp.ContactFeature.CONTACT_BLOCKING,                  #
-
         ])
 
         # Wait for the account to be ready to ensure the channel
@@ -112,24 +116,35 @@ class NetworkStack(object):
 
         # Attempt to find an enabled & connected account
         for account in self.accounts:
-            if self.account is None and account.is_enabled and account.get_connection_status() is Tp.ConnectionStatus.CONNECTED:
+            # Send accounts to account manager
+            if self.add_account:
+                self.add_account(account)
+            # Set Account to use
+            if self.account is None and account.is_enabled and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
                 self.account = account
+
+        # This is probably duplicate logic and will be adjusted when cleanup time comes
         if self.account is None:
             logger.debug("No enabled and connected accounts found...")
             # **FIXME** Add alert to UI and open the account manager
             # return False
+        else:
+            self.account.prepare_async(None, self.setup_connection_logic, None)
 
+        # Account Manager should depict unenabled or disconnected accounts in grey
+        # User can attempt to override by double-clicking, which will run below logic
+        # which should attempt to enable and connect manually
         # **FIXME** Future iterations will not automatically use the first account
         #           Subsequently, no automatic connection logic will be required either
-        self.account = self.accounts[0]
-        if not self.account.is_enabled():
-            logger.debug("TEMP: Enabling account...")
-            self.account.set_enabled_async(True, self.enable_account_callback, None)
-        elif self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
-            self.change_account_presence_available()
-        else:
-            logger.debug("TEMP: Connecting...")
-            self.account.prepare_async(None, self.setup_connection_logic, None)
+        # self.account = self.accounts[0]
+        # if not self.account.is_enabled():
+        #     logger.debug("TEMP: Enabling account...")
+        #     self.account.set_enabled_async(True, self.enable_account_callback, None)
+        # elif self.account.get_connection_status()[0] is not Tp.ConnectionStatus.CONNECTED:
+        #     self.change_account_presence_available()
+        # else:
+        #     logger.debug("TEMP: Connecting...")
+        #     self.account.prepare_async(None, self.setup_connection_logic, None)
 
     def enable_account_callback(self, account, status, data):
         logger.debug("Account is now enabled")

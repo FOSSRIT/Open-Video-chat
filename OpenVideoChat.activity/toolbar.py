@@ -34,20 +34,25 @@ logger = logging.getLogger(__name__)
 
 # Constants
 ICONS = {
-    'play': 'icons/ovc-start-tiny.svg',
-    'stop': 'icons/ovc-stop-tiny.svg',
-    'unmute': 'icons/ovc-unmute-tiny.svg',
-    'mute': 'icons/ovc-mute-tiny.svg'
+    'play': 'icons/ovc_start.svg',
+    'stop': 'icons/ovc_stop.svg',
+    'unmute': 'icons/ovc_unmute.svg',
+    'mute': 'icons/ovc_mute.svg',
+    'onwebcam': 'icons/ovc_webcam_on.svg',
+    'offwebcam': 'icons/ovc_webcam_off.svg',
+    'onmic': 'icons/ovc_mic_on.svg',
+    'offmic': 'icons/ovc_mic_off.svg',
+    'accounts': 'icons/ovc_account_manager.svg'
 }
 
 
 class Toolbar(Gtk.Expander):
-    def __init__(self):
+    def __init__(self, swap_gui_method):
         Gtk.Expander.__init__(self, expanded=True, label=_('Toolbar'))
         logger.debug("Preparing Toolbar...")
 
         # Define Buttons
-        self.build_buttons()
+        self.build_buttons(swap_gui_method)
 
         # Build Menu
         self.add(self.build_toolbar())
@@ -56,19 +61,21 @@ class Toolbar(Gtk.Expander):
         self.show_all()
         logger.debug("Toolbar Prepared")
 
-    def build_buttons(self):
+    def build_buttons(self, swap_gui_method):
 
         # Create Toggles
         logger.debug("Defining Toolbar Buttons...")
         self.toggles = {
-            'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['play'])),
-            'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['unmute'])),
-            'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
-            'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['mute']))
+            'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['onwebcam'])),
+            'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['onmic'])),
+            'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['play'])),
+            'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['unmute'])),
+            'manage-accounts': Gtk.ToolButton(tooltip_text="Manage Jabber Accounts", icon_widget=Gtk.Image(file=ICONS['accounts']))
         }
         logger.debug("Defined Toolbar Buttons")
 
         # Define Signal Events
+        self.toggles['manage-accounts'].connect('clicked', swap_gui_method)
 
     def build_toolbar(self):
 
@@ -84,6 +91,11 @@ class Toolbar(Gtk.Expander):
         toolbar.insert(Gtk.SeparatorToolItem(draw=True), 3)
         toolbar.insert(self.toggles['incoming-video'], 4)
         toolbar.insert(self.toggles['incoming-audio'], 5)
+        spacer = Gtk.SeparatorToolItem(draw=False)
+        spacer.set_expand(True)
+        toolbar.insert(spacer, 6)
+        toolbar.insert(self.toggles['manage-accounts'], 7)
+        toolbar.insert(Gtk.SeparatorToolItem(draw=False), 8)
         logger.debug("Buttons Added")
 
         # Override Background Color

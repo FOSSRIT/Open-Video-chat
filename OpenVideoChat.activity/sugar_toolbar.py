@@ -35,10 +35,14 @@ logger = logging.getLogger(__name__)
 
 # Constants
 ICONS = {
-    'play': 'icons/ovc-start.svg',
-    'stop': 'icons/ovc-stop.svg',
-    'unmute': 'icons/ovc-unmute.svg',
-    'mute': 'icons/ovc-mute.svg'
+    'play': 'icons/ovc_start_sugar.svg',
+    'stop': 'icons/ovc_stop_sugar.svg',
+    'unmute': 'icons/ovc_unmute_sugar.svg',
+    'mute': 'icons/ovc_mute_sugar.svg',
+    'onwebcam': 'icons/ovc_webcam_on_sugar.svg',
+    'offwebcam': 'icons/ovc_webcam_off_sugar.svg',
+    'onmic': 'icons/ovc_mic_on_sugar.svg',
+    'offmic': 'icons/ovc_mic_off_sugar.svg'
 }
 
 
@@ -68,10 +72,10 @@ class Toolbar(Gtk.Toolbar):
         # Create Toggles
         logger.debug("Defining Toolbar Buttons...")
         self.toggles = {
-            'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
-            'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['mute'])),
-            'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['stop'])),
-            'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['mute']))
+            'outgoing-video': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Video", icon_widget=Gtk.Image(file=ICONS['onwebcam'])),
+            'outgoing-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Outgoing Audio", icon_widget=Gtk.Image(file=ICONS['onmic'])),
+            'incoming-video': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Video", icon_widget=Gtk.Image(file=ICONS['play'])),
+            'incoming-audio': Gtk.ToolButton(sensitive=False, tooltip_text="Incoming Audio", icon_widget=Gtk.Image(file=ICONS['unmute']))
         }
         logger.debug("Defined Toolbar Buttons")
 
@@ -98,28 +102,3 @@ class Toolbar(Gtk.Toolbar):
         self.insert(StopButton(self.activity), 9)
         self.insert(Gtk.SeparatorToolItem(draw=False), 10)
         logger.debug("Built Toolbar")
-
-    #     # Video Toggle
-    #     video_toggle_button = ToolButton()
-    #     video_toggle_button.connect("clicked", self.toggle_video)
-    #     toolbar_box.toolbar.insert(video_toggle_button, 1)
-    #     self.toggle_video(video_toggle_button)
-
-    #     # Audio Toggle
-    #     audio_toggle_button = ToolButton()
-    #     audio_toggle_button.connect("clicked", self.toggle_audio)
-    #     toolbar_box.toolbar.insert(audio_toggle_button, 2)
-    #     self.toggle_audio(audio_toggle_button)
-
-    #     # Toggle Preview Display Button
-    #     preview_toggle_button = ToolButton()
-    #     preview_toggle_button.connect("clicked", self.toolbar_toggle_preview_visibility)
-    #     toolbar_box.toolbar.insert(preview_toggle_button, 3)
-    #     self.toolbar_toggle_preview_visibility(preview_toggle_button)
-
-    #     # Forced Refresh
-    #     reload_video = ToolButton("view-refresh")
-    #     reload_video.set_tooltip_text(_("Reload Video"))
-    #     reload_video.connect("clicked", self.force_redraw)
-    #     toolbar_box.toolbar.insert(reload_video, -1)
-

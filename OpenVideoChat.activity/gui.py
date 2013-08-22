@@ -49,10 +49,10 @@ class Gui(Gtk.Grid):
         logger.debug("Preparing GUI...")
 
         # Add Video
-        self.attach(self.build_video(), 0, 1, 1, 1)
+        self.attach(self.build_video(), 0, 0, 1, 1)
 
         # Add Chat
-        self.attach(self.build_chat(), 0, 2, 1, 1)
+        self.attach(self.build_chat(), 0, 1, 1, 1)
 
         # Display Grid
         self.show()
@@ -127,7 +127,11 @@ class Gui(Gtk.Grid):
         user_list_tree_view.append_column(user_tree_view_column)
 
         # Create a scrollbox for user list
-        user_list_scrolled_window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=(MIN_CHAT_HEIGHT - 20))
+        user_list_scrolled_window = Gtk.ScrolledWindow(
+            hscrollbar_policy=Gtk.PolicyType.NEVER,
+            vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+            min_content_height=(MIN_CHAT_HEIGHT - 20)
+        )
         user_list_scrolled_window.add(user_list_tree_view)
 
         # Add a click handler to the tree view for user selection
