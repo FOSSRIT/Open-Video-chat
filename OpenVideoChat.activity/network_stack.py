@@ -116,28 +116,35 @@ class NetworkStack(object):
 
         # Attempt to find an enabled & connected account
         for account in self.accounts:
-            if self.account is None and account.is_enabled and account.get_connection_status() is Tp.ConnectionStatus.CONNECTED:
+            # Send accounts to account manager
+            if self.add_account:
+                self.add_account(account)
+            # Set Account to use
+            if self.account is None and account.is_enabled and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
                 self.account = account
-                # Send accounts to account manager
-                if self.add_account:
-                    self.add_account(account)
+
         # This is probably duplicate logic and will be adjusted when cleanup time comes
         if self.account is None:
             logger.debug("No enabled and connected accounts found...")
             # **FIXME** Add alert to UI and open the account manager
             # return False
+        else:
+            self.account.prepare_async(None, self.setup_connection_logic, None)
 
+        # Account Manager should depict unenabled or disconnected accounts in grey
+        # User can attempt to override by double-clicking, which will run below logic
+        # which should attempt to enable and connect manually
         # **FIXME** Future iterations will not automatically use the first account
         #           Subsequently, no automatic connection logic will be required either
-        self.account = self.accounts[0]
-        if not self.account.is_enabled():
-            logger.debug("TEMP: Enabling account...")
-            self.account.set_enabled_async(True, self.enable_account_callback, None)
-        elif self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
-            self.change_account_presence_available()
-        else:
-            logger.debug("TEMP: Connecting...")
-            self.account.prepare_async(None, self.setup_connection_logic, None)
+        # self.account = self.accounts[0]
+        # if not self.account.is_enabled():
+        #     logger.debug("TEMP: Enabling account...")
+        #     self.account.set_enabled_async(True, self.enable_account_callback, None)
+        # elif self.account.get_connection_status()[0] is not Tp.ConnectionStatus.CONNECTED:
+        #     self.change_account_presence_available()
+        # else:
+        #     logger.debug("TEMP: Connecting...")
+        #     self.account.prepare_async(None, self.setup_connection_logic, None)
 
     def enable_account_callback(self, account, status, data):
         logger.debug("Account is now enabled")
