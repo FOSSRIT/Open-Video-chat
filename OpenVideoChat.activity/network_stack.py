@@ -165,7 +165,7 @@ class NetworkStack(object):
 
     """ Connection Logic """
 
-    def initialize_connection(self, account):
+    def initialize_connection(self, account, status, data):
         logger.debug("Initializing connection...")
 
 
@@ -178,7 +178,7 @@ class NetworkStack(object):
 
     def register_callback(self, event, callback):
         # If no key exists define it with a list
-        if not self.network_stack_callbacks[event]:
+        if not event in self.network_stack_callbacks:
             self.network_stack_callbacks[event] = []
 
         # Add callback
