@@ -104,9 +104,8 @@ class NetworkStack(object):
         # Run Jabber Accounts
         self.get_jabber_accounts(account_manager)
 
-        # Test
-        if self.active_account:
-            logger.debug("Active Account is Ready!")
+
+    """ Account Logic """
 
     def get_jabber_accounts(self, account_manager):
         logger.debug("Getting jabber accounts list...")
@@ -121,11 +120,53 @@ class NetworkStack(object):
 
     def initialize_account(self, accounts):
         for account in accounts:
-            if account.is_enabled and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+            if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
                 self.active_account = account
 
-        if not self.active_account:
+        if self.active_account:
+            self.setup_active_account()
+        else:
             logger.warning("No enabled and connected accounts were found...")
+
+    def switch_active_account(self, account):
+        logger.debug("Switching accounts...")
+
+        # Logic chain to automatically enable and connect account
+        if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+            self.active_account = account
+            self.setup_active_account()
+        elif not account.is_enabled():
+            logger.warning("Attempting to enable account...")
+            account.set_enabled_async(True, self.enable_active_account_callback, account)
+        elif account.get_connection_status()[0] is not Tp.ConnectionStatus.CONNECTED:
+            logger.warning("Attempting to connect (set account available)...")
+            account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", self.connect_active_account_callback, account)
+        else:
+            logger.warning("Unable to select account...")
+
+    def enable_active_account_callback(self, account):
+        if account.is_enabled():
+            self.switch_active_account(account)
+        else:
+            logger.error("Unable to activate account!")
+
+    def connect_active_account_callback(self, account):
+        if account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+            self.switch_active_account(account)
+        else:
+            logger.error("Unable to connect!")
+
+    def setup_active_account(self):
+        logger.debug("Configuring Active Account...")
+
+        # Run Async to prepare the account
+        self.active_account.prepare_async(None, self.initialize_connection, None)
+
+
+    """ Connection Logic """
+
+    def initialize_connection(self, account):
+        logger.debug("Initializing connection...")
 
 
     """ Callback Handling """
@@ -145,5 +186,5 @@ class NetworkStack(object):
 
     def run_callbacks(self, event, *args):
         for callback in self.network_stack_callbacks[event]:
-            callback(args)
+            callback(*args)
             self.remove_callback(event, callback)
