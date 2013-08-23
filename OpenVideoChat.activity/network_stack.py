@@ -133,6 +133,9 @@ class NetworkStack(object):
 
         # Logic chain to automatically enable and connect account
         if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+            # Check for & remove a status-changed signal from the former account
+            # if 'account_status_changed' in self.network_stack_signals and self.network_stack_signals['account_status_changed'] is not None:
+                # self.active_account.disconnect(self.network_stack_signals['account_status_changed'])
             self.active_account = account
             self.setup_active_account()
         elif not account.is_enabled():
@@ -159,6 +162,9 @@ class NetworkStack(object):
     def setup_active_account(self):
         logger.debug("Configuring Active Account...")
 
+        # The account should have a status-changed signal, connect to it here
+        # self.network_stack_signals['account_status_changed'] = self.active_account.connect('status-changed', )
+
         # Run Async to prepare the account
         self.active_account.prepare_async(None, self.initialize_connection, None)
 
@@ -167,6 +173,53 @@ class NetworkStack(object):
 
     def initialize_connection(self, account, status, data):
         logger.debug("Initializing connection...")
+
+        # Finish account async
+        account.prepare_finish(status)
+
+        # Grab the connection
+        connection = account.get_connection()
+
+        if connection:
+            logger.debug("Working on the next step!")
+
+            if self.active_connection:
+                logger.debug("Testing!")
+
+            # If signal exists remove it from old connection
+
+            # Modular load_contacts or similar?
+            # Should also begin async on connection and connect to signals contact changes
+
+
+        else:
+            logger.error("Unable to acquire connection...")
+
+
+    def get_connection_contacts(self):
+        logger.debug("Grabbing contacts from connection...")
+
+        contacts = []
+        if self.active_connection.get_contact_list_state() is Tp.ContactListState.SUCCESS:
+            contacts = self.active_connection.dup_contact_list()
+        else:
+            logger.warning("Unable to retreive contacts from connection!")
+
+        # Connect connection handler for contact updates
+        # self.network_stack_signals['contact_list_changed'] =
+        # connection.connect('contact-list-changed', self.contacts_changed_callback)
+
+
+    # def contact_list_changed()
+
+        # # Setup async on connection to handler changes to contact list
+        # connection.prepare_async(None, None, None)
+        # # **FIXME** Perhaps this needs to be closed later?  How can we do that?  Handler that stores gasyncresult object for running finish?
+        # # Also does this handle more than one contact-list-changed event or just one per?  In which case closing and re-opening in an "infinite" loop is good
+
+        # # Listen for incoming channel requests
+        # # self.listen_for_chat_channel()
+
 
 
     """ Callback Handling """
