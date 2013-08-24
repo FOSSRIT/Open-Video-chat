@@ -180,6 +180,8 @@ class NetworkStack(object):
         old_status,
         new_status,
         reason,
+        dbus_error_name,
+        details,
         data
     ):
         logger.debug("Account status changed...")
