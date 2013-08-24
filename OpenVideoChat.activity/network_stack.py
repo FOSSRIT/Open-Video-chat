@@ -27,6 +27,11 @@
 
 # External Imports
 import logging
+
+# Initialize threads for telepathy?
+from gi.repository import GObject
+GObject.threads_init()
+
 from gi.repository import TelepathyGLib as Tp
 
 
@@ -270,7 +275,7 @@ class NetworkStack(object):
         else:
             logger.warning("Unable to retreive contacts from connection!")
 
-    def contacts_changed_callback(self):
+    def contacts_changed_callback(self, added, removed, data):
         logger.debug("Received change to contacts...")
 
     def connection_async_callback(self, connection, status, data):
