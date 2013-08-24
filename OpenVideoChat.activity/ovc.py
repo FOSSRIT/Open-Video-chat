@@ -88,7 +88,7 @@ class OpenVideoChat(Gtk.Window):
         Gtk.main()
 
     def can_close(self):
-        self.network_stack.close_chat_channel()  # Close Chat Channel(s)
+        # self.network_stack.close_chat_channel()  # Close Chat Channel(s)
         # **FIXME** Does not wait for async closures
         return True
 
