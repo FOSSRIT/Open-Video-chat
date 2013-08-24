@@ -237,6 +237,9 @@ class NetworkStack(object):
         if self.active_connection.get_contact_list_state() is Tp.ContactListState.SUCCESS:
             contacts = self.active_connection.dup_contact_list()
 
+            # TEMPORARILY DEBUG CONTACTS
+            logger.debug(contacts)
+
             # Setup signals for contact list changes
             self.network_stack_signals['contact_list_changed'] = self.active_connection.connect('contact-list-changed', self.contacts_changed_callback)
 
