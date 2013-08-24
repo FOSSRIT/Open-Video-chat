@@ -37,6 +37,11 @@ logger.setLevel(logging.DEBUG)
 
 class NetworkStack(object):
 
+
+    """ Properties """
+    active_account = None
+
+
     def __init__(self, **callbacks):
         logger.debug("Preparing Network Stack...")
 
@@ -122,7 +127,6 @@ class NetworkStack(object):
         # This should only ever run once
         self.remove_callback(event, callback)
 
-        self.active_account = None
         for account in accounts:
             if self.active_account is None and account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
                 self.active_account = account
@@ -137,17 +141,22 @@ class NetworkStack(object):
 
         # Logic chain to automatically enable and connect account
         if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+
             # Check for & remove a status-changed signal from the former account
             if 'account_status_changed' in self.network_stack_signals and self.network_stack_signals['account_status_changed'] is not None:
                 self.active_account.disconnect(self.network_stack_signals['account_status_changed'])
+
             self.active_account = account
             self.setup_active_account()
+
         elif not account.is_enabled():
             logger.warning("Attempting to enable account...")
             account.set_enabled_async(True, self.enable_active_account_callback, account)
+
         elif account.get_connection_status()[0] is not Tp.ConnectionStatus.CONNECTED:
             logger.warning("Attempting to connect (set account available)...")
             account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", self.connect_active_account_callback, account)
+
         else:
             logger.warning("Unable to select account...")
 
@@ -186,6 +195,7 @@ class NetworkStack(object):
         data
     ):
         logger.debug("Account status changed...")
+        # No logic or handlers have been added here yet
 
 
     """ Connection Logic """
@@ -208,41 +218,39 @@ class NetworkStack(object):
 
             # Update connection
             self.active_connection = connection
-            # If signal exists remove it from old connection
 
             # Load Contacts
+            self.get_connection_contacts()
+
+            # Setup async & logic to disconnect async if connection changes
+            # self.active_connection.prepare_async(None, self.connection_async_callback, None)
 
         else:
             logger.error("Unable to acquire connection...")
 
-
     def get_connection_contacts(self):
         logger.debug("Grabbing contacts from connection...")
 
-        contacts = []
         if self.active_connection.get_contact_list_state() is Tp.ContactListState.SUCCESS:
             contacts = self.active_connection.dup_contact_list()
+
+            # Setup signals for contact list changes
+            self.network_stack_signals['contact_list_changed'] = self.active_connection.connect('contact-list-changed', self.contacts_changed_callback)
+
+            # Run registered handlers
+            self.run_callbacks('get_connection_contacts', self, contacts)
+
         else:
             logger.warning("Unable to retreive contacts from connection!")
 
-        # Run registered handlers
-        self.run_callbacks('get_connection_contacts', self, contacts)
+    def contacts_changed_callback(self):
+        logger.debug("Received change to contacts...")
 
-        # Connect connection handler for contact updates
-        # self.network_stack_signals['contact_list_changed'] =
-        # connection.connect('contact-list-changed', self.contacts_changed_callback)
-
-
-    # def contact_list_changed()
-
-        # # Setup async on connection to handler changes to contact list
-        # connection.prepare_async(None, None, None)
-        # # **FIXME** Perhaps this needs to be closed later?  How can we do that?  Handler that stores gasyncresult object for running finish?
-        # # Also does this handle more than one contact-list-changed event or just one per?  In which case closing and re-opening in an "infinite" loop is good
-
-        # # Listen for incoming channel requests
-        # # self.listen_for_chat_channel()
-
+    def connection_async_callback(self, connection, status, data):
+        # Alternative logic has us reset the callback while is
+        # Still need to test whether the first approach works for notifying of changes to contact list
+        if self.active_connection is not connection:
+            connection.prepare_finish(status)
 
 
     """ Callback Handling """
