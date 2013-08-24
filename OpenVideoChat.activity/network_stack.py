@@ -116,9 +116,12 @@ class NetworkStack(object):
                 accounts.append(account)
 
         # Handle Registered Callbacks & remove them after
-        self.run_callbacks('get_jabber_accounts', accounts)
+        self.run_callbacks('get_jabber_accounts', self, accounts)
 
-    def initialize_account(self, accounts):
+    def initialize_account(self, callback, event, parent, accounts):
+        # This should only ever run once
+        self.remove_callback(event, callback)
+
         for account in accounts:
             if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
                 self.active_account = account
@@ -183,14 +186,15 @@ class NetworkStack(object):
         if connection:
             logger.debug("Working on the next step!")
 
-            if self.active_connection:
-                logger.debug("Testing!")
+            # Remove signal from old connection
+            if 'contact_list_changed' in self.network_stack_signals:
+                self.active_connection.disconnect(self.network_stack_signals['contact_list_changed'])
 
+            # Update connection
+            self.active_connection = connection
             # If signal exists remove it from old connection
 
-            # Modular load_contacts or similar?
-            # Should also begin async on connection and connect to signals contact changes
-
+            # Load Contacts
 
         else:
             logger.error("Unable to acquire connection...")
@@ -204,6 +208,9 @@ class NetworkStack(object):
             contacts = self.active_connection.dup_contact_list()
         else:
             logger.warning("Unable to retreive contacts from connection!")
+
+        # Run registered handlers
+        self.run_callbacks('get_connection_contacts', contacts)
 
         # Connect connection handler for contact updates
         # self.network_stack_signals['contact_list_changed'] =
@@ -239,5 +246,4 @@ class NetworkStack(object):
 
     def run_callbacks(self, event, *args):
         for callback in self.network_stack_callbacks[event]:
-            callback(*args)
-            self.remove_callback(event, callback)
+            callback(callback, event, *args)
