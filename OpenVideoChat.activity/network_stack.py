@@ -137,8 +137,8 @@ class NetworkStack(object):
         # Logic chain to automatically enable and connect account
         if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
             # Check for & remove a status-changed signal from the former account
-            # if 'account_status_changed' in self.network_stack_signals and self.network_stack_signals['account_status_changed'] is not None:
-                # self.active_account.disconnect(self.network_stack_signals['account_status_changed'])
+            if 'account_status_changed' in self.network_stack_signals and self.network_stack_signals['account_status_changed'] is not None:
+                self.active_account.disconnect(self.network_stack_signals['account_status_changed'])
             self.active_account = account
             self.setup_active_account()
         elif not account.is_enabled():
@@ -166,10 +166,23 @@ class NetworkStack(object):
         logger.debug("Configuring Active Account...")
 
         # The account should have a status-changed signal, connect to it here
-        # self.network_stack_signals['account_status_changed'] = self.active_account.connect('status-changed', )
+        self.network_stack_signals['account_status_changed'] = self.active_account.connect(
+            'status-changed',
+            self.update_active_account_status
+        )
 
         # Run Async to prepare the account
         self.active_account.prepare_async(None, self.initialize_connection, None)
+
+    def update_active_account_status(
+        self,
+        account,
+        old_status,
+        new_status,
+        reason,
+        data
+    ):
+        logger.debug("Account status changed...")
 
 
     """ Connection Logic """
@@ -210,7 +223,7 @@ class NetworkStack(object):
             logger.warning("Unable to retreive contacts from connection!")
 
         # Run registered handlers
-        self.run_callbacks('get_connection_contacts', contacts)
+        self.run_callbacks('get_connection_contacts', self, contacts)
 
         # Connect connection handler for contact updates
         # self.network_stack_signals['contact_list_changed'] =
