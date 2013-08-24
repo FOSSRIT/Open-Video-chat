@@ -257,8 +257,17 @@ class NetworkStack(object):
         # Test/Log Contact List
         logger.debug(len(contacts))
 
+        # Try some sort of other thing
+        connection.connect("notify::contact-list-state", self.contact_list_state_changed)
+
         # Connect signal for contact-list-changed
         connection.connect('contact-list-changed', self.contacts_changed_callback)
+
+    def contact_list_state_changed(self, connection, prop):
+        logger.debug("TEST STATE: ")
+        logger.debug(prop)
+        # if connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
+            # self.get_contacts(connection)
 
     def get_connection_contacts(self):
         logger.debug("Grabbing contacts from connection...")
