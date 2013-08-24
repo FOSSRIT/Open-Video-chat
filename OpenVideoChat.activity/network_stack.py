@@ -219,11 +219,14 @@ class NetworkStack(object):
             # Update connection
             self.active_connection = connection
 
+            # Register logic setup for contact callbacks
+            # One should setup async on connection to confirm contact updates
+            # needs test logic to disconnect async if connection changes
+            # multiple possibilities...
+            # self.active_connection.prepare_async(None, self.connection_async_callback, None)
+
             # Load Contacts
             self.get_connection_contacts()
-
-            # Setup async & logic to disconnect async if connection changes
-            # self.active_connection.prepare_async(None, self.connection_async_callback, None)
 
         else:
             logger.error("Unable to acquire connection...")
@@ -256,9 +259,10 @@ class NetworkStack(object):
     """ Callback Handling """
 
     def remove_callback(self, event, callback):
-        for cb in self.network_stack_callbacks[event]:
-            if callback is cb:
-                self.network_stack_callbacks[event].remove(callback)
+        if event in self.network_stack_callbacks:
+            for cb in self.network_stack_callbacks[event]:
+                if callback is cb:
+                    self.network_stack_callbacks[event].remove(callback)
 
     def register_callback(self, event, callback):
         # If no key exists define it with a list
@@ -269,5 +273,6 @@ class NetworkStack(object):
         self.network_stack_callbacks[event].append(callback)
 
     def run_callbacks(self, event, *args):
-        for callback in self.network_stack_callbacks[event]:
-            callback(callback, event, *args)
+        if event in self.network_stack_callbacks:
+            for callback in self.network_stack_callbacks[event]:
+                callback(callback, event, *args)
