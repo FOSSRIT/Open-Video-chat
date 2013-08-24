@@ -226,19 +226,40 @@ class NetworkStack(object):
             # self.active_connection.prepare_async(None, self.connection_async_callback, None)
 
             # Load Contacts
-            self.get_connection_contacts()
+            # self.get_connection_contacts()
+
+            # Try this custom quark manual set of features
+            self.active_connection.prepare_async(
+                [
+                    Tp.Connection.get_feature_quark_contact_list(),
+                    Tp.Connection.get_feature_quark_core(),
+                    0
+                ],
+                self.connection_contacts_callback,
+                None
+            )
 
         else:
             logger.error("Unable to acquire connection...")
+
+    def connection_contacts_callback(self, connection, status, data):
+        # Remove async (Maybe?)
+        # connection.prepare_finish(status)
+
+        # Grab Contacts
+        contacts = connection.dup_contact_list()
+
+        # Test/Log Contact List
+        logger.debug(len(contacts))
+
+        # Connect signal for contact-list-changed
+        connection.connect('contact-list-changed', self.contacts_changed_callback)
 
     def get_connection_contacts(self):
         logger.debug("Grabbing contacts from connection...")
 
         if self.active_connection.get_contact_list_state() is Tp.ContactListState.SUCCESS:
             contacts = self.active_connection.dup_contact_list()
-
-            # TEMPORARILY DEBUG CONTACTS
-            logger.debug(contacts)
 
             # Setup signals for contact list changes
             self.network_stack_signals['contact_list_changed'] = self.active_connection.connect('contact-list-changed', self.contacts_changed_callback)
