@@ -260,9 +260,8 @@ class NetworkStack(object):
 
     def remove_callback(self, event, callback):
         if event in self.network_stack_callbacks:
-            for cb in self.network_stack_callbacks[event]:
-                if callback is cb:
-                    self.network_stack_callbacks[event].remove(callback)
+            if callback in self.network_stack_callbacks[event]:
+                self.network_stack_callbacks[event].remove(callback)
 
     def register_callback(self, event, callback):
         # If no key exists define it with a list
