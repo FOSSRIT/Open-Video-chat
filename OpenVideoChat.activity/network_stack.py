@@ -122,8 +122,9 @@ class NetworkStack(object):
         # This should only ever run once
         self.remove_callback(event, callback)
 
+        self.active_account = None
         for account in accounts:
-            if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+            if self.active_account is None and account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
                 self.active_account = account
 
         if self.active_account:
