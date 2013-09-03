@@ -155,7 +155,7 @@ class AccountManager(Gtk.Grid):
         # Run call to setup process in network stack
         self.switch_active_account(account)
 
-    def add_accounts(self, accounts):
+    def add_accounts(self, callback, event, parent, accounts):
         for account in accounts:
             self.account_list_store.append([account.get_nickname(), account])
 
