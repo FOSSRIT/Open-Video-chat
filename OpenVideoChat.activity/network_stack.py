@@ -96,7 +96,7 @@ class NetworkStack(object):
         self.account_manager.prepare_async(None, self.account_manager_async_callback, None)
 
     def account_manager_async_callback(self, account_manager, status, data):
-        logger.debug("Removing account manager async...")
+        logger.debug("Finishing account manager async...")
         account_manager.prepare_finish(status)
 
         # Run Jabber Accounts
