@@ -63,7 +63,7 @@ class NetworkStack(object):
 
             # Register initial callbacks
             self.register_callback('get_jabber_accounts', self.initialize_account)
-            self.register_callback("setup_active_account", self.close_channels)
+            self.register_callback("setup_active_account", self.close_chat_channels)
             self.register_callback('setup_active_account', self.initialize_connection)
             self.register_callback("new_chat_channel", self.setup_chat_channel)
 
@@ -300,7 +300,7 @@ class NetworkStack(object):
                 if isinstance(channel, Tp.TpTextChannel):
 
                     # Run Callbacks
-                    self.run_callbacks("new_chat_channel", channel, channel.get_initiator())
+                    self.run_callbacks("new_chat_channel", self, channel, channel.get_initiator())
 
         else:
             logger.debug("Chat Requested on inactive account...")
@@ -351,9 +351,9 @@ class NetworkStack(object):
         (channel, context) = request.ensure_and_handle_channel_finish(status)
 
         # Run Registered Callbacks
-        self.run_callbacks("new_chat_channel", channel, contact)
+        self.run_callbacks("new_chat_channel", self, channel, contact)
 
-    def close_chat_channels(self, callback, event, parent):
+    def close_chat_channels(self, callback, event, parent, data):
         logger.debug("Closing open chat channels...")
 
         for (channel, message_handler) in self.close_channels:
@@ -400,7 +400,7 @@ class NetworkStack(object):
         logger.debug("Processing received messsage...")
 
         # Run Registered Callbacks
-        self.run_callbacks("chat_message_received", message, contact)
+        self.run_callbacks("chat_message_received", self, message, contact)
 
     """ Callback Handling """
 
