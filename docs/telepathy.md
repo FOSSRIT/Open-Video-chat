@@ -9,7 +9,7 @@ Let's start with reference links:
 
 The best resource you will find is the Telepathy Client Example.  It is comprehensive, but not without flaws.  Granted, many of the flaws stem from breaks in TelepathyGLib.
 
-Reading the documentation is the same as approaching Gtk3.  It is all written in C, and has the same quirks.  If you haven't read up on this or are unaware how it works, check the [Gtk3 Documentation]() out first.
+Reading the documentation is the same as approaching Gtk3.  It is all written in C, and has the same quirks.  If you haven't read up on this or are unaware how it works, check the [Gtk3 Documentation](gtk3.md) out first.
 
 ## Contents
 
