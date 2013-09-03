@@ -207,8 +207,12 @@ class Gui(Gtk.Grid):
         # Run method to create a chat channel
         self.create_chat_channel(contact)
 
-    def activate_chat(self, contact, channel):
+    def activate_chat(self, callback, event, parent, contact, channel):
         logger.debug("Chat services enabled on first-channel established...")
+
+        # Find row with contact in list store
+        # Add channel to row
+        # Debug output to verify both channel and text buffer exist
 
         # Enable Chat GtkButton & GtkEntry
         self.chat_entry.set_sensitive(True)
@@ -217,27 +221,33 @@ class Gui(Gtk.Grid):
         # Set focus into chat entry
         self.chat_entry.grab_focus()
 
+    def deactive_chat(self, callback, event, parent, account):
+        self.chat_entry.set_sensitive(False)
+        self.chat_send_message_button.set_sensitive(False)
+
     """ Chat Methods """
 
     def send_message(self, sender):
         if self.chat_entry.get_text() != "":
             message = self.chat_entry.get_text()
-            self.send_chat_message(message)   # Send message over the wire
 
-            # Post message from self immediately?
-            # self.receive_message(self.network_stack.username, message)
+            # Send Message
+            self.send_chat_message(message)
+
+            # Run receive_message callback manually from network stack to handle posting locally
+            # Gotta make sure it won't create duplicates though once message_received is properly setup
 
             self.chat_entry.set_text("")      # Empty Chat Entry
             self.chat_entry.grab_focus()      # Set focus back to chat entry
 
     def chat_write_line(self, line):
+
+        # Write a message
         self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), line + "\n", -1)
-
-    def receive_message(self, contact, message):
-        logger.debug("Posting received message...")
-
-        # Add Message
-        self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), "%s [%s]: %s\n" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
 
         # Scroll to bottom
         self.chat_text_view.scroll_to_iter(self.chat_text_view.get_buffer().get_end_iter(), 0.1, False, 0.0, 0.0)
+
+    def receive_message(self, contact, message):
+        logger.debug("Posting received message...")
+        self.chat_write_line("%s [%s]: %s" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message))

@@ -46,6 +46,7 @@ class NetworkStack(object):
     """ Properties """
     active_account = None
     active_connection = None
+    close_channels = []
 
 
     def __init__(self, callbacks={}):
@@ -62,7 +63,9 @@ class NetworkStack(object):
 
             # Register initial callbacks
             self.register_callback('get_jabber_accounts', self.initialize_account)
+            self.register_callback("setup_active_account", self.close_channels)
             self.register_callback('setup_active_account', self.initialize_connection)
+            self.register_callback("new_chat_channel", self.setup_chat_channel)
 
             # Run first async process to startup the system
             self.account_manager_async()
@@ -102,6 +105,8 @@ class NetworkStack(object):
         # Run Jabber Accounts
         self.get_jabber_accounts(account_manager)
 
+        # Register listener for incoming chat requests
+        self.listen_for_incoming_chat(account_manager)
 
     """ Account Logic """
 
@@ -233,9 +238,6 @@ class NetworkStack(object):
             self.contacts_add_remove
         )
 
-        # Begin listening for chat messages
-        self.listen_for_incoming_chat()
-
         logger.debug("Connection Established")
 
     def contacts_add_remove(self, added, removed, *args):
@@ -246,59 +248,14 @@ class NetworkStack(object):
         # Run callback for changes to the contact list
         self.run_callbacks("contacts_changed", self, added, removed)
 
-    """ Chat Channel Logic """
+    """ Channel Logic """
 
-    def create_chat_channel(self, contact):
-        logger.debug("Setting up outgoing chat channel...")
-
-        # Describe the channel type (text)
-        channel_description = {
-            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
-            Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
-        }
-
-        # Request the channel
-        request = Tp.AccountChannelRequest.new(
-            self.account,                              # Account
-            channel_description,                       # Dict of channel properties
-            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
-        )
-
-        # Run this asynchronously
-        request.ensure_and_handle_channel_async(
-            None,                              # Whether it can be cancelled
-            self.create_chat_channel_callback, # Callback to run when done
-            None                               # Custom Data sent to callback
-        )
-
-        # Private channels are not named, only group channels (MUC for Multi-User Channel)
-        # Because they are not named, only one can exist at a time
-        # This also means that `ensure` is better than create in this case
-
-    def create_chat_channel_callback(self, request, status, contact):
-        logger.debug("Chat channel approved and initiating...")
-
-        # Remove async process & grab channel plus context
-        (channel, context) = request.ensure_and_handle_channel_finish(status)
-
-        # Run shared setup process
-        self.setup_chat_channel(contact, channel)
-
-    def setup_chat_channel(self, contact, channel):
-
-        # Run Registered Callbacks
-        self.run_callbacks("setup_chat_channel", contact, channel)
-
-        # Add listener for received messages
-        channel.connect('message-received', self.receive_chat_message, contact)
-
-    def listen_for_incoming_chat(self):
+    def listen_for_incoming_chat(self, account_manager):
         logger.debug("Listening for incoming connections...")
 
-        # Define handler for new channels
+        # Create a TpBaseClient to handle incoming chat requests
         self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
-            self.account_manager,              # As specified in the method name
+            account_manager,              # As specified in the method name
             False,                             # bypass approval (dbus related)
             False,                             # Whether to implement requests (more work but allows optional accept or deny)
             "ChatHandler",                     # Name of handler
@@ -307,14 +264,14 @@ class NetworkStack(object):
             None                               # Custom data to pass to callback
         )
 
-        # Describe the channel (a chat channel)
+        # Describe the channel we care about (a chat channel)
         handler.add_handler_filter({
             Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
             Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
             Tp.PROP_CHANNEL_REQUESTED: False,
         })
 
-        # Register the handler
+        # Register the handler, we will receive information going forward.
         handler.register()
 
         logger.debug("Now listening for incoming chat requests...")
@@ -332,42 +289,90 @@ class NetworkStack(object):
     ):
         logger.debug("SimpleHandler received request for channel...")
 
-        # Check that each channel is a Tp.TextChannel
-        # For each TextChannel check get_target_contact OR get_initiator_contact (if is not self)
-        # Then send those to the shared create_chat_channel_callback method
+        if account is self.active_account:
+            logger.debug("Is active account, continue!")
 
-        # for channel in channels:
-            # if channel is Tp.TextChannel:
-                # contact = channel.get_target_contact() or channel.get_initiator_contact()
-                # if contact:
-                    # self.setup_chat_channel(contact, channel)
-                    # Accept Channel
-                    # Assign close handler for when closed
+            # Accept Context
+            context.accept()
 
-        #     print "Accepting tube"
-        #     channel.connect('invalidated', tube_invalidated_cb, loop)
-        #     channel.accept_async(tube_accept_cb, loop)
-        # context.accept()
+            # Process Channels
+            for channel in channels:
+                if isinstance(channel, Tp.TpTextChannel):
 
-    def close_chat_channels(self, channels):
-        logger.debug("Closing any existing chat channels...")
+                    # Run Callbacks
+                    self.run_callbacks("new_chat_channel", channel, channel.get_initiator())
 
-        # for channel in channels:
-            # channel.call_close()
-            # channel.close()
-            # channel.close_async()
-            # channel.leave_async()
+        else:
+            logger.debug("Chat Requested on inactive account...")
+
+            # Decline Context
+            context.fail()
+
+    def setup_chat_channel(self, callback, event, parent, channel, contact):
+
+        # Connect to receive-message
+        message_handler = channel.connect('message-received', self.receive_chat_message, contact)
+
+        # Add to close list with handler id
+        self.close_channels.append([channel, message_handler])
+
+    def request_chat_channel(self, contact):
+        logger.debug("Setting up outgoing chat channel...")
+
+        # Describe the channel type (text)
+        channel_description = {
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
+        }
+
+        # Request the channel from the account
+        request = Tp.AccountChannelRequest.new(
+            self.active_account,                        # Current Account
+            channel_description,                        # Dict of channel properties
+            Tp.USER_ACTION_TIME_NOT_USER_ACTION         # Time stamp of action (0 also works)
+        )
+
+        # Run this asynchronously and execute the callback
+        request.ensure_and_handle_channel_async(
+            None,                                       # Whether it can be cancelled
+            self.chat_channel_request_callback,         # Callback to run when done
+            contact                                     # Custom Data sent to callback
+        )
+
+        # Private channels are not named, only group channels (MUC for Multi-User Channel)
+        # Because they are not named, only one can exist at a time
+        # This also means that `ensure` is better than create in this case
+
+    def chat_channel_request_callback(self, request, status, contact):
+        logger.debug("Chat channel approved and initiating...")
+
+        # Remove async process & grab channel plus context
+        (channel, context) = request.ensure_and_handle_channel_finish(status)
+
+        # Run Registered Callbacks
+        self.run_callbacks("new_chat_channel", channel, contact)
+
+    def close_chat_channels(self, callback, event, parent):
+        logger.debug("Closing open chat channels...")
+
+        for (channel, message_handler) in self.close_channels:
+
+            # Disconnect Handler
+            channel.disconnect(message_handler)
+
+            # Close Channel
+            channel.leave_async(
+                Tp.ChannelChangeGroupReason.OFFLINE,
+                "Exited OVC.",
+                (lambda c, s, d: c.leave_finish(s)),
+                None
+            )
 
     """ Chat Methods """
 
     def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
         logger.debug("Sending a message over the wire...")
-
-        # Verifiy connection status before trying to send a message
-        if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
-            logger.debug("Disconnected, cannot send a message")
-            # **FIXME** Add handling to message user that they are disconnected and no message could be sent
-            return False
 
         # Wrap our message in a Telepathy Message object
         message_container = Tp.ClientMessage.new_text(message_type, message)
@@ -395,9 +400,7 @@ class NetworkStack(object):
         logger.debug("Processing received messsage...")
 
         # Run Registered Callbacks
-        # self.run_callbacks("chat_message_received", message, contact)
-
-
+        self.run_callbacks("chat_message_received", message, contact)
 
     """ Callback Handling """
 

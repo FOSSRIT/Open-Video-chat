@@ -73,18 +73,23 @@ class OpenVideoChat(Gtk.Window):
             ],
             "setup_active_account": [
                 self.accounts.display_active_account,
+                self.gui.deactive_chat,
             ],
             "reset_contacts": [
                 self.gui.reset_contacts,
             ],
-            "something": [
+            "new_chat_channel": [
                 self.gui.activate_chat,
+            ],
+            "chat_message_received": [
+                self.gui.chat_message_received,
             ],
         })
 
         # Register methods to network stack directly onto the ui components
         self.accounts.switch_active_account = self.network_stack.switch_active_account
-        self.gui.create_chat_channel = self.network_stack.create_chat_channel
+        self.gui.create_chat_channel = self.network_stack.request_chat_channel
+        self.gui.send_chat_message = self.network_stack.send_chat_message
 
         """ Setup GStreamer Stack """
 
@@ -92,7 +97,7 @@ class OpenVideoChat(Gtk.Window):
         logger.info("Open Video Chat Prepared")
 
     def can_close(self):
-        # Run channel closure on network_stack (may require async handling)
+        self.network_stack.close_chat_channels(None, None, None)
         return True
 
     def on_resize(self, trigger):
