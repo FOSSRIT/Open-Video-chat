@@ -169,7 +169,12 @@ class Gui(Gtk.Grid):
     """ Contact Methods """
 
     def reset_contacts(self, callback, event, parent):
+
+        # Clear the list
         self.user_list_store.clear()
+
+        # Remove the text buffer
+        self.chat_text_view.set_buffer(Gtk.TextBuffer())
 
     def add_remove_contacts(self, callback, event, parent, add_contacts, remove_contacts):
 
