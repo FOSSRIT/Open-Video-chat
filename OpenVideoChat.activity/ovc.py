@@ -97,7 +97,7 @@ class OpenVideoChat(Gtk.Window):
         logger.info("Open Video Chat Prepared")
 
     def can_close(self):
-        self.network_stack.close_chat_channels(None, None, None)
+        self.network_stack.close_chat_channels(None, None, None, None)
         return True
 
     def on_resize(self, trigger):
