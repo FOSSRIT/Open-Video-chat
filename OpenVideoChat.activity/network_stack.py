@@ -369,6 +369,9 @@ class NetworkStack(object):
                 None
             )
 
+        # Empty Channels again
+        self.close_channels = []
+
     """ Chat Methods """
 
     def send_chat_message(self, channel, message, message_type=Tp.ChannelTextMessageType.NORMAL):
