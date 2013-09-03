@@ -69,7 +69,12 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
-        self.network_stack.setup()
+
+        # Also Handle connections the sugar way
+        # if self.shared_activity:
+        #     self.sharing_handler = self.connect("joined", self.network_stack.start_chat_and_video)
+        # else:
+        #     self.sharing_handler = self.connect("shared", self.network_stack.start_chat_and_video)
 
         logger.debug("Open Video Chat Prepared")
 
