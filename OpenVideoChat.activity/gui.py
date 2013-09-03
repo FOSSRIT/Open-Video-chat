@@ -214,9 +214,10 @@ class Gui(Gtk.Grid):
     def activate_chat(self, callback, event, parent, contact, channel):
         logger.debug("Chat services enabled on first-channel established...")
 
-        # Find row with contact in list store
-        # Add channel to row
-        # Debug output to verify both channel and text buffer exist
+        # Find row with contact & add channel
+        for row in self.user_list_store:
+            if contact is row[1]:
+                row[3] = channel
 
         # Enable Chat GtkButton & GtkEntry
         self.chat_entry.set_sensitive(True)
