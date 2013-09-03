@@ -2,4 +2,7 @@
 # Open Video Chat Launcher script
 
 from ovc import OpenVideoChat
-OpenVideoChat()
+from gi.repository import Gtk
+ovc_instance = OpenVideoChat()
+ovc_instance.connect("delete-event", lambda w, s: ovc_instance.can_close() and Gtk.main_quit())
+Gtk.main()

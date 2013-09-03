@@ -52,8 +52,7 @@ class OpenVideoChat(Gtk.Window):
         # Assume a default size of 1200x900
         self.set_default_size(DEFAULT_WINDOW_SIZE['width'], DEFAULT_WINDOW_SIZE['height'])
 
-        # Connect Window Event Signals
-        self.connect("delete-event", lambda w, s: self.can_close() and Gtk.main_quit())
+        # Connect Internal Window Event Signals
         self.connect('check-resize', self.on_resize)
 
         """ Setup GUI """
@@ -66,6 +65,17 @@ class OpenVideoChat(Gtk.Window):
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack()
+
+        # Supply network stack with callbacks
+        self.network_stack.register_callback("get_jabber_accounts", self.accounts.add_accounts)
+        self.network_stack.register_callback("contacts_changed", self.gui.add_remove_contacts)
+        self.network_stack.register_callback("reset_contacts", self.gui.reset_contacts)
+
+        # Supply other components with callback methods (until the callback system can be expanded)
+        self.accounts.switch_active_account = self.network_stack.switch_active_account
+        self.gui.create_text_channel = self.network_stack.create_text_channel
+
+
         # self.network_stack.populate_accounts_callback(self.accounts.add_account_to_list)
         # self.network_stack.setup()
 
@@ -84,8 +94,7 @@ class OpenVideoChat(Gtk.Window):
         """ Setup GStreamer Stack """
 
         # Proceed with Application Loop
-        logger.debug("Open Video Chat Prepared")
-        Gtk.main()
+        logger.info("Open Video Chat Prepared")
 
     def can_close(self):
         # self.network_stack.close_chat_channel()  # Close Chat Channel(s)
@@ -93,7 +102,8 @@ class OpenVideoChat(Gtk.Window):
         return True
 
     def on_resize(self, trigger):
-        # On resize adjust displayed components (may not be needed)
+        # Logic for resize, probably unnecessary but could be tied to
+        # GStreamer for scaling if feasible, but scaling eats more CPU
         return False
 
     def swap_grids(self, *args):
