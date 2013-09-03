@@ -164,11 +164,13 @@ class AccountManager(Gtk.Grid):
         params = account.dup_parameters_vardict()
 
         # Populate text fields with username, password & server (if able)
-        self.account_name_entry.set_text(account.get_display_name())
-        if "password" in params:
-            self.account_password_entry.set_text(params['password'])
-        if "server" in params:
-            self.server_entry.set_text(params["server"])
+        self.account_name_entry.set_text(account.get_normalized_name())
+
+        logger.debug(params)
+        # if "password" in params:
+        #     self.account_password_entry.set_text(params['password'])
+        # if "server" in params:
+        #     self.server_entry.set_text(params["server"])
 
     def add_accounts(self, callback, event, parent, accounts):
         for account in accounts:
