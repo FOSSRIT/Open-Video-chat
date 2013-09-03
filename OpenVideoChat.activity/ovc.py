@@ -82,7 +82,7 @@ class OpenVideoChat(Gtk.Window):
                 self.gui.activate_chat,
             ],
             "chat_message_received": [
-                self.gui.chat_message_received,
+                self.gui.receive_message,
             ],
         })
 
