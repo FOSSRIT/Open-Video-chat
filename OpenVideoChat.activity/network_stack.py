@@ -138,7 +138,9 @@ class NetworkStack(object):
         logger.debug("Switching accounts...")
 
         # Logic chain to automatically enable and connect account
-        if account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+        if account is self.active_account:
+            logger.warning("Account is already active!")
+        elif account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
 
             # Check for & remove a status-changed signal from the former account
             if 'account_status_changed' in self.network_stack_signals and self.network_stack_signals['account_status_changed'] is not None:
