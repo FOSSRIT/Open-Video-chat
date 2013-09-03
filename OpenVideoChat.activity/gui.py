@@ -211,7 +211,7 @@ class Gui(Gtk.Grid):
             # Run method to create a chat channel
             self.create_chat_channel(contact)
 
-    def activate_chat(self, callback, event, parent, contact, channel):
+    def activate_chat(self, callback, event, parent, channel, contact):
         logger.debug("Chat services enabled on first-channel established...")
 
         # Find row with contact & add channel
