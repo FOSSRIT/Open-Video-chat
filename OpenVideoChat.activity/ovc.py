@@ -81,7 +81,7 @@ class OpenVideoChat(Gtk.Window):
 
         # Register methods to network stack directly onto the ui components
         self.accounts.switch_active_account = self.network_stack.switch_active_account
-        self.gui.create_text_channel = self.network_stack.create_text_channel
+        self.gui.create_chat_channel = self.network_stack.create_chat_channel
 
         """ Setup GStreamer Stack """
 

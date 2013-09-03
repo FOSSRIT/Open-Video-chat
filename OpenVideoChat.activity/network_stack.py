@@ -48,7 +48,7 @@ class NetworkStack(object):
     active_connection = None
 
 
-    def __init__(self, **callbacks):
+    def __init__(self, callbacks={}):
         logger.debug("Preparing Network Stack...")
 
         # Create dicts for signals and callbacks

@@ -46,6 +46,8 @@ class AccountManager(Gtk.Grid):
         logger.debug("Displaying Content")
         self.show_all()
 
+        logger.info("Prepared Account Manager")
+
     def build_list(self):
 
         logger.debug("Creating Account List...")
