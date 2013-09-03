@@ -61,6 +61,7 @@ class NetworkStack(object):
 
             # Register initial callbacks
             self.register_callback('get_jabber_accounts', self.initialize_account)
+            self.register_callback('setup_active_account', self.initialize_connection)
 
             # Run first async process to startup the system
             self.account_manager_async()
@@ -82,24 +83,10 @@ class NetworkStack(object):
         ])
         factory.add_connection_features([
             Tp.Connection.get_feature_quark_contact_list(),      # Get the contact list as a "feature"
-            Tp.Connection.get_feature_quark_contact_groups(),    # Contact Groups?
-            Tp.Connection.get_feature_quark_contact_blocking(),  # Contact Blocking?
         ])
         factory.add_contact_features([
             Tp.ContactFeature.ALIAS,                             # Get contact ALIAS's from system
-            Tp.ContactFeature.CONTACT_GROUPS,                    #
-            Tp.ContactFeature.PRESENCE,                          #
-            Tp.ContactFeature.AVATAR_DATA,                       #
-            Tp.ContactFeature.SUBSCRIPTION_STATES,               #
-            Tp.ContactFeature.CAPABILITIES,                      #
-            Tp.ContactFeature.CONTACT_INFO,                      #
-            Tp.ContactFeature.LOCATION,                          #
-            Tp.ContactFeature.CONTACT_BLOCKING,                  #
         ])
-
-        # Right now the feature descriptions are not well defined
-        # many of the above may be totally unneeded
-        # Once everything is working we can systematically remove features to see what breaks
 
         logger.debug("Configured Telepathy")
 
@@ -186,8 +173,8 @@ class NetworkStack(object):
             self.update_active_account_status
         )
 
-        # Run Async to prepare the account
-        self.active_account.prepare_async(None, self.initialize_connection, None)
+        # Run callbacks
+        self.run_callbacks('setup_active_account', self, self.active_account)
 
     def update_active_account_status(
         self,
@@ -196,8 +183,7 @@ class NetworkStack(object):
         new_status,
         reason,
         dbus_error_name,
-        details,
-        data
+        details
     ):
         logger.debug("Account status changed...")
         # No logic or handlers have been added here yet
@@ -205,17 +191,13 @@ class NetworkStack(object):
 
     """ Connection Logic """
 
-    def initialize_connection(self, account, status, data):
+    def initialize_connection(self, callback, event, parent, account):
         logger.debug("Initializing connection...")
-
-        # Finish account async
-        account.prepare_finish(status)
 
         # Grab the connection
         connection = account.get_connection()
 
         if connection:
-            logger.debug("Working on the next step!")
 
             # Remove signal from old connection
             if 'contact_list_changed' in self.network_stack_signals:
@@ -224,74 +206,204 @@ class NetworkStack(object):
             # Update connection
             self.active_connection = connection
 
-            # Register logic setup for contact callbacks
-            # One should setup async on connection to confirm contact updates
-            # needs test logic to disconnect async if connection changes
-            # multiple possibilities...
-            # self.active_connection.prepare_async(None, self.connection_async_callback, None)
+            # Setup Connection
+            self.connection_setup()
 
-            # Load Contacts
-            # self.get_connection_contacts()
-
-            # Try this custom quark manual set of features
-            self.active_connection.prepare_async(
-                [
-                    Tp.Connection.get_feature_quark_contact_list(),
-                    Tp.Connection.get_feature_quark_core(),
-                    0
-                ],
-                self.connection_contacts_callback,
-                None
-            )
+            logger.debug("Connection Initialized")
 
         else:
             logger.error("Unable to acquire connection...")
 
-    def connection_contacts_callback(self, connection, status, data):
-        # Remove async (Maybe?)
-        # connection.prepare_finish(status)
+    def connection_setup(self):
+        logger.debug("Setting up connection...")
 
-        # Grab Contacts
-        contacts = connection.dup_contact_list()
+        # Wipe out the previous contacts array
+        self.run_callbacks('reset_contacts', self)
 
-        # Test/Log Contact List
-        logger.debug(len(contacts))
+        # Dup Contacts
+        contacts = self.active_connection.dup_contact_list()
 
-        # Try some sort of other thing
-        connection.connect("notify::contact-list-state", self.contact_list_state_changed)
+        # Send to the contacts add/remove method
+        self.contacts_add_remove(contacts, None)
 
-        # Connect signal for contact-list-changed
-        connection.connect('contact-list-changed', self.contacts_changed_callback)
+        # Connect Signal for future changes to the list
+        self.network_stack_signals['contact_list_changed'] = self.active_connection.connect(
+            'contact-list-changed',
+            self.contacts_add_remove
+        )
 
-    def contact_list_state_changed(self, connection, prop):
-        logger.debug("TEST STATE: ")
-        logger.debug(prop)
-        # if connection.get_contact_list_state() == Tp.ContactListState.SUCCESS:
-            # self.get_contacts(connection)
 
-    def get_connection_contacts(self):
-        logger.debug("Grabbing contacts from connection...")
+        logger.debug("Connection Established")
 
-        if self.active_connection.get_contact_list_state() is Tp.ContactListState.SUCCESS:
-            contacts = self.active_connection.dup_contact_list()
-
-            # Setup signals for contact list changes
-            self.network_stack_signals['contact_list_changed'] = self.active_connection.connect('contact-list-changed', self.contacts_changed_callback)
-
-            # Run registered handlers
-            self.run_callbacks('get_connection_contacts', self, contacts)
-
-        else:
-            logger.warning("Unable to retreive contacts from connection!")
-
-    def contacts_changed_callback(self, added, removed, data):
+    def contacts_add_remove(self, added, removed, data):
         logger.debug("Received change to contacts...")
 
-    def connection_async_callback(self, connection, status, data):
-        # Alternative logic has us reset the callback while is
-        # Still need to test whether the first approach works for notifying of changes to contact list
-        if self.active_connection is not connection:
-            connection.prepare_finish(status)
+        # Update the locally kept contact list(s)?
+
+        # Run callback for changes to the contact list
+        self.run_callbacks("contacts_changed", self, added, removed)
+
+    """ Chat Channel Logic """
+
+    def create_chat_channel(self, contact):
+        logger.debug("Setting up outgoing chat channel...")
+
+        # Describe the channel type (text)
+        channel_description = {
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
+        }
+
+        # Request the channel
+        request = Tp.AccountChannelRequest.new(
+            self.account,                              # Account
+            channel_description,                       # Dict of channel properties
+            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
+        )
+
+        # Run this asynchronously
+        request.ensure_and_handle_channel_async(
+            None,                              # Whether it can be cancelled
+            self.create_chat_channel_callback, # Callback to run when done
+            callback                           # Custom Data sent to callback
+        )
+
+        # Private channels are not named, only group channels (MUC for Multi-User Channel)
+        # Because they are not named, only one can exist at a time
+        # This also means that `ensure` is better than create in this case
+
+    def create_chat_channel_callback(self, request, status, contact):
+        logger.debug("Chat channel approved and initiating...")
+
+        # Remove async process & grab channel plus context
+        (channel, context) = request.ensure_and_handle_channel_finish(status)
+
+        # Run shared setup process
+        self.setup_chat_channel(contact, channel)
+
+    def setup_chat_channel(self, contact, channel):
+
+        # Run Registered Callbacks
+        self.run_callbacks("setup_chat_channel", contact, channel)
+
+        # Add listener for received messages
+        channel.connect('message-received', self.chat_message_received, contact)
+
+    def chat_message_received(self, channel, message, contact):
+        logger.debug("Processing received message...")
+
+        # Run Registered Callbacks
+        # self.run_callbacks("chat_message_received", message, contact)
+
+    def listen_for_incoming_chat(self):
+        logger.debug("Listening for incoming connections...")
+
+        # Define handler for new channels
+        self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
+            self.account_manager,              # As specified in the method name
+            False,                             # bypass approval (dbus related)
+            False,                             # Whether to implement requests (more work but allows optional accept or deny)
+            "ChatHandler",                     # Name of handler
+            False,                             # dbus uniquify-name token
+            self.incoming_chat_channel,        # The callback
+            None                               # Custom data to pass to callback
+        )
+
+        # Describe the channel (a chat channel)
+        handler.add_handler_filter({
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_REQUESTED: False,
+        })
+
+        # Register the handler
+        handler.register()
+
+        logger.debug("Now listening for incoming chat requests...")
+
+    def incoming_chat_channel(
+        self,
+        handler,
+        account,
+        connection,
+        channels,
+        requests,
+        user_action_time,
+        context,
+        loop
+    ):
+        logger.debug("SimpleHandler received request for channel...")
+
+        # Check that each channel is a Tp.TextChannel
+        # For each TextChannel check get_target_contact OR get_initiator_contact (if is not self)
+        # Then send those to the shared create_chat_channel_callback method
+
+        # for channel in channels:
+            # if channel is Tp.TextChannel:
+                # contact = channel.get_target_contact() or channel.get_initiator_contact()
+                # if contact:
+                    # self.setup_chat_channel(contact, channel)
+                    # Accept Channel
+                    # Assign close handler for when closed
+
+    #     print "Accepting tube"
+    #     channel.connect('invalidated', tube_invalidated_cb, loop)
+    #     channel.accept_async(tube_accept_cb, loop)
+    # context.accept()
+
+    def close_chat_channels(self, channels):
+        logger.debug("Closing any existing chat channels...")
+
+        # for channel in channels:
+            # channel.call_close()
+            # channel.close()
+            # channel.close_async()
+            # channel.leave_async()
+
+    def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
+        logger.debug("Sending a message over the wire...")
+
+        # Verifiy connection status before trying to send a message
+        if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
+            logger.debug("Disconnected, cannot send a message")
+            # **FIXME** Add handling to message user that they are disconnected and no message could be sent
+            return False
+
+        # Wrap our message in a Telepathy Message object
+        message_container = Tp.ClientMessage.new_text(message_type, message)
+
+        # Send asynchronous message
+        self.chat_channel.send_message_async(
+            message_container,  # Telepathy ClientMessage object
+            0,                  # Optional Message Sending Flags
+            None,               # Callback (server-received confirmation)
+            None                # Data for callback
+        )
+
+        # The message sending flags are numeric constants representing features
+        # currently these include delivery, read, and deleted confirmation
+        # The numeric representation uses bit-mapping increments (1, 2, 4, etc)
+        # in this way 3 represents the combination of 1 + 2, or two-enabled features
+
+        # Technically, they are missing a NONE constant to represent 0
+        # hence why supplying 0 is the same as saying "use no features"
+        # and supplying None will throw an error
+
+        # **Also** server callback is not the same as user-delivery confirmation
+
+
+    def set_chat_activation(self, callback):
+        logger.debug("Defined chat activation in network stack...")
+        self.activate_chat = callback
+
+    def set_populate_users(self, callback):
+        logger.debug("Adding callback to add users to gui...")
+        self.add_user_to_gui = callback
+
+
+
+
 
 
     """ Callback Handling """
