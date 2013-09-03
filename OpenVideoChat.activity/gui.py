@@ -236,8 +236,14 @@ class Gui(Gtk.Grid):
         if self.chat_entry.get_text() != "":
             message = self.chat_entry.get_text()
 
+            # Get Channel
+            channel = None
+            for row in self.user_list_store:
+                if row[2] is self.chat_text_view.get_buffer():
+                    channel = row[3]
+
             # Send Message
-            self.send_chat_message(message)
+            self.send_chat_message(channel, message)
 
             # Run receive_message callback manually from network stack to handle posting locally
             # Gotta make sure it won't create duplicates though once message_received is properly setup

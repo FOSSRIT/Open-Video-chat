@@ -371,7 +371,7 @@ class NetworkStack(object):
 
     """ Chat Methods """
 
-    def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
+    def send_chat_message(self, channel, message, message_type=Tp.ChannelTextMessageType.NORMAL):
         logger.debug("Sending a message over the wire...")
 
         # Wrap our message in a Telepathy Message object
