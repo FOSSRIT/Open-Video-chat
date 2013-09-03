@@ -46,6 +46,7 @@ class NetworkStack(object):
     """ Properties """
     active_account = None
     active_connection = None
+    active_call = None
     close_channels = []
 
 
@@ -85,14 +86,16 @@ class NetworkStack(object):
         factory.add_account_features([
             Tp.Account.get_feature_quark_connection()               # Pull the connections for the accounts
         ])
-        factory.add_channel_features([
-            Tp.TextChannel.get_feature_quark_incoming_messages(),   # Why would we want to receive messages when using communication software by default?
-        ])
         factory.add_connection_features([
             Tp.Connection.get_feature_quark_contact_list(),         # Get the contact list as a "feature"
         ])
         factory.add_contact_features([
             Tp.ContactFeature.ALIAS,                                # Get contact ALIAS's from system
+        ])
+        factory.add_channel_features([
+            Tp.Channel.get_feature_quark_contacts(),                # Make sure we have contacts on the channel
+            Tp.TextChannel.get_feature_quark_chat_states(),         # Gets us additional message info
+            Tp.TextChannel.get_feature_quark_incoming_messages(),   # Why would we want to receive messages when using communication software by default?
         ])
 
         logger.debug("Configured Telepathy")
@@ -263,7 +266,7 @@ class NetworkStack(object):
             account_manager,              # As specified in the method name
             False,                             # bypass approval (dbus related)
             False,                             # Whether to implement requests (more work but allows optional accept or deny)
-            "ChatHandler",                     # Name of handler
+            "OVCChatHandler",                  # Name of handler
             False,                             # dbus uniquify-name token
             self.incoming_chat_channel,        # The callback
             None                               # Custom data to pass to callback
@@ -275,6 +278,11 @@ class NetworkStack(object):
             Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
             Tp.PROP_CHANNEL_REQUESTED: False,
         })
+
+        # Tell dbus to let everything know this can handle messages
+        handler.add_handler_capabilities([
+            Tp.IFACE_CHANNEL_INTERFACE_MESSAGES,
+        ])
 
         # Register the handler, we will receive information going forward.
         handler.register()
