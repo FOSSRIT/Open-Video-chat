@@ -202,11 +202,14 @@ class Gui(Gtk.Grid):
         # Set GtkTextBuffer to main window
         self.chat_text_view.set_buffer(self.user_list_store[selected_index][2])
 
-        # Local message notifying chat is being enabled with selected user
-        self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
+        # If no channel exists try to establish one
+        if self.user_list_store[selected_index][3] is None:
 
-        # Run method to create a chat channel
-        self.create_chat_channel(contact)
+            # Local message notifying chat is being enabled with selected user
+            self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
+
+            # Run method to create a chat channel
+            self.create_chat_channel(contact)
 
     def activate_chat(self, callback, event, parent, contact, channel):
         logger.debug("Chat services enabled on first-channel established...")
