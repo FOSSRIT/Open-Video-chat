@@ -71,6 +71,9 @@ class OpenVideoChat(Gtk.Window):
             "contacts_changed": [
                 self.gui.add_remove_contacts,
             ],
+            "setup_active_account": [
+                self.accounts.display_active_account,
+            ],
             "reset_contacts": [
                 self.gui.reset_contacts,
             ],
