@@ -219,20 +219,25 @@ class Gui(Gtk.Grid):
     def activate_chat(self, callback, event, parent, channel, contact):
         logger.debug("Chat services enabled on first-channel established...")
 
-        # Find row with contact & add channel
-        for row in self.user_list_store:
-            if contact is row[1]:
-                row[3] = channel
-
         # Enable Chat GtkButton & GtkEntry
         self.chat_entry.set_sensitive(True)
         self.chat_send_message_button.set_sensitive(True)
 
-        # Shrink users list
-        self.user_list_expander.set_expanded(False)
+        # Find row with contact & add channel
+        for row in self.user_list_store:
 
-        # Set focus into chat entry
-        self.chat_entry.grab_focus()
+            # Add Channel to Row
+            if contact is row[1]:
+                row[3] = channel
+
+                # If contact is selected (buffer match) then do the reset:
+                if self.chat_text_view.get_buffer() is row[2]:
+
+                    # Shrink users list
+                    self.user_list_expander.set_expanded(False)
+
+                    # Set focus into chat entry
+                    self.chat_entry.grab_focus()
 
     def deactive_chat(self, callback, event, parent, account):
         self.chat_entry.set_sensitive(False)
