@@ -157,7 +157,7 @@ class Gui(Gtk.Grid):
         user_list_grid.attach(user_list_search_entry, 0, 1, 1, 1)
 
         # Create an expander to show the users on-demand & display all components
-        user_list_expander = Gtk.Expander(label=_("Users"))
+        self.user_list_expander = user_list_expander = Gtk.Expander(label=_("Users"))
         user_list_expander.add(user_list_grid)
         user_list_expander.show_all()
 
@@ -227,6 +227,9 @@ class Gui(Gtk.Grid):
         # Enable Chat GtkButton & GtkEntry
         self.chat_entry.set_sensitive(True)
         self.chat_send_message_button.set_sensitive(True)
+
+        # Shrink users list
+        self.user_list_expander.set_expanded(False)
 
         # Set focus into chat entry
         self.chat_entry.grab_focus()
