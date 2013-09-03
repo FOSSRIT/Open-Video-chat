@@ -83,13 +83,16 @@ class NetworkStack(object):
 
         # Add features to the shared abstract factory (used by all components)
         factory.add_account_features([
-            Tp.Account.get_feature_quark_connection()            # Pull the connections for the accounts
+            Tp.Account.get_feature_quark_connection()               # Pull the connections for the accounts
+        ])
+        factory.add_channel_features([
+            Tp.TextChannel.get_feature_quark_incoming_messages(),   # Why would we want to receive messages when using communication software by default?
         ])
         factory.add_connection_features([
-            Tp.Connection.get_feature_quark_contact_list(),      # Get the contact list as a "feature"
+            Tp.Connection.get_feature_quark_contact_list(),         # Get the contact list as a "feature"
         ])
         factory.add_contact_features([
-            Tp.ContactFeature.ALIAS,                             # Get contact ALIAS's from system
+            Tp.ContactFeature.ALIAS,                                # Get contact ALIAS's from system
         ])
 
         logger.debug("Configured Telepathy")
