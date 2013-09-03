@@ -110,7 +110,8 @@ class Gui(Gtk.Grid):
         self.user_list_store = Gtk.ListStore(
             str,        # Contact Alias
             object,     # TpContact Object
-            object      # Gtk3 TextBuffer
+            object,     # Gtk3 TextBuffer
+            object      # TpTextChannel
         )
 
         # Missing fields for new messages in contacts no-longer selected
@@ -167,14 +168,6 @@ class Gui(Gtk.Grid):
 
     """ Contact Methods """
 
-    def set_chat_channel_initializer(self, callback):
-        logger.debug("Assigning callback for chat-channel initialization...")
-        self.chat_channel_initializer = callback
-
-    def set_send_chat_message(self, callback):
-        logger.debug("Assigning callback for send-message over chat channel...")
-        self.send_chat_message = callback
-
     def reset_contacts(self):
         self.user_list_store.clear()
 
@@ -185,7 +178,8 @@ class Gui(Gtk.Grid):
             self.user_list_store.append([
                 contact.get_alias(),    # Alias
                 contact,                # TpContact
-                None                   # GtkTextBuffer (if/when activated)
+                None,                   # GtkTextBuffer (if/when activated)
+                None                    # TpTextChannel (if/when connected to)
             ])
 
         # Remove contacts

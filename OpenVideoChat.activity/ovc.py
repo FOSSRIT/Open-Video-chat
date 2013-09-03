@@ -64,32 +64,24 @@ class OpenVideoChat(Gtk.Window):
         self.show()
 
         """ Setup Network Stack """
-        self.network_stack = NetworkStack()
+        self.network_stack = NetworkStack({
+            "get_jabber_accounts": [
+                self.accounts.add_accounts,
+            ],
+            "contacts_changed": [
+                self.gui.add_remove_contacts,
+            ],
+            "reset_contacts": [
+                self.gui.reset_contacts,
+            ],
+            "something": [
+                self.gui.activate_chat,
+            ],
+        })
 
-        # Supply network stack with callbacks
-        self.network_stack.register_callback("get_jabber_accounts", self.accounts.add_accounts)
-        self.network_stack.register_callback("contacts_changed", self.gui.add_remove_contacts)
-        self.network_stack.register_callback("reset_contacts", self.gui.reset_contacts)
-
-        # Supply other components with callback methods (until the callback system can be expanded)
+        # Register methods to network stack directly onto the ui components
         self.accounts.switch_active_account = self.network_stack.switch_active_account
         self.gui.create_text_channel = self.network_stack.create_text_channel
-
-
-        # self.network_stack.populate_accounts_callback(self.accounts.add_account_to_list)
-        # self.network_stack.setup()
-
-        # Supply network stack with user population method to add to list
-        # self.network_stack.set_populate_users(self.gui.add_a_contact)
-
-        # Supply network stack with gui chat enabled callback on channel activation
-        # self.network_stack.set_chat_activation(self.gui.activate_chat)
-
-        # Supply gui with network channel establishment callback
-        # self.gui.set_chat_channel_initializer(self.network_stack.setup_chat_channel)
-
-        # Supply gui with send_message network callback
-        # self.gui.set_send_chat_message(self.network_stack.send_chat_message)
 
         """ Setup GStreamer Stack """
 
@@ -97,8 +89,7 @@ class OpenVideoChat(Gtk.Window):
         logger.info("Open Video Chat Prepared")
 
     def can_close(self):
-        # self.network_stack.close_chat_channel()  # Close Chat Channel(s)
-        # **FIXME** Does not wait for async closures
+        # Run channel closure on network_stack (may require async handling)
         return True
 
     def on_resize(self, trigger):

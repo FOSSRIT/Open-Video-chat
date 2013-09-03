@@ -45,6 +45,7 @@ class NetworkStack(object):
 
     """ Properties """
     active_account = None
+    active_connection = None
 
 
     def __init__(self, **callbacks):
@@ -232,6 +233,8 @@ class NetworkStack(object):
             self.contacts_add_remove
         )
 
+        # Begin listening for chat messages
+        self.listen_for_incoming_chat()
 
         logger.debug("Connection Established")
 
@@ -266,7 +269,7 @@ class NetworkStack(object):
         request.ensure_and_handle_channel_async(
             None,                              # Whether it can be cancelled
             self.create_chat_channel_callback, # Callback to run when done
-            callback                           # Custom Data sent to callback
+            None                               # Custom Data sent to callback
         )
 
         # Private channels are not named, only group channels (MUC for Multi-User Channel)
@@ -288,13 +291,7 @@ class NetworkStack(object):
         self.run_callbacks("setup_chat_channel", contact, channel)
 
         # Add listener for received messages
-        channel.connect('message-received', self.chat_message_received, contact)
-
-    def chat_message_received(self, channel, message, contact):
-        logger.debug("Processing received message...")
-
-        # Run Registered Callbacks
-        # self.run_callbacks("chat_message_received", message, contact)
+        channel.connect('message-received', self.receive_chat_message, contact)
 
     def listen_for_incoming_chat(self):
         logger.debug("Listening for incoming connections...")
@@ -347,10 +344,10 @@ class NetworkStack(object):
                     # Accept Channel
                     # Assign close handler for when closed
 
-    #     print "Accepting tube"
-    #     channel.connect('invalidated', tube_invalidated_cb, loop)
-    #     channel.accept_async(tube_accept_cb, loop)
-    # context.accept()
+        #     print "Accepting tube"
+        #     channel.connect('invalidated', tube_invalidated_cb, loop)
+        #     channel.accept_async(tube_accept_cb, loop)
+        # context.accept()
 
     def close_chat_channels(self, channels):
         logger.debug("Closing any existing chat channels...")
@@ -360,6 +357,8 @@ class NetworkStack(object):
             # channel.close()
             # channel.close_async()
             # channel.leave_async()
+
+    """ Chat Methods """
 
     def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
         logger.debug("Sending a message over the wire...")
@@ -392,17 +391,11 @@ class NetworkStack(object):
 
         # **Also** server callback is not the same as user-delivery confirmation
 
+    def receive_chat_message(self, channel, message, contact):
+        logger.debug("Processing received messsage...")
 
-    def set_chat_activation(self, callback):
-        logger.debug("Defined chat activation in network stack...")
-        self.activate_chat = callback
-
-    def set_populate_users(self, callback):
-        logger.debug("Adding callback to add users to gui...")
-        self.add_user_to_gui = callback
-
-
-
+        # Run Registered Callbacks
+        # self.run_callbacks("chat_message_received", message, contact)
 
 
 

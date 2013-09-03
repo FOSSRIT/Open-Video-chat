@@ -153,12 +153,12 @@ class AccountManager(Gtk.Grid):
         # Run call to setup process in network stack
         self.switch_active_account(account)
 
+    def add_accounts(self, accounts):
+        for account in accounts:
+            self.account_list_store.append([account.get_nickname(), account])
+
     def create_account(self):
         logger.debug("Account Creation is Incomplete...")
 
     def delete_account(self):
         logger.debug("Account Deletion is Incomplete...")
-
-    def add_accounts(self, accounts):
-        for account in accounts:
-            self.account_list_store.append([account.get_nickname(), account])
