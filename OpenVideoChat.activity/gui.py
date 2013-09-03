@@ -145,7 +145,7 @@ class Gui(Gtk.Grid):
         user_list_tree_view.connect('row-activated', self.user_selected)
 
         # Build Search Entry
-        user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE, placeholder_text="username...")
+        self.user_list_search_entry = user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE, placeholder_text="username...")
         user_list_search_entry.set_tooltip_text(_("Search for contacts..."))
 
         # Apply the search entry to the Tree View
@@ -160,11 +160,16 @@ class Gui(Gtk.Grid):
         self.user_list_expander = user_list_expander = Gtk.Expander(label=_("Users"))
         user_list_expander.add(user_list_grid)
         user_list_expander.show_all()
+        user_list_expander.connect('notify::expanded', self.find_user_set_focus)
 
         logger.debug("Built User List")
 
         # Return the top-level container
         return user_list_expander
+
+    def find_user_set_focus(self, expander, data):
+        if expander.get_expanded():
+            self.user_list_search_entry.grab_focus()
 
     """ Contact Methods """
 
