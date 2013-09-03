@@ -171,7 +171,7 @@ class Gui(Gtk.Grid):
     def reset_contacts(self, callback, event, parent):
         self.user_list_store.clear()
 
-    def add_remove_contacts(self, add_contacts, remove_contacts):
+    def add_remove_contacts(self, callback, event, parent, add_contacts, remove_contacts):
 
         # Add Contacts
         for contact in add_contacts:
