@@ -200,6 +200,7 @@ class Gui(Gtk.Grid):
             self.user_list_store[selected_index][2] = Gtk.TextBuffer()
 
         # Set GtkTextBuffer to main window
+        self.chat_text_view.set_buffer(self.user_list_store[selected_index][2])
 
         # Local message notifying chat is being enabled with selected user
         self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
