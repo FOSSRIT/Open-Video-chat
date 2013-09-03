@@ -383,7 +383,7 @@ class NetworkStack(object):
         message_container = Tp.ClientMessage.new_text(message_type, message)
 
         # Send asynchronous message
-        self.chat_channel.send_message_async(
+        channel.send_message_async(
             message_container,  # Telepathy ClientMessage object
             0,                  # Optional Message Sending Flags
             None,               # Callback (server-received confirmation)
