@@ -238,7 +238,7 @@ class NetworkStack(object):
 
         logger.debug("Connection Established")
 
-    def contacts_add_remove(self, added, removed, data):
+    def contacts_add_remove(self, added, removed, *args):
         logger.debug("Received change to contacts...")
 
         # Update the locally kept contact list(s)?
