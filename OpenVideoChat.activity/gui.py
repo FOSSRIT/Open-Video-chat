@@ -174,18 +174,20 @@ class Gui(Gtk.Grid):
     def add_remove_contacts(self, callback, event, parent, add_contacts, remove_contacts):
 
         # Add Contacts
-        for contact in add_contacts:
-            self.user_list_store.append([
-                contact.get_alias(),    # Alias
-                contact,                # TpContact
-                None,                   # GtkTextBuffer (if/when activated)
-                None                    # TpTextChannel (if/when connected to)
-            ])
+        if add_contacts:
+            for contact in add_contacts:
+                self.user_list_store.append([
+                    contact.get_alias(),    # Alias
+                    contact,                # TpContact
+                    None,                   # GtkTextBuffer (if/when activated)
+                    None                    # TpTextChannel (if/when connected to)
+                ])
 
         # Remove contacts
-        for row in self.user_list_store:
-            if row[1] in remove_contacts:
-                self.user_list_store.remove(row)
+        if remove_contacts:
+            for row in self.user_list_store:
+                if row[1] in remove_contacts:
+                    self.user_list_store.remove(row)
 
     def user_selected(self, tree_view, selected_index, column_object):
         logger.debug("Identifying selected user to initiate communication...")
