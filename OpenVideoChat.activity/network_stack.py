@@ -363,7 +363,7 @@ class NetworkStack(object):
 
             # Close Channel
             channel.leave_async(
-                Tp.ChannelChangeGroupReason.OFFLINE,
+                Tp.ChannelGroupChangeReason.OFFLINE,
                 "Exited OVC.",
                 (lambda c, s, d: c.leave_finish(s)),
                 None
