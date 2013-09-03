@@ -50,7 +50,10 @@ class AccountManager(Gtk.Grid):
 
         logger.debug("Creating Account List...")
 
-        self.account_list_store = Gtk.ListStore(str, object)
+        self.account_list_store = Gtk.ListStore(
+            str,        # User Account Alias
+            object      # TpAccount
+        )
 
         # Create a Tree View and supply it the List Store
         account_list_tree_view = Gtk.TreeView(self.account_list_store)
@@ -77,7 +80,7 @@ class AccountManager(Gtk.Grid):
         account_list_scrolled_window.add(account_list_tree_view)
 
         # Add a click handler to the tree view for user selection
-        account_list_tree_view.connect('row-activated', self.account_selected)
+        account_list_tree_view.connect('row-activated', self.set_active_account)
 
         logger.debug("Created Account List")
         logger.debug("Creating Account Buttons...")
@@ -136,13 +139,19 @@ class AccountManager(Gtk.Grid):
         account_info_grid.attach(account_password_entry, 1, 1, 1, 1)
         account_info_grid.attach(server_entry, 1, 2, 1, 1)
 
-        # **FIXME** Add buttons for update/create handling tied to actual functionality
+        # **FIXME** Add dynamic buttons for update/create handling
 
         # Attach grid to grid
         self.attach(account_info_grid, 3, 0, 1, 1)
 
-    def account_selected(self, tree_view, selected_index, column_object):
+    def set_active_account(self, tree_view, selected_index, column_object):
         logger.debug("Testing Account Selection...")
+
+        # Grab the selected account & run call to network stack
+        account = self.account_list_store[selected_index][1]
+
+        # Run call to setup process in network stack
+        self.switch_active_account(account)
 
     def create_account(self):
         logger.debug("Account Creation is Incomplete...")
@@ -150,6 +159,6 @@ class AccountManager(Gtk.Grid):
     def delete_account(self):
         logger.debug("Account Deletion is Incomplete...")
 
-    def add_account_to_list(self, account):
-        # logger.debug("Adding account to accounts list...")
-        self.account_list_store.append([account.get_nickname(), account])
+    def add_accounts(self, accounts):
+        for account in accounts:
+            self.account_list_store.append([account.get_nickname(), account])
