@@ -155,6 +155,21 @@ class AccountManager(Gtk.Grid):
         # Run call to setup process in network stack
         self.switch_active_account(account)
 
+    def display_active_account(self, callback, event, parent, account):
+        logger.debug("Updating UI to indicate the currently active account...")
+
+        # **FIXME** find the method to select the active row without creating a loop back to the row-activated event
+
+        # Grab Parameters
+        params = account.dup_parameters_vardict()
+
+        # Populate text fields with username, password & server (if able)
+        self.account_name_entry.set_text(account.get_display_name())
+        if "password" in params:
+            self.account_password_entry.set_text(params['password'])
+        if "server" in params:
+            self.server_entry.set_text(params["server"])
+
     def add_accounts(self, callback, event, parent, accounts):
         for account in accounts:
             self.account_list_store.append([account.get_nickname(), account])
