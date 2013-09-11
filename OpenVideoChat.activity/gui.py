@@ -221,12 +221,15 @@ class Gui(Gtk.Grid):
             # Run method to create a chat channel
             self.create_chat_channel(contact)
 
-    def activate_chat(self, callback, event, parent, channel, contact):
+    def activate_chat(self, callback, event, parent, channel):
         logger.debug("Chat services enabled on first-channel established...")
 
         # Enable Chat GtkButton & GtkEntry
         self.chat_entry.set_sensitive(True)
         self.chat_send_message_button.set_sensitive(True)
+
+        # Grab Contact from channel
+        contact = channel.get_target_contact()
 
         # Find row with contact & add channel
         for row in self.user_list_store:
@@ -277,6 +280,6 @@ class Gui(Gtk.Grid):
         # Scroll to bottom
         self.chat_text_view.scroll_to_iter(self.chat_text_view.get_buffer().get_end_iter(), 0.1, False, 0.0, 0.0)
 
-    def receive_message(self, contact, message):
+    def receive_message(self, message, contact):
         logger.debug("Posting received message...")
-        self.chat_write_line("%s [%s]: %s" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message))
+        self.chat_write_line("%s [%s]: %s" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message.to_text()[0]))

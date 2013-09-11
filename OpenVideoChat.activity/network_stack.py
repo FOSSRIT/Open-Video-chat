@@ -42,13 +42,16 @@ logger.setLevel(logging.DEBUG)
 
 class NetworkStack(object):
 
-
     """ Properties """
+
+    call = None
+    observer = None
+    handler = None
     active_account = None
     active_connection = None
-    active_call = None
     close_channels = []
 
+    """ Setup Logic """
 
     def __init__(self, callbacks={}):
         logger.debug("Preparing Network Stack...")
@@ -60,13 +63,15 @@ class NetworkStack(object):
         # Grab the account manager to begin the setup process
         self.account_manager = Tp.AccountManager.dup()
         if self.account_manager:
+
+            # Setup factory configuration and a channel observer
             self.configure_network_stack(self.account_manager)
+            self.configure_observer(self.account_manager)
 
             # Register initial callbacks
             self.register_callback('get_jabber_accounts', self.initialize_account)
             self.register_callback("setup_active_account", self.close_chat_channels)
             self.register_callback('setup_active_account', self.initialize_connection)
-            self.register_callback("new_chat_channel", self.setup_chat_channel)
 
             # Run first async process to startup the system
             self.account_manager_async()
@@ -202,7 +207,6 @@ class NetworkStack(object):
         logger.debug("Account status changed...")
         # No logic or handlers have been added here yet
 
-
     """ Connection Logic """
 
     def initialize_connection(self, callback, event, parent, account):
@@ -251,12 +255,34 @@ class NetworkStack(object):
     def contacts_add_remove(self, added, removed, *args):
         logger.debug("Received change to contacts...")
 
-        # Update the locally kept contact list(s)?
-
         # Run callback for changes to the contact list
         self.run_callbacks("contacts_changed", self, added, removed)
 
-    """ Channel Logic """
+    """ Observe, Request, and Handle Channels with DBus Interfaces """
+
+    def configure_observer(self, account_manager):
+
+        # Create an observer with class-level reference
+        self.observer = observer = Tp.SimpleObserver.new_with_am(
+            am,
+            False,
+            "OVC.Chat.Observer",
+            False,
+            self.observe_chat_channels,
+            None
+        )
+
+        # Filter Channel Types
+        observer.add_observer_filter({
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,           # Only look for text channels
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),     # Private channels only
+        })
+
+        # Delay approvers on dbus from processing (to allow override time)
+        observer.set_observer_delay_approvers(True)
+
+        # Register with the DBus
+        observer.register()
 
     def listen_for_incoming_chat(self, account_manager):
         logger.debug("Listening for incoming connections...")
@@ -266,7 +292,7 @@ class NetworkStack(object):
             account_manager,              # As specified in the method name
             False,                             # bypass approval (dbus related)
             False,                             # Whether to implement requests (more work but allows optional accept or deny)
-            "OVCChatHandler",                  # Name of handler
+            "OVC.Chat.Handler",                # Name of handler
             False,                             # dbus uniquify-name token
             self.incoming_chat_channel,        # The callback
             None                               # Custom data to pass to callback
@@ -289,46 +315,6 @@ class NetworkStack(object):
 
         logger.debug("Now listening for incoming chat requests...")
 
-    def incoming_chat_channel(
-        self,
-        handler,
-        account,
-        connection,
-        channels,
-        requests,
-        user_action_time,
-        context,
-        loop
-    ):
-        logger.debug("SimpleHandler received request for channel...")
-
-        if account is self.active_account:
-            logger.debug("Is active account, continue!")
-
-            # Accept Context
-            context.accept()
-
-            # Process Channels
-            for channel in channels:
-                if isinstance(channel, Tp.TpTextChannel):
-
-                    # Run Callbacks
-                    self.run_callbacks("new_chat_channel", self, channel, channel.get_initiator())
-
-        else:
-            logger.debug("Chat Requested on inactive account...")
-
-            # Decline Context
-            context.fail()
-
-    def setup_chat_channel(self, callback, event, parent, channel, contact):
-
-        # Connect to receive-message
-        message_handler = channel.connect('message-received', self.receive_chat_message, contact)
-
-        # Add to close list with handler id
-        self.close_channels.append([channel, message_handler])
-
     def request_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
 
@@ -350,21 +336,86 @@ class NetworkStack(object):
         request.ensure_and_handle_channel_async(
             None,                                       # Whether it can be cancelled
             self.chat_channel_request_callback,         # Callback to run when done
-            contact                                     # Custom Data sent to callback
+            None                                        # Custom Data sent to callback
         )
 
         # Private channels are not named, only group channels (MUC for Multi-User Channel)
         # Because they are not named, only one can exist at a time
-        # This also means that `ensure` is better than create in this case
+        # The `ensure` method will reuse existing channels, hence it is the better choice
 
-    def chat_channel_request_callback(self, request, status, contact):
+    """ Channel Logic """
+
+    def observe_chat_channels(
+        self,
+        observer,
+        account,
+        connection,
+        channels,
+        operation,
+        requests,
+        context,
+        data
+    ):
+        if account is self.active_account and operation and len(channels):
+
+            # Claim Channel
+            operation.claim_with_async(
+                self.handler,
+                self.claimed_chat_channel,
+                channels[0]
+            )
+
+            # Wait for claim before accepting context
+            context.accept()
+
+    def claimed_chat_channel(self, operation, status, channel):
+        operation.claim_with_finish(status)
+
+        # Prepare Channel
+        channel.prepare_async(None, self.chat_channel_activated, None)
+
+    def incoming_chat_channel(
+        self,
+        handler,
+        account,
+        connection,
+        channels,
+        requests,
+        user_action_time,
+        context,
+        loop
+    ):
+        logger.debug("SimpleHandler received request for channel...")
+
+        if account is self.active_account and len(channels):
+            channels[0].prepare_async(None, self.chat_channel_activated, None)
+            context.accept()
+        else:
+            logger.warning("Channel is not for active account...")
+            context.fail()
+
+    def chat_channel_request_callback(self, request, status, data):
         logger.debug("Chat channel approved and initiating...")
 
         # Remove async process & grab channel plus context
         (channel, context) = request.ensure_and_handle_channel_finish(status)
 
-        # Run Registered Callbacks
-        self.run_callbacks("new_chat_channel", self, channel, contact)
+        # Async channel to handle
+        channel.prepare_async(None, self.chat_channel_activated, None)
+
+    def chat_channel_activated(self, channel, status, data):
+        channel.prepare_finish(status)
+
+        # Add to close-channels list
+        self.close_channels.append(channel)
+
+        # Append message processing
+        channel.connect('message-received', self.receive_chat_message)
+
+        # Run callbacks for new chat channel received
+        self.run_callbacks('new_chat_channel', self, channel)
+
+    """ Shutdown Process """
 
     def close_chat_channels(self, callback, event, parent, data):
         logger.debug("Closing open chat channels...")
@@ -385,6 +436,16 @@ class NetworkStack(object):
         # Empty Channels again
         self.close_channels = []
 
+    def stop_observer_and_handler(self):
+        self.observer.unregister()
+        self.observer = None
+        self.handler.unregister()
+        self.handler = None
+
+    def shutdown(self):
+        self.stop_observer_and_handler()
+        self.close_chat_channels(None, None, None, None)
+
     """ Chat Methods """
 
     def send_chat_message(self, channel, message, message_type=Tp.ChannelTextMessageType.NORMAL):
@@ -395,10 +456,10 @@ class NetworkStack(object):
 
         # Send asynchronous message
         channel.send_message_async(
-            message_container,  # Telepathy ClientMessage object
-            0,                  # Optional Message Sending Flags
-            None,               # Callback (server-received confirmation)
-            None                # Data for callback
+            message_container,          # Telepathy ClientMessage object
+            0,                          # Optional Message Sending Flags
+            self.chat_message_sent,     # Callback (to close async)
+            None                        # Data for callback
         )
 
         # The message sending flags are numeric constants representing features
@@ -410,13 +471,24 @@ class NetworkStack(object):
         # hence why supplying 0 is the same as saying "use no features"
         # and supplying None will throw an error
 
-        # **Also** server callback is not the same as user-delivery confirmation
+    def chat_message_sent(self, channel, status, data):
+        channel.send_message_finish(status)
 
-    def receive_chat_message(self, channel, message, contact):
+    def receive_chat_message(self, channel, message, data):
         logger.debug("Processing received messsage...")
 
+        # Acknowledge Message
+        channel.ack_message_async(
+            message,
+            self.chat_message_acknowledged,
+            None
+        )
+
         # Run Registered Callbacks
-        self.run_callbacks("chat_message_received", self, message, contact)
+        self.run_callbacks("chat_message_received", self, message, channel.get_target_contact())
+
+    def chat_message_acknowledged(self, channel, status, data):
+        channel.ack_message_finish(status)
 
     """ Callback Handling """
 
