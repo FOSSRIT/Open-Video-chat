@@ -4,8 +4,9 @@
 Let's start with reference links:
 
 - [TelepathyGLib Docs](http://telepathy.freedesktop.org/doc/telepathy-glib/)
-- [Telepathy Repository](https://secure.freedesktop.org/cgit/telepathy/)
+- [Telepathy Repository](git://git.collabora.co.uk/git/freedesktop.org-mirror/telepathy/telepathy-glib.git)
 - [Telepathy Client Example](http://git.enlightenment.org/devs/kuuko/apathy.git/)
+- [All of Collabra's Work](http://cgit.collabora.com/git/)
 
 The best resource you will find is the Telepathy Client Example.  It is comprehensive, but not without flaws.  Granted, many of the flaws stem from breaks in TelepathyGLib.
 
@@ -102,4 +103,8 @@ A final tip, in line with GObject all objects in TelepathyGLib extend from [TpPr
 
 The Apathy source is an excellent example of using the factory to set requirements easily.
 
-The `contact-list-changed` signal on the TpConnection object apparently doesn't fire, which I believe is a break in the library.
+The `contact-list-changed` signal on the TpConnection object apparently doesn't fire, which I believe is a break in the library.  I have tried maintaining a ref-count to the connection object but that did not resolve this.  However I could also be misunderstanding how it is triggered, does the jabber server keep a record of all users connected even after they disconnect and simply mark their status as unavailable or offline?  If so that might be why it never fires, in which case `status-changed` of some sort should be attached to all contacts to monitor them.
+
+Telepathy is ref-counted; if you want objects to continue existing a variable must point to them at all times.  If they loose scope they will disappear along with any connected signals.  Hence why the code keeps class level references to the observer, handler, and all channels.
+
+When using an observer to override messages, you can run claim_with_async to claim it immediately, but if you want it to run through the handler callback then you use handle_with_async instead.  The claim approach is a short-cut that circumvents a lot of processing and is useful, but if you want to go through more natural channels it is possible.
