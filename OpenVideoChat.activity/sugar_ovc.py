@@ -76,7 +76,7 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
         # else:
         #     self.sharing_handler = self.connect("shared", self.network_stack.start_chat_and_video)
 
-        logger.debug("Open Video Chat Prepared")
+        logger.info("Open Video Chat Prepared")
 
         # logger.debug("Connect Event to Setup Network Stack on Demand")
         # self.establish_activity_sharing(handle)
@@ -114,16 +114,6 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
     #     # Supply Network Stack to GUI
     #     sender.get_canvas().set_network_stack(sender.network_stack)
 
-    # """ Tear-Down Handling """
-
-    # def can_close(self):
-    #     logger.debug("Shutting down Network and GST")
-    #     if self.network_stack is not None:
-    #         self.network_stack.close()
-    #     # self.gststack.start_stop_incoming_pipeline(False)
-    #     # self.gststack.start_stop_outgoing_pipeline(False)
-    #     return True
-
     # """ Automated Alert Handling """
 
     # def alert(self, title, text=None, timeout=5):
@@ -137,6 +127,12 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
 
     # def cancel_alert(self, alert, response_id):
     #     self.remove_alert(alert)
+
+    """ Tear-Down Handling """
+
+    def can_close(self):
+        self.network_stack.shutdown()
+        return True
 
     """ Journal Save and Restore """
 

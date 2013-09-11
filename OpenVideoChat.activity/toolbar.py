@@ -59,7 +59,7 @@ class Toolbar(Gtk.Expander):
 
         # Display
         self.show_all()
-        logger.debug("Toolbar Prepared")
+        logger.info("Toolbar Prepared")
 
     def build_buttons(self, swap_gui_method):
 

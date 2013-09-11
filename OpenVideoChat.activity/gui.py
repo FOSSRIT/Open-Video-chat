@@ -56,7 +56,7 @@ class Gui(Gtk.Grid):
 
         # Display Grid
         self.show()
-        logger.debug("GUI Prepared")
+        logger.info("OVC GUI Prepared")
 
     def build_video(self):
         logger.debug("Building Video...")
@@ -281,5 +281,4 @@ class Gui(Gtk.Grid):
         self.chat_text_view.scroll_to_iter(self.chat_text_view.get_buffer().get_end_iter(), 0.1, False, 0.0, 0.0)
 
     def receive_message(self, message, contact):
-        logger.debug("Posting received message...")
         self.chat_write_line("%s [%s]: %s" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message.to_text()[0]))
