@@ -27,6 +27,11 @@
 
 # External Imports
 import logging
+
+# Initialize threads for telepathy?
+from gi.repository import GObject
+GObject.threads_init()
+
 from gi.repository import TelepathyGLib as Tp
 
 
@@ -37,211 +42,281 @@ logger.setLevel(logging.DEBUG)
 
 class NetworkStack(object):
 
-    def __init__(self):
+    """ Properties """
+
+    call = None
+    observer = None
+    handler = None
+    active_account = None
+    active_connection = None
+    close_channels = []
+
+    """ Setup Logic """
+
+    def __init__(self, callbacks={}):
         logger.debug("Preparing Network Stack...")
 
-        # Network Components
-        self.account_manager = None
-        self.account = None
-        self.connection = None
-        self.chat_channel = None
-        self.add_account = None
+        # Create dicts for signals and callbacks
+        self.network_stack_signals = {}
+        self.network_stack_callbacks = callbacks
 
-        """ Sugar Specific Handling """
-        # Such as determining whether the application opened as a result of another user
-        # and automatically connecting to them...
-
-        # Completed
-        logger.debug("Network Stack Initialized")
-
-    def populate_accounts_callback(self, populate_accounts_callback_method):
-        self.add_account = populate_accounts_callback_method
-
-    def setup(self):
-        logger.debug("Migrating setup procedure to this thing...")
-
-        # Grab Account Details
-        self.prepare_account()
-
-    def prepare_account(self):
-        logger.debug("Preparing account asynchronously...")
-
-        # Grab the account manager
+        # Grab the account manager to begin the setup process
         self.account_manager = Tp.AccountManager.dup()
+        if self.account_manager:
+
+            # Setup factory configuration and a channel observer
+            self.configure_network_stack(self.account_manager)
+            self.configure_observer(self.account_manager)
+
+            # Register initial callbacks
+            self.register_callback('get_jabber_accounts', self.initialize_account)
+            self.register_callback("setup_active_account", self.close_chat_channels)
+            self.register_callback('setup_active_account', self.initialize_connection)
+
+            # Run first async process to startup the system
+            self.account_manager_async()
+
+        else:
+            logger.error("Unable to acquire the account manager, software will not be usable...")
+
+        logger.info("Network Stack Initialized")
+
+    def configure_network_stack(self, account_manager):
+        logger.debug("Configuring Telepathy...")
 
         # Grab the ambiguous factory object
-        factory = self.account_manager.get_factory()
+        factory = account_manager.get_factory()
 
         # Add features to the shared abstract factory (used by all components)
         factory.add_account_features([
-            Tp.Account.get_feature_quark_connection()            # Pull the connections for the accounts
+            Tp.Account.get_feature_quark_connection()               # Pull the connections for the accounts
         ])
         factory.add_connection_features([
-            Tp.Connection.get_feature_quark_contact_list(),      # Get the contact list as a "feature"
-            Tp.Connection.get_feature_quark_contact_groups(),    # Contact Groups?
-            Tp.Connection.get_feature_quark_contact_blocking(),  # Contact Blocking?
+            Tp.Connection.get_feature_quark_contact_list(),         # Get the contact list as a "feature"
         ])
         factory.add_contact_features([
-            Tp.ContactFeature.ALIAS,                             # Get contact ALIAS's from system
-            Tp.ContactFeature.CONTACT_GROUPS,                    #
-            Tp.ContactFeature.PRESENCE,                          #
-            Tp.ContactFeature.AVATAR_DATA,                       #
-            Tp.ContactFeature.SUBSCRIPTION_STATES,               #
-            Tp.ContactFeature.CAPABILITIES,                      #
-            Tp.ContactFeature.CONTACT_INFO,                      #
-            Tp.ContactFeature.LOCATION,                          #
-            Tp.ContactFeature.CONTACT_BLOCKING,                  #
+            Tp.ContactFeature.ALIAS,                                # Get contact ALIAS's from system
+        ])
+        factory.add_channel_features([
+            Tp.Channel.get_feature_quark_contacts(),                # Make sure we have contacts on the channel
+            Tp.TextChannel.get_feature_quark_chat_states(),         # Gets us additional message info
+            Tp.TextChannel.get_feature_quark_incoming_messages(),   # Why would we want to receive messages when using communication software by default?
         ])
 
-        # Wait for the account to be ready to ensure the channel
-        self.account_manager.prepare_async(None, self.setup_accounts, None)
+        logger.debug("Configured Telepathy")
 
-    def setup_accounts(self, account_manager, status, data):
-        logger.debug("Setting up asynchronous stack components...")
+    def account_manager_async(self):
+        logger.debug("Processing account manager async...")
+        self.account_manager.prepare_async(None, self.account_manager_async_callback, None)
 
-        # Cease waiting on async event from account_manager
-        self.account_manager.prepare_finish(status)
+    def account_manager_async_callback(self, account_manager, status, data):
+        logger.debug("Finishing account manager async...")
+        account_manager.prepare_finish(status)
 
-        # Grab accounts into locally stored list
-        self.accounts = []
-        for account in self.account_manager.dup_valid_accounts():
+        # Run Jabber Accounts
+        self.get_jabber_accounts(account_manager)
+
+        # Register listener for incoming chat requests
+        self.listen_for_incoming_chat(account_manager)
+
+    """ Account Logic """
+
+    def get_jabber_accounts(self, account_manager):
+        logger.debug("Getting jabber accounts list...")
+
+        accounts = []
+        for account in account_manager.dup_valid_accounts():
             if account.get_protocol() == "jabber":
-                self.accounts.append(account)
+                accounts.append(account)
 
-        # If no accounts were found exit and notify
-        if len(self.accounts) == 0:
-            logger.debug("No accounts found...")
-            # **FIXME** Add alert to UI and open the account manager
-            return False
+        # Handle Registered Callbacks & remove them after
+        self.run_callbacks('get_jabber_accounts', self, accounts)
 
-        # Attempt to find an enabled & connected account
-        for account in self.accounts:
-            # Send accounts to account manager
-            if self.add_account:
-                self.add_account(account)
-            # Set Account to use
-            if self.account is None and account.is_enabled and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
-                self.account = account
+    def initialize_account(self, callback, event, parent, accounts):
+        # This should only ever run once
+        self.remove_callback(event, callback)
 
-        # This is probably duplicate logic and will be adjusted when cleanup time comes
-        if self.account is None:
-            logger.debug("No enabled and connected accounts found...")
-            # **FIXME** Add alert to UI and open the account manager
-            # return False
+        for account in accounts:
+            if self.active_account is None and account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+                self.active_account = account
+
+        if self.active_account:
+            self.setup_active_account()
         else:
-            self.account.prepare_async(None, self.setup_connection_logic, None)
+            logger.warning("No enabled and connected accounts were found...")
 
-        # Account Manager should depict unenabled or disconnected accounts in grey
-        # User can attempt to override by double-clicking, which will run below logic
-        # which should attempt to enable and connect manually
-        # **FIXME** Future iterations will not automatically use the first account
-        #           Subsequently, no automatic connection logic will be required either
-        # self.account = self.accounts[0]
-        # if not self.account.is_enabled():
-        #     logger.debug("TEMP: Enabling account...")
-        #     self.account.set_enabled_async(True, self.enable_account_callback, None)
-        # elif self.account.get_connection_status()[0] is not Tp.ConnectionStatus.CONNECTED:
-        #     self.change_account_presence_available()
-        # else:
-        #     logger.debug("TEMP: Connecting...")
-        #     self.account.prepare_async(None, self.setup_connection_logic, None)
+    def switch_active_account(self, account):
+        logger.debug("Switching accounts...")
 
-    def enable_account_callback(self, account, status, data):
-        logger.debug("Account is now enabled")
-        account.set_enabled_finish(status)
-        self.change_account_presence_available()
+        # Logic chain to automatically enable and connect account
+        if account is self.active_account:
+            logger.warning("Account is already active!")
+        elif account.is_enabled() and account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
 
-    def change_account_presence_available(self):
-        logger.debug("TEMP: Connecting async...")
-        self.account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", self.force_connect_callback, None)
+            # Check for & remove a status-changed signal from the former account
+            if 'account_status_changed' in self.network_stack_signals and self.network_stack_signals['account_status_changed'] is not None:
+                self.active_account.disconnect(self.network_stack_signals['account_status_changed'])
 
-    def force_connect_callback(self, account, status, data):
-        logger.debug("User is now available")
-        account.request_presence_finish(status)
+            self.active_account = account
+            self.setup_active_account()
 
-        # Async into the connection logic
-        self.account.prepare_async(None, self.setup_connection_logic, None)
+        elif not account.is_enabled():
+            logger.warning("Attempting to enable account...")
+            account.set_enabled_async(True, self.enable_active_account_callback, account)
 
-    def setup_connection_logic(self, account, status, data):
-        logger.debug("Setting up the connection components...")
+        elif account.get_connection_status()[0] is not Tp.ConnectionStatus.CONNECTED:
+            logger.warning("Attempting to connect (set account available)...")
+            account.request_presence_async(Tp.ConnectionPresenceType.AVAILABLE, "", "", self.connect_active_account_callback, account)
 
-        # Kill async process
-        account.prepare_finish(status)
+        else:
+            logger.warning("Unable to select account...")
 
-        # Grab the connection from our account
+    def enable_active_account_callback(self, account):
+        if account.is_enabled():
+            self.switch_active_account(account)
+        else:
+            logger.error("Unable to activate account!")
+
+    def connect_active_account_callback(self, account):
+        if account.get_connection_status()[0] is Tp.ConnectionStatus.CONNECTED:
+            self.switch_active_account(account)
+        else:
+            logger.error("Unable to connect!")
+
+    def setup_active_account(self):
+        logger.debug("Configuring Active Account...")
+
+        # The account should have a status-changed signal, connect to it here
+        self.network_stack_signals['account_status_changed'] = self.active_account.connect(
+            'status-changed',
+            self.update_active_account_status
+        )
+
+        # Run callbacks
+        self.run_callbacks('setup_active_account', self, self.active_account)
+
+    def update_active_account_status(
+        self,
+        account,
+        old_status,
+        new_status,
+        reason,
+        dbus_error_name,
+        details
+    ):
+        logger.debug("Account status changed...")
+        # No logic or handlers have been added here yet
+
+    """ Connection Logic """
+
+    def initialize_connection(self, callback, event, parent, account):
+        logger.debug("Initializing connection...")
+
+        # Grab the connection
         connection = account.get_connection()
 
-        # If connection is (ever) None at this stage we have done something wrong
-        if connection is None:
-            logger.critical("Connection should not be none!")
-            return False
+        if connection:
 
-        # Dup contact list & begin populating the UI user list
-        if connection.get_contact_list_state() is Tp.ContactListState.SUCCESS:
-            self.populate_users_list(connection.dup_contact_list())
+            # Remove signal from old connection
+            if 'contact_list_changed' in self.network_stack_signals:
+                self.active_connection.disconnect(self.network_stack_signals['contact_list_changed'])
 
-        # Connect handler for contact list
-        connection.connect('contact-list-changed', self.contacts_changed_callback)
+            # Update connection
+            self.active_connection = connection
 
-        # Setup async on connection to handler changes to contact list
-        connection.prepare_async(None, None, None)
-        # **FIXME** Perhaps this needs to be closed later?  How can we do that?  Handler that stores gasyncresult object for running finish?
-        # Also does this handle more than one contact-list-changed event or just one per?  In which case closing and re-opening in an "infinite" loop is good
+            # Setup Connection
+            self.connection_setup()
 
-        # Listen for incoming channel requests
-        # self.listen_for_chat_channel()
+            logger.debug("Connection Initialized")
 
-        """ Sugar handling for if connection established through sugar sharing process """
+        else:
+            logger.error("Unable to acquire connection...")
 
-    def populate_users_list(self, contacts):
-        logger.debug("Adding contacts to gui...")
+    def connection_setup(self):
+        logger.debug("Setting up connection...")
 
-        for contact in contacts:
-            self.add_user_to_gui(contact)
+        # Wipe out the previous contacts array
+        self.run_callbacks('reset_contacts', self)
 
-        logger.debug("Sent users to gui")
+        # Dup Contacts
+        contacts = self.active_connection.dup_contact_list()
 
-    def contacts_changed_callback(self, added, removed, data):
-        logger.debug("Contacts have been updated!!!")
-        logger.debug(added)
-        logger.debug(removed)
+        # Send to the contacts add/remove method
+        self.contacts_add_remove(contacts, None)
 
-    # def listen_for_chat_channel(self):
-    #     logger.debug("Listening for incoming connections...")
+        # Connect Signal for future changes to the list
+        self.network_stack_signals['contact_list_changed'] = self.active_connection.connect(
+            'contact-list-changed',
+            self.contacts_add_remove
+        )
 
-    #     # Define handler for new channels
-    #     self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
-    #         self.account_manager,              # As specified in the method name
-    #         False,                             # bypass approval (dbus related)
-    #         False,                             # Whether to implement requests (more work but allows optional accept or deny)
-    #         "ChatHandler",                     # Name of handler
-    #         False,                             # dbus uniquify-name token
-    #         self.chat_channel_setup_callback,  # The callback
-    #         None                               # Custom data to pass to callback
-    #     )
+        logger.debug("Connection Established")
 
-    #     # Describe the channel (a chat channel)
-    #     handler.add_handler_filter({
-    #         Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
-    #         Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
-    #         Tp.PROP_CHANNEL_REQUESTED: False,
-    #     })
+    def contacts_add_remove(self, added, removed, *args):
+        logger.debug("Received change to contacts...")
 
-    #     # Register the handler
-    #     handler.register()
+        # Run callback for changes to the contact list
+        self.run_callbacks("contacts_changed", self, added, removed)
 
-    #     logger.debug("Now listening for incoming chat requests...")
+    """ Observe, Request, and Handle Channels with DBus Interfaces """
 
-    def setup_chat_channel(self, contact):
+    def configure_observer(self, account_manager):
+
+        # Create an observer with class-level reference
+        self.observer = observer = Tp.SimpleObserver.new_with_am(
+            am,
+            False,
+            "OVC.Chat.Observer",
+            False,
+            self.observe_chat_channels,
+            None
+        )
+
+        # Filter Channel Types
+        observer.add_observer_filter({
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,           # Only look for text channels
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),     # Private channels only
+        })
+
+        # Delay approvers on dbus from processing (to allow override time)
+        observer.set_observer_delay_approvers(True)
+
+        # Register with the DBus
+        observer.register()
+
+    def listen_for_incoming_chat(self, account_manager):
+        logger.debug("Listening for incoming connections...")
+
+        # Create a TpBaseClient to handle incoming chat requests
+        self.chat_handler = handler = Tp.SimpleHandler.new_with_am(
+            account_manager,              # As specified in the method name
+            False,                             # bypass approval (dbus related)
+            False,                             # Whether to implement requests (more work but allows optional accept or deny)
+            "OVC.Chat.Handler",                # Name of handler
+            False,                             # dbus uniquify-name token
+            self.incoming_chat_channel,        # The callback
+            None                               # Custom data to pass to callback
+        )
+
+        # Describe the channel we care about (a chat channel)
+        handler.add_handler_filter({
+            Tp.PROP_CHANNEL_CHANNEL_TYPE: Tp.IFACE_CHANNEL_TYPE_TEXT,        # Channel Type
+            Tp.PROP_CHANNEL_TARGET_HANDLE_TYPE: int(Tp.HandleType.CONTACT),  # What it is tied to (A Contact)
+            Tp.PROP_CHANNEL_REQUESTED: False,
+        })
+
+        # Tell dbus to let everything know this can handle messages
+        handler.add_handler_capabilities([
+            Tp.IFACE_CHANNEL_INTERFACE_MESSAGES,
+        ])
+
+        # Register the handler, we will receive information going forward.
+        handler.register()
+
+        logger.debug("Now listening for incoming chat requests...")
+
+    def request_chat_channel(self, contact):
         logger.debug("Setting up outgoing chat channel...")
-
-        # Call Channel closure for previously opened channels
-        self.close_chat_channel()
-
-        # Remove handler for listener, since we are establishing the connection ourselves
-        if self.chat_handler is not None:
-            self.chat_handler.unregister()
-            self.chat_handler = None
 
         # Describe the channel type (text)
         channel_description = {
@@ -250,102 +325,141 @@ class NetworkStack(object):
             Tp.PROP_CHANNEL_TARGET_ID: contact.get_identifier()              # Who to open the channel with
         }
 
+        # Request the channel from the account
+        request = Tp.AccountChannelRequest.new(
+            self.active_account,                        # Current Account
+            channel_description,                        # Dict of channel properties
+            Tp.USER_ACTION_TIME_NOT_USER_ACTION         # Time stamp of action (0 also works)
+        )
+
+        # Run this asynchronously and execute the callback
+        request.ensure_and_handle_channel_async(
+            None,                                       # Whether it can be cancelled
+            self.chat_channel_request_callback,         # Callback to run when done
+            None                                        # Custom Data sent to callback
+        )
+
         # Private channels are not named, only group channels (MUC for Multi-User Channel)
         # Because they are not named, only one can exist at a time
-        # This also means that `ensure` is better than create in this case
+        # The `ensure` method will reuse existing channels, hence it is the better choice
 
-        # Request the channel
-        request = Tp.AccountChannelRequest.new(
-            self.account,                              # Account
-            channel_description,                       # Dict of channel properties
-            Tp.USER_ACTION_TIME_NOT_USER_ACTION        # Time stamp of action (0 also works)
-        )
+    """ Channel Logic """
 
-        # Run this asynchronously
-        request.ensure_and_handle_channel_async(
-            None,                              # Whether it can be canceled
-            self.chat_channel_setup_callback,  # Callback
-            None                               # Custom Data for callback
-        )
+    def observe_chat_channels(
+        self,
+        observer,
+        account,
+        connection,
+        channels,
+        operation,
+        requests,
+        context,
+        data
+    ):
+        if account is self.active_account and operation and len(channels):
 
-    # def handler_chat_channel_setup_callback(
-    #     self,
-    #     handler,
-    #     account,
-    #     connection,
-    #     channels,
-    #     requests,
-    #     user_action_time,
-    #     context,
-    #     loop
-    # ):
-    #     logger.debug("SimpleHandler received request for channel...")
-
-    #     # Limit chat to one-on-one by unregistering the handler
-    #     # if self.chat_handler is not None:
-    #     #     self.chat_handler.unregister()
-    #     #     self.chat_handler = None
-
-    #     # for channel in channels:
-    #     #     if not isinstance(channel, Tp.StreamTubeChannel):
-    #     #         continue
-
-    #     #     print "Accepting tube"
-
-    #     #     channel.connect('invalidated', tube_invalidated_cb, loop)
-
-    #     #     channel.accept_async(tube_accept_cb, loop)
-
-    #     # context.accept()
-
-    def close_chat_channel(self):
-        logger.debug("Closing any existing chat channels...")
-
-        if self.chat_channel is not None:
-            # Try async with lambda to catch & finish
-            self.chat_channel.close_async(
-                lambda c, s, d: c.close_finish(s) and logger.debug("Existing channel closed"),  # Callback
-                None                                                                            # User Data
+            # Claim Channel
+            operation.claim_with_async(
+                self.handler,
+                self.claimed_chat_channel,
+                channels[0]
             )
 
-    def chat_channel_setup_callback(self, request, status, data):
+            # Wait for claim before accepting context
+            context.accept()
+
+    def claimed_chat_channel(self, operation, status, channel):
+        operation.claim_with_finish(status)
+
+        # Prepare Channel
+        channel.prepare_async(None, self.chat_channel_activated, None)
+
+    def incoming_chat_channel(
+        self,
+        handler,
+        account,
+        connection,
+        channels,
+        requests,
+        user_action_time,
+        context,
+        loop
+    ):
+        logger.debug("SimpleHandler received request for channel...")
+
+        if account is self.active_account and len(channels):
+            channels[0].prepare_async(None, self.chat_channel_activated, None)
+            context.accept()
+        else:
+            logger.warning("Channel is not for active account...")
+            context.fail()
+
+    def chat_channel_request_callback(self, request, status, data):
         logger.debug("Chat channel approved and initiating...")
 
         # Remove async process & grab channel plus context
         (channel, context) = request.ensure_and_handle_channel_finish(status)
 
-        # Call shared-setup process
-        self.process_chat_channel_setup(channel)
+        # Async channel to handle
+        channel.prepare_async(None, self.chat_channel_activated, None)
 
-    def process_chat_channel_setup(self, channel):
+    def chat_channel_activated(self, channel, status, data):
+        channel.prepare_finish(status)
 
-        # Assign channel to class variable
-        self.chat_channel = channel
+        # Add to close-channels list
+        self.close_channels.append(channel)
 
-        # Add listener for received messages
-        channel.connect('message-received', self.chat_message_received)
+        # Append message processing
+        channel.connect('message-received', self.receive_chat_message)
 
-        # Activate Chat Services
-        self.activate_chat()
+        # Run callbacks for new chat channel received
+        self.run_callbacks('new_chat_channel', self, channel)
 
-    def send_chat_message(self, message, message_type=Tp.ChannelTextMessageType.NORMAL):
+    """ Shutdown Process """
+
+    def close_chat_channels(self, callback, event, parent, data):
+        logger.debug("Closing open chat channels...")
+
+        for (channel, message_handler) in self.close_channels:
+
+            # Disconnect Handler
+            channel.disconnect(message_handler)
+
+            # Close Channel
+            channel.leave_async(
+                Tp.ChannelGroupChangeReason.OFFLINE,
+                "Exited OVC.",
+                (lambda c, s, d: c.leave_finish(s)),
+                None
+            )
+
+        # Empty Channels again
+        self.close_channels = []
+
+    def stop_observer_and_handler(self):
+        self.observer.unregister()
+        self.observer = None
+        self.handler.unregister()
+        self.handler = None
+
+    def shutdown(self):
+        self.stop_observer_and_handler()
+        self.close_chat_channels(None, None, None, None)
+
+    """ Chat Methods """
+
+    def send_chat_message(self, channel, message, message_type=Tp.ChannelTextMessageType.NORMAL):
         logger.debug("Sending a message over the wire...")
-
-        # Verifiy connection status before trying to send a message
-        if self.account.get_connection_status() is not Tp.ConnectionStatus.CONNECTED:
-            logger.debug("Disconnected, cannot send a message")
-            # **FIXME** Add handling to message user that they are disconnected and no message could be sent
-            return False
 
         # Wrap our message in a Telepathy Message object
         message_container = Tp.ClientMessage.new_text(message_type, message)
 
         # Send asynchronous message
-        self.chat_channel.send_message_async(
-            message_container,  # Telepathy ClientMessage object
-            0,                  # Optional Message Sending Flags
-            None,               # Callback (server-received confirmation)
-            None                # Data for callback
+        channel.send_message_async(
+            message_container,          # Telepathy ClientMessage object
+            0,                          # Optional Message Sending Flags
+            self.chat_message_sent,     # Callback (to close async)
+            None                        # Data for callback
         )
 
         # The message sending flags are numeric constants representing features
@@ -357,81 +471,41 @@ class NetworkStack(object):
         # hence why supplying 0 is the same as saying "use no features"
         # and supplying None will throw an error
 
-        # **Also** server callback is not the same as user-delivery confirmation
+    def chat_message_sent(self, channel, status, data):
+        channel.send_message_finish(status)
 
-    def chat_message_received(self, channel, message):
-        logger.debug("Processing received message...")
+    def receive_chat_message(self, channel, message, data):
+        logger.debug("Processing received messsage...")
 
-    def set_chat_activation(self, callback):
-        logger.debug("Defined chat activation in network stack...")
-        self.activate_chat = callback
+        # Acknowledge Message
+        channel.ack_message_async(
+            message,
+            self.chat_message_acknowledged,
+            None
+        )
 
-    def set_populate_users(self, callback):
-        logger.debug("Adding callback to add users to gui...")
-        self.add_user_to_gui = callback
+        # Run Registered Callbacks
+        self.run_callbacks("chat_message_received", self, message, channel.get_target_contact())
 
-    """ Old Code (Deprecated & scheduled for removal after testing) """
+    def chat_message_acknowledged(self, channel, status, data):
+        channel.ack_message_finish(status)
 
-    # def setup(self, activity, get_buddy):
-    #     # Grab Shared Activity Reference
-    #     self.shared_activity = activity.shared_activity
+    """ Callback Handling """
 
-    #     # Add get_buddy reference
-    #     self.get_buddy = get_buddy
+    def remove_callback(self, event, callback):
+        if event in self.network_stack_callbacks:
+            if callback in self.network_stack_callbacks[event]:
+                self.network_stack_callbacks[event].remove(callback)
 
-    #     # Grab Username & Apply Owner
-    #     self.owner = activity.owner
-    #     if self.owner.nick:
-    #         self.username = self.owner.nick
+    def register_callback(self, event, callback):
+        # If no key exists define it with a list
+        if not event in self.network_stack_callbacks:
+            self.network_stack_callbacks[event] = []
 
-    # def close(self):
-    #     # Delete Telepathy Connection Reference
-    #     self.chan = None
-    #     # try:
-    #     #     if self.chan is not None:
-    #     #         self.chan[CHANNEL_INTERFACE].Close()
-    #     # except Exception:
-    #     #     logger.debug("Unable to close channel")
-    #     # finally:
+        # Add callback
+        self.network_stack_callbacks[event].append(callback)
 
-    # def connect(self, receive_message_callback):
-    #     logger.debug("Creating Connection")
-
-    #     # Assign Callback for Receiving Messages
-    #     self.receive_message_callback = receive_message_callback
-
-    #     # Acquire Channel and Connection
-    #     self.chan = self.shared_activity.telepathy_text_chan
-
-    #     # Assign Callbacks
-    #     self.chan[CHANNEL_INTERFACE].connect_to_signal(
-    #             'Closed',
-    #             self.close)
-    #     self.chan[CHANNEL_TYPE_TEXT].connect_to_signal(
-    #             'Received',
-    #             self.receive_message)
-
-    # def send_message(self, message):
-    #     if self.chan is not None:
-    #         self.chan[CHANNEL_TYPE_TEXT].Send(
-    #                 CHANNEL_TEXT_MESSAGE_TYPE_NORMAL,
-    #                 message)
-
-    # def receive_message(self, identity, timestamp, sender, type_, flags, message):
-    #     # Exclude any auxiliary messages
-    #     if type_ != 0:
-    #         return
-
-    #     # Get buddy from main
-    #     buddy = self.get_buddy(sender)
-    #     if type(buddy) is dict:
-    #         nick = buddy['nick']
-    #     else:
-    #         nick = buddy.props.nick
-
-    #     # Send Message if callback is set & buddy is not self
-    #     if self.receive_message_callback is not None and buddy != self.owner:
-    #         self.receive_message_callback(nick, message)
-
-    #     # Empty from pending messages
-    #     self.chan[CHANNEL_TYPE_TEXT].AcknowledgePendingMessages([identity])
+    def run_callbacks(self, event, *args):
+        if event in self.network_stack_callbacks:
+            for callback in self.network_stack_callbacks[event]:
+                callback(callback, event, *args)

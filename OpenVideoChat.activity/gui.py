@@ -74,8 +74,7 @@ class Gui(Gtk.Grid):
         logger.debug("Building Chat...")
 
         # Create Chat Components
-        chat_text_buffer = Gtk.TextBuffer()
-        self.chat_text_view = chat_text_view = Gtk.TextView(editable=False, buffer=chat_text_buffer, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
+        self.chat_text_view = chat_text_view = Gtk.TextView(editable=False, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
         chat_scrollable_history = Gtk.ScrolledWindow(hexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC, min_content_height=MIN_CHAT_HEIGHT)
         chat_scrollable_history.add(chat_text_view)
         self.chat_entry = chat_entry = Gtk.Entry(hexpand=True, max_length=MAX_CHAT_MESSAGE_SIZE, sensitive=False, placeholder_text="message...")
@@ -108,7 +107,15 @@ class Gui(Gtk.Grid):
         logger.debug("Building User List...")
 
         # Create Buffer for user storage
-        self.user_list_store = Gtk.ListStore(str, object)
+        self.user_list_store = Gtk.ListStore(
+            str,        # Contact Alias
+            object,     # TpContact Object
+            object,     # Gtk3 TextBuffer
+            object      # TpTextChannel
+        )
+
+        # Missing fields for new messages in contacts no-longer selected
+        # dialog system should also supply messages about new contact attempts
 
         # Create a Tree View and supply it the List Store
         user_list_tree_view = Gtk.TreeView(self.user_list_store)
@@ -138,7 +145,7 @@ class Gui(Gtk.Grid):
         user_list_tree_view.connect('row-activated', self.user_selected)
 
         # Build Search Entry
-        user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE, placeholder_text="username...")
+        self.user_list_search_entry = user_list_search_entry = Gtk.Entry(max_length=MAX_CHAT_MESSAGE_SIZE, placeholder_text="username...")
         user_list_search_entry.set_tooltip_text(_("Search for contacts..."))
 
         # Apply the search entry to the Tree View
@@ -150,28 +157,47 @@ class Gui(Gtk.Grid):
         user_list_grid.attach(user_list_search_entry, 0, 1, 1, 1)
 
         # Create an expander to show the users on-demand & display all components
-        user_list_expander = Gtk.Expander(label=_("Users"))
+        self.user_list_expander = user_list_expander = Gtk.Expander(label=_("Users"))
         user_list_expander.add(user_list_grid)
         user_list_expander.show_all()
+        user_list_expander.connect('notify::expanded', self.find_user_set_focus)
 
         logger.debug("Built User List")
 
         # Return the top-level container
         return user_list_expander
 
-    """ Network & User Methods """
+    def find_user_set_focus(self, expander, data):
+        if expander.get_expanded():
+            self.user_list_search_entry.grab_focus()
 
-    def set_chat_channel_initializer(self, callback):
-        logger.debug("Assigning callback for chat-channel initialization...")
-        self.chat_channel_initializer = callback
+    """ Contact Methods """
 
-    def set_send_chat_message(self, callback):
-        logger.debug("Assigning callback for send-message over chat channel...")
-        self.send_chat_message = callback
+    def reset_contacts(self, callback, event, parent):
 
-    def add_a_contact(self, contact):
-        # Simply add a user (logs would fill fast if I added one here)
-        self.user_list_store.append([contact.get_alias(), contact])
+        # Clear the list
+        self.user_list_store.clear()
+
+        # Remove the text buffer
+        self.chat_text_view.set_buffer(Gtk.TextBuffer())
+
+    def add_remove_contacts(self, callback, event, parent, add_contacts, remove_contacts):
+
+        # Add Contacts
+        if add_contacts:
+            for contact in add_contacts:
+                self.user_list_store.append([
+                    contact.get_alias(),    # Alias
+                    contact,                # TpContact
+                    None,                   # GtkTextBuffer (if/when activated)
+                    None                    # TpTextChannel (if/when connected to)
+                ])
+
+        # Remove contacts
+        if remove_contacts:
+            for row in self.user_list_store:
+                if row[1] in remove_contacts:
+                    self.user_list_store.remove(row)
 
     def user_selected(self, tree_view, selected_index, column_object):
         logger.debug("Identifying selected user to initiate communication...")
@@ -179,49 +205,81 @@ class Gui(Gtk.Grid):
         # We can pull the contact object from our store
         contact = self.user_list_store[selected_index][1]
 
-        # Local message notifying chat is being enabled with selected user
-        self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
+        # If no GtkTextBuffer for this contact create & add to row
+        if self.user_list_store[selected_index][2] is None:
+            self.user_list_store[selected_index][2] = Gtk.TextBuffer()
 
-        # Send request to network stack /w callback to activate chat
-        self.chat_channel_initializer(contact)
+        # Set GtkTextBuffer to main window
+        self.chat_text_view.set_buffer(self.user_list_store[selected_index][2])
 
-    def activate_chat(self):
+        # If no channel exists try to establish one
+        if self.user_list_store[selected_index][3] is None:
+
+            # Local message notifying chat is being enabled with selected user
+            self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
+
+            # Run method to create a chat channel
+            self.create_chat_channel(contact)
+
+    def activate_chat(self, callback, event, parent, channel):
         logger.debug("Chat services enabled on first-channel established...")
 
         # Enable Chat GtkButton & GtkEntry
         self.chat_entry.set_sensitive(True)
         self.chat_send_message_button.set_sensitive(True)
 
-        # Set focus into chat entry
-        self.chat_entry.grab_focus()
+        # Grab Contact from channel
+        contact = channel.get_target_contact()
+
+        # Find row with contact & add channel
+        for row in self.user_list_store:
+
+            # Add Channel to Row
+            if contact is row[1]:
+                row[3] = channel
+
+                # If contact is selected (buffer match) then do the reset:
+                if self.chat_text_view.get_buffer() is row[2]:
+
+                    # Shrink users list
+                    self.user_list_expander.set_expanded(False)
+
+                    # Set focus into chat entry
+                    self.chat_entry.grab_focus()
+
+    def deactive_chat(self, callback, event, parent, account):
+        self.chat_entry.set_sensitive(False)
+        self.chat_send_message_button.set_sensitive(False)
 
     """ Chat Methods """
 
     def send_message(self, sender):
         if self.chat_entry.get_text() != "":
             message = self.chat_entry.get_text()
-            self.send_chat_message(message)   # Send message over the wire
 
-            # Post message from self immediately?
-            # self.receive_message(self.network_stack.username, message)
+            # Get Channel
+            channel = None
+            for row in self.user_list_store:
+                if row[2] is self.chat_text_view.get_buffer():
+                    channel = row[3]
+
+            # Send Message
+            self.send_chat_message(channel, message)
+
+            # Run receive_message callback manually from network stack to handle posting locally
+            # Gotta make sure it won't create duplicates though once message_received is properly setup
 
             self.chat_entry.set_text("")      # Empty Chat Entry
             self.chat_entry.grab_focus()      # Set focus back to chat entry
 
     def chat_write_line(self, line):
+
+        # Write a message
         self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), line + "\n", -1)
-
-    def receive_message(self, contact, message):
-        logger.debug("Posting received message...")
-
-        # Add Message
-        self.chat_text_view.get_buffer().insert(self.chat_text_view.get_buffer().get_end_iter(), "%s [%s]: %s\n" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message), -1)
 
         # Scroll to bottom
         self.chat_text_view.scroll_to_iter(self.chat_text_view.get_buffer().get_end_iter(), 0.1, False, 0.0, 0.0)
 
-    # def get_history(self):
-    #     return self.chat_text.get_text(
-    #             self.chat_text.get_start_iter(),
-    #             self.chat_text.get_end_iter(),
-    #             True)
+    def receive_message(self, message, contact):
+        logger.debug("Posting received message...")
+        self.chat_write_line("%s [%s]: %s" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message.to_text()[0]))
