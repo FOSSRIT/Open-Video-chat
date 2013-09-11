@@ -45,6 +45,11 @@ DEFAULT_WINDOW_SIZE = {
 
 
 class OpenVideoChat(Gtk.Window):
+
+    self.gui = None
+    self.network_stack = None
+    self.gstreamer_stack = None
+
     def __init__(self):
         Gtk.Window.__init__(self, title="Open Video Chat")
         logger.debug("Preparing Open Video Chat...")

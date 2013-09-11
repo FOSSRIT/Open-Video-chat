@@ -173,6 +173,9 @@ class Gui(Gtk.Grid):
 
     """ Contact Methods """
 
+    def hide_contacts(self):
+        self.user_list_expander.hide()
+
     def reset_contacts(self, callback, event, parent):
 
         # Clear the list
@@ -237,6 +240,8 @@ class Gui(Gtk.Grid):
             # Add Channel to Row
             if contact is row[1]:
                 row[3] = channel
+
+                # **FIXME** Add a message that the user has joined the chat
 
                 # If contact is selected (buffer match) then do the reset:
                 if self.chat_text_view.get_buffer() is row[2]:

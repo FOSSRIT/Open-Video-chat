@@ -51,6 +51,10 @@ logger.setLevel(logging.DEBUG)
 
 class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
 
+    network_stack = None
+    gstreamer_stack = None
+    sharing_handler = None
+
     def __init__(self, handle):
         Activity.__init__(self, handle)
         logger.debug("Preparing Open Video Chat...")
@@ -58,61 +62,84 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
         # Self-Enforced max_participants
         self.max_participants = SUGAR_MAX_PARTICIPANTS
 
-        # Define Empty Properties
-        self.network_stack = None
-        self.gstreamer_stack = None
-
         """ Setup GUI """
         self.set_toolbar_box(Toolbar(self))
         self.set_canvas(Gui())
         self.show()
 
-        """ Setup Network Stack """
-        self.network_stack = NetworkStack()
+        # Sugar OVC uses it's own method of user connectivity
+        # To alleviate confusion we can disable the user-list in-app
+        self.get_canvas().hide_contacts()
 
-        # Also Handle connections the sugar way
-        # if self.shared_activity:
-        #     self.sharing_handler = self.connect("joined", self.network_stack.start_chat_and_video)
-        # else:
-        #     self.sharing_handler = self.connect("shared", self.network_stack.start_chat_and_video)
+        # Sugar network logic implementation
+        # Will require connecting signals for joined/shared depending on shared state
+        # Store the signals to disconnect after first-run
+        # Also, logical changes involve establishing
+        if self.shared_activity:
+            if self.get_shared():
+                self.sugar_joined(None)
+            else:
+                self.sharing_handler = self.connect('shared', self.sugar_joined)
+        else:
+            self.sharing_handler = self.connect('shared', self.sugar_shared)
+
+        """ Setup Network Stack """
+        self.network_stack = NetworkStack({
+            "contacts_changed": [
+                self.get_canvas().add_remove_contacts,
+            ],
+            "setup_active_account": [
+                self.get_canvas().deactive_chat,
+            ],
+            "reset_contacts": [
+                self.get_canvas().reset_contacts,
+            ],
+            "new_chat_channel": [
+                self.get_canvas().activate_chat,
+            ],
+            "chat_message_received": [
+                self.get_canvas().receive_message,
+            ],
+        })
+
+        # Register methods to network stack directly onto the ui components
+        self.accounts.switch_active_account = self.network_stack.switch_active_account
+        self.get_canvas().create_chat_channel = self.network_stack.request_chat_channel
+        self.get_canvas().send_chat_message = self.network_stack.send_chat_message
 
         logger.info("Open Video Chat Prepared")
 
-        # logger.debug("Connect Event to Setup Network Stack on Demand")
-        # self.establish_activity_sharing(handle)
+    """ Sugar Logic """
 
-        # self.gststack = GSTStack()
-        # self.get_canvas().set_gstreamer_stack(self.gststack);
+    def sugar_shared(self, sender):
+        logger.debug("Shared from Sugar")
 
-    # This method is to obfuscate sugar from the network stack
-    # def get_buddy(self, handle):
-    #     pservice = presenceservice.get_instance()
-    #     tp_name, tp_path = pservice.get_preferred_connection()
-    #     return pservice.get_buddy_by_telepathy_handle(tp_name, tp_path, handle)
+        # Remove Signal
+        self.disconnect(self.sharing_handler)
 
+        # Listen for invited buddies
+        self.connect('buddy_joined', self.buddy_joined)
 
-    # """ Networking & Network Stack Setup """
+    def sugar_joined(self, sender):
+        logger.debug ("Joined from Sugar")
 
-    # def establish_activity_sharing(self, handle=None):
-    #     if self.shared_activity:
-    #         self.sharing_handler = self.connect("joined", self.share_activity_internals)
-    #     elif handle.uri:# XMPP Logic
-    #         logger.debug("XMPP Connection Requested")
-    #     else:
-    #         self.sharing_handler = self.connect("shared", self.share_activity_internals)
+        # Remove Signal
+        self.disconnect(self.sharing_handler)
 
-    # def share_activity_internals(self, sender):
-    #     # Create Network Stack
-    #     sender.network_stack = NetworkStack()
+        # Grab our buddy and send to joined process
+        buddy = self.shared_activity.get_joined_buddies()[0]
+        self.buddy_joined(sender, buddy)
 
-    #     # Disconnect Sharing Handler
-    #     sender.disconnect(sender.sharing_handler)
+    def buddy_joined(self, sender, buddy):
+        logger.debug("Processing new contact...")
 
-    #     # Setup Network Components
-    #     sender.network_stack.setup(sender, sender.get_buddy)
+        # Extract buddy contact id to identify or create new contact and establish channel
 
-    #     # Supply Network Stack to GUI
-    #     sender.get_canvas().set_network_stack(sender.network_stack)
+        # TESTING
+        print buddy
+        print dir(buddy)
+
+        # Post message about user joining us in channel?
 
     # """ Automated Alert Handling """
 
