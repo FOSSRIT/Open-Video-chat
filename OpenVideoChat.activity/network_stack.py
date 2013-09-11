@@ -264,7 +264,7 @@ class NetworkStack(object):
 
         # Create an observer with class-level reference
         self.observer = observer = Tp.SimpleObserver.new_with_am(
-            am,
+            account_manager,
             False,
             "OVC.Chat.Observer",
             False,
