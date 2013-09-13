@@ -406,11 +406,11 @@ class NetworkStack(object):
     def chat_channel_activated(self, channel, status, data):
         channel.prepare_finish(status)
 
-        # Add to close-channels list
-        self.close_channels.append(channel)
-
         # Append message processing
-        channel.connect('message-received', self.receive_chat_message)
+        message_handler = channel.connect('message-received', self.receive_chat_message)
+
+        # Add to close-channels & callback to list
+        self.close_channels.append([channel, message_handler])
 
         # Run callbacks for new chat channel received
         self.run_callbacks('new_chat_channel', self, channel)
@@ -422,25 +422,29 @@ class NetworkStack(object):
 
         for (channel, message_handler) in self.close_channels:
 
-            # Disconnect Handler
-            channel.disconnect(message_handler)
+            if channel and message_handler:
 
-            # Close Channel
-            channel.leave_async(
-                Tp.ChannelGroupChangeReason.OFFLINE,
-                "Exited OVC.",
-                (lambda c, s, d: c.leave_finish(s)),
-                None
-            )
+                # Disconnect Handler
+                channel.disconnect(message_handler)
+
+                # Close Channel
+                channel.leave_async(
+                    Tp.ChannelGroupChangeReason.OFFLINE,
+                    "Exited OVC.",
+                    (lambda c, s, d: c.leave_finish(s)),
+                    None
+                )
 
         # Empty Channels again
         self.close_channels = []
 
     def stop_observer_and_handler(self):
-        self.observer.unregister()
-        self.observer = None
-        self.handler.unregister()
-        self.handler = None
+        if self.observer:
+            self.observer.unregister()
+            self.observer = None
+        if self.handler:
+            self.handler.unregister()
+            self.handler = None
 
     def shutdown(self):
         self.stop_observer_and_handler()
