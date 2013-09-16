@@ -207,6 +207,9 @@ class NetworkStack(object):
         logger.debug("Account status changed...")
         # No logic or handlers have been added here yet
 
+    def get_username(self):
+        return self.active_account.get_nickname()
+
     """ Connection Logic """
 
     def initialize_connection(self, callback, event, parent, account):

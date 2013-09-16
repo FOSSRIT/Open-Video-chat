@@ -285,6 +285,9 @@ class Gui(Gtk.Grid):
 
             if channel:
 
+                # Post Local Copy
+                self.chat_write_line("%s [%s]: %s" % (self.get_username(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message))
+
                 # Send Message
                 self.send_chat_message(channel, message)
 

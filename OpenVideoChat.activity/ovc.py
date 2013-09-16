@@ -95,6 +95,7 @@ class OpenVideoChat(Gtk.Window):
         self.accounts.switch_active_account = self.network_stack.switch_active_account
         self.gui.create_chat_channel = self.network_stack.request_chat_channel
         self.gui.send_chat_message = self.network_stack.send_chat_message
+        self.gui.get_username = self.network_stack.get_username
 
         """ Setup GStreamer Stack """
 
