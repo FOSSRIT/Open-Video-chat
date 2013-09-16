@@ -45,8 +45,8 @@ class NetworkStack(object):
     """ Properties """
 
     call = None
-    observer = None
-    handler = None
+    chat_observer = None
+    chat_handler = None
     active_account = None
     active_connection = None
     close_channels = []
@@ -263,7 +263,7 @@ class NetworkStack(object):
     def configure_observer(self, account_manager):
 
         # Create an observer with class-level reference
-        self.observer = observer = Tp.SimpleObserver.new_with_am(
+        self.chat_observer = observer = Tp.SimpleObserver.new_with_am(
             account_manager,
             False,
             "OVC.Chat.Observer",
@@ -360,7 +360,7 @@ class NetworkStack(object):
 
             # Claim Channel
             operation.claim_with_async(
-                self.handler,
+                self.chat_handler,
                 self.claimed_chat_channel,
                 channels[0]
             )
@@ -439,12 +439,12 @@ class NetworkStack(object):
         self.close_channels = []
 
     def stop_observer_and_handler(self):
-        if self.observer:
-            self.observer.unregister()
-            self.observer = None
-        if self.handler:
-            self.handler.unregister()
-            self.handler = None
+        if self.chat_observer:
+            self.chat_observer.unregister()
+            self.chat_observer = None
+        if self.chat_handler:
+            self.chat_handler.unregister()
+            self.chat_handler = None
 
     def shutdown(self):
         self.stop_observer_and_handler()
