@@ -244,7 +244,7 @@ class Gui(Gtk.Grid):
 
         # Set it or Create it
         if active_row:
-            active_row[3] = Channel
+            active_row[3] = channel
 
         else:
             self.user_list_store.append([
