@@ -419,7 +419,7 @@ class NetworkStack(object):
 
         # Handle Pending Messages (Not sure why I need this in OVC but my example worked without it...)
         for message in channel.dup_pending_messages():
-            self.chat_message_received(channel, message, None)
+            self.chat_message_received(channel, message)
 
     """ Shutdown Process """
 
@@ -484,7 +484,7 @@ class NetworkStack(object):
     def chat_message_sent(self, channel, status, data):
         channel.send_message_finish(status)
 
-    def chat_message_received(self, channel, message, data):
+    def chat_message_received(self, channel, message):
         logger.debug("Processing received messsage...")
 
         # Acknowledge Message
