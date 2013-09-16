@@ -236,17 +236,28 @@ class Gui(Gtk.Grid):
 
         # Search for row
         active_row = None
+        active_buffer = None
         for row in self.user_list_store:
 
             # If contact is in our list set the row
             if contact is row[1]:
+                row[3] = channel
                 active_row = row
 
-        # Set it or Create it
-        if active_row:
-            active_row[3] = channel
+                # Close user list if matching selected
+                if self.chat_text_view.get_buffer() is row[2]:
 
-        else:
+                    # Note active buffer
+                    active_buffer = row[2]
+
+                    # Shrink users list
+                    self.user_list_expander.set_expanded(False)
+
+                    # Set focus into chat entry
+                    self.chat_entry.grab_focus()
+
+        # Set it or Create it
+        if active_row is None:
             active_row = [
                 contact.get_alias(),
                 contact,
@@ -255,17 +266,13 @@ class Gui(Gtk.Grid):
             ]
             self.user_list_store.append(active_row)
 
+            # Set buffer if not set
+            if active_buffer is None:
+                self.chat_text_view.set_buffer(active_row[2])
+                self.chat_entry.grab_focus()
+
         # Add text that user has joined channel
         self.chat_write_line("\tSYSTEM: [Established a channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
-
-        # Close user list if matching selected
-        if self.chat_text_view.get_buffer() is active_row[2]:
-
-            # Shrink users list
-            self.user_list_expander.set_expanded(False)
-
-            # Set focus into chat entry
-            self.chat_entry.grab_focus()
 
     def deactive_chat(self, callback, event, parent, account):
         self.chat_entry.set_sensitive(False)
