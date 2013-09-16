@@ -67,21 +67,18 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
         self.set_canvas(Gui())
         self.show()
 
-        # Sugar OVC uses it's own method of user connectivity
-        # To alleviate confusion we can disable the user-list in-app
-        self.get_canvas().hide_contacts()
+        # Sugar Logic Implementation
+        # **FIXME** Requires extraction of buddy info to get contact-id to establish channels
+        # if self.shared_activity:
+        #     if self.get_shared():
+        #         self.sugar_joined(None)
+        #     else:
+        #         self.sharing_handler = self.connect('shared', self.sugar_joined)
+        # else:
+        #     self.sharing_handler = self.connect('shared', self.sugar_shared)
 
-        # Sugar network logic implementation
-        # Will require connecting signals for joined/shared depending on shared state
-        # Store the signals to disconnect after first-run
-        # Also, logical changes involve establishing
-        if self.shared_activity:
-            if self.get_shared():
-                self.sugar_joined(None)
-            else:
-                self.sharing_handler = self.connect('shared', self.sugar_joined)
-        else:
-            self.sharing_handler = self.connect('shared', self.sugar_shared)
+        # Sugar Logic should override the use of a contacts list
+        # self.get_canvas().hide_contacts()
 
         """ Setup Network Stack """
         self.network_stack = NetworkStack({
