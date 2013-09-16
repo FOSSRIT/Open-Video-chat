@@ -103,9 +103,9 @@ class OpenVideoChatActivity(Activity):  # Sugar Activity Extends GtkWindow
         })
 
         # Register methods to network stack directly onto the ui components
-        self.accounts.switch_active_account = self.network_stack.switch_active_account
         self.get_canvas().create_chat_channel = self.network_stack.request_chat_channel
         self.get_canvas().send_chat_message = self.network_stack.send_chat_message
+        self.get_canvas().get_username = self.network_stack.get_username
 
         logger.info("Open Video Chat Prepared")
 
