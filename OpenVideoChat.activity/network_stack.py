@@ -370,6 +370,7 @@ class NetworkStack(object):
 
     def claimed_chat_channel(self, operation, status, channel):
         operation.claim_with_finish(status)
+        logger.debug("Claimed channel!")
 
         # Prepare Channel
         channel.prepare_async(None, self.chat_channel_activated, None)
@@ -404,6 +405,7 @@ class NetworkStack(object):
         channel.prepare_async(None, self.chat_channel_activated, None)
 
     def chat_channel_activated(self, channel, status, data):
+        logger.debug("Connecting channel callbacks...")
         channel.prepare_finish(status)
 
         # Append message processing

@@ -234,23 +234,37 @@ class Gui(Gtk.Grid):
         # Grab Contact from channel
         contact = channel.get_target_contact()
 
-        # Find row with contact & add channel
+        # Search for row
+        active_row = None
         for row in self.user_list_store:
 
-            # Add Channel to Row
+            # If contact is in our list set the row
             if contact is row[1]:
-                row[3] = channel
+            active_row = row
 
-                # **FIXME** Add a message that the user has joined the chat
+        # Set it or Create it
+        if active_row:
+            active_row[3] = Channel
 
-                # If contact is selected (buffer match) then do the reset:
-                if self.chat_text_view.get_buffer() is row[2]:
+        else:
+            self.user_list_store.append([
+                contact.get_alias(),
+                contact,
+                Gtk.TextBuffer(),
+                channel
+            ])
 
-                    # Shrink users list
-                    self.user_list_expander.set_expanded(False)
+        # Add text that user has joined channel
+        self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
 
-                    # Set focus into chat entry
-                    self.chat_entry.grab_focus()
+        # Close user list if matching selected
+        if self.chat_text_view.get_buffer() is active_row[2]:
+
+            # Shrink users list
+            self.user_list_expander.set_expanded(False)
+
+            # Set focus into chat entry
+            self.chat_entry.grab_focus()
 
     def deactive_chat(self, callback, event, parent, account):
         self.chat_entry.set_sensitive(False)
@@ -268,11 +282,10 @@ class Gui(Gtk.Grid):
                 if row[2] is self.chat_text_view.get_buffer():
                     channel = row[3]
 
-            # Send Message
-            self.send_chat_message(channel, message)
+            if channel:
 
-            # Run receive_message callback manually from network stack to handle posting locally
-            # Gotta make sure it won't create duplicates though once message_received is properly setup
+                # Send Message
+                self.send_chat_message(channel, message)
 
             self.chat_entry.set_text("")      # Empty Chat Entry
             self.chat_entry.grab_focus()      # Set focus back to chat entry
