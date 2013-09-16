@@ -247,18 +247,19 @@ class Gui(Gtk.Grid):
             active_row[3] = channel
 
         else:
-            self.user_list_store.append([
+            active_row = [
                 contact.get_alias(),
                 contact,
                 Gtk.TextBuffer(),
                 channel
-            ])
+            ]
+            self.user_list_store.append(active_row)
 
         # Add text that user has joined channel
-        self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
+        self.chat_write_line("\tSYSTEM: [Established a channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
 
         # Close user list if matching selected
-        if self.chat_text_view.get_buffer() and self.chat_text_view.get_buffer() is active_row[2]:
+        if self.chat_text_view.get_buffer() is active_row[2]:
 
             # Shrink users list
             self.user_list_expander.set_expanded(False)

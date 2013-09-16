@@ -417,6 +417,10 @@ class NetworkStack(object):
         # Run callbacks for new chat channel received
         self.run_callbacks('new_chat_channel', self, channel)
 
+        # Handle Pending Messages
+        pending = channel.dup_pending_message()
+        print pending
+
     """ Shutdown Process """
 
     def close_chat_channels(self, callback, event, parent, data):
