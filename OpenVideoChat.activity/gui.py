@@ -299,5 +299,5 @@ class Gui(Gtk.Grid):
         # Scroll to bottom
         self.chat_text_view.scroll_to_iter(self.chat_text_view.get_buffer().get_end_iter(), 0.1, False, 0.0, 0.0)
 
-    def receive_message(self, message, contact):
+    def receive_message(self, callback, event, parent, message, contact):
         self.chat_write_line("%s [%s]: %s" % (contact.get_alias(), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message.to_text()[0]))
