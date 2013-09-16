@@ -258,7 +258,7 @@ class Gui(Gtk.Grid):
         self.chat_write_line("\tSYSTEM: [Establishing channel with " + contact.get_alias() + "(" + contact.get_identifier() + ")...]")
 
         # Close user list if matching selected
-        if self.chat_text_view.get_buffer() is active_row[2]:
+        if self.chat_text_view.get_buffer() and self.chat_text_view.get_buffer() is active_row[2]:
 
             # Shrink users list
             self.user_list_expander.set_expanded(False)
