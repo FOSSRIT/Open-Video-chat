@@ -240,7 +240,7 @@ class Gui(Gtk.Grid):
 
             # If contact is in our list set the row
             if contact is row[1]:
-            active_row = row
+                active_row = row
 
         # Set it or Create it
         if active_row:
