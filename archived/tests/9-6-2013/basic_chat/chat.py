@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 # Imports
 from gi.repository import Gtk, TelepathyGLib as Tp
 import datetime
@@ -372,3 +371,14 @@ class Chat(Gtk.Grid):
 
     def message_sent(self, channel, status, data):
         channel.send_message_finish(status)
+
+# If executed stand-alone it will execute itself
+if __name__ == "__main__":
+
+    # Create a window to hold the chat system
+    window = Gtk.Window()
+    window.set_default_size(800, 600)
+    window.add(Chat())
+    window.connect('delete-event', Gtk.main_quit)
+    window.show_all()
+    Gtk.main()
