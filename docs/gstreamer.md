@@ -9,10 +9,11 @@ It is highly recommended that you give the "Manual" a brief run through, as it g
 As per the default format, here are a series of links to referance material:
 
 - [Manual](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/index.html)
-- [Documentation](http://gstreamer.freedesktop.org/documentation/)
-- [Core Docs](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/)
-- [Libraries Docs](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-libs/html/)
-- [Plugins Docs](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-base-libs/html/)
+- [All GStreamer Documentation](http://gstreamer.freedesktop.org/documentation/)
+- [GStreamer Core](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/)
+- [GStreamer Plugins Core](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer-plugins/html/)
+- [GStreamer Plugins Base](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-base-plugins/html/)
+- [GStreamer Plugins Good](http://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-good-plugins/html/)
 
 **There are multiple "sets" of separated plugins, and OVC uses a few from them.  Be sure to check the documentation page for more links to the other elements.**
 
