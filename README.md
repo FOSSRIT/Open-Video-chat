@@ -14,17 +14,16 @@ Current GSoC 2013 objectives are to get it running again on Sugar and porting a 
 ## Current Features & Status
 
 - Sugar3/Gtk3 Interface
-- text chat system on Telepathy channels
-- Incomplete GStreamer 1.0 & RTP upgrades
+- Gtk3 Cross-Platform Interface
+- Multi-Channel TelepathyGLib Text Chat
 
 
 ## Planned Features
 
-- Upwards of 30 frames per second
-- Cross Platform Gtk3
-- Audio
-- Higher Resolution or Scaling
-- Multi-User Implementation
+- Farstream Video & Audio / RTP
+- Sugar "Buddy" Contact-ID Conversion
+- Higher Resolution/Scaling
+- Performance Improvements
 
 
 ## IRC
